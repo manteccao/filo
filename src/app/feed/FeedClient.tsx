@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { BottomNav } from "@/components/BottomNav";
 
 const CATEGORIES = [
   "tutte",
@@ -26,18 +27,26 @@ export type FeedRecommendation = {
   profile: { full_name: string | null; city: string | null } | null;
 };
 
-function formatDate(value: string) {
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return value;
-  return new Intl.DateTimeFormat("it-IT", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(d);
+const AVATAR_COLORS = [
+  "bg-violet-600",
+  "bg-blue-600",
+  "bg-emerald-600",
+  "bg-rose-600",
+  "bg-amber-600",
+  "bg-cyan-600",
+  "bg-pink-600",
+  "bg-indigo-600",
+];
+
+function avatarColor(name: string): string {
+  let hash = 0;
+  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-function getRecommenderName(r: FeedRecommendation) {
-  return r.profile?.full_name ?? "Sconosciuto";
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
 }
 
 function ConnectionBadge({
@@ -51,20 +60,20 @@ function ConnectionBadge({
 }) {
   if (followingIds.includes(userId)) {
     return (
-      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-400 ring-1 ring-emerald-500/30">
+      <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(16,185,129,0.15)", color: "#10B981" }}>
         1° grado
       </span>
     );
   }
   if (secondDegreeIds.includes(userId)) {
     return (
-      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-medium text-amber-400 ring-1 ring-amber-500/30">
+      <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B" }}>
         2° grado
       </span>
     );
   }
   return (
-    <span className="rounded-full bg-zinc-700/40 px-2 py-0.5 text-[10px] font-medium text-zinc-400 ring-1 ring-white/10">
+    <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold" style={{ background: "rgba(107,114,128,0.2)", color: "#6B7280" }}>
       Community
     </span>
   );
@@ -82,177 +91,175 @@ export function FeedClient({
   const [city, setCity] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("tutte");
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
+  const [showFilters, setShowFilters] = useState(false);
 
   const filtered = useMemo(() => {
     const cityQ = city.trim().toLowerCase();
-    const catQ = category;
-
     return recommendations.filter((r) => {
-      const matchCity = cityQ
-        ? (r.city ?? "").toLowerCase().includes(cityQ)
-        : true;
-      const matchCategory =
-        catQ === "tutte" ? true : (r.category ?? "") === catQ;
-      const matchFollow =
-        mode === "tutti" ? true : followingIds.includes(r.user_id);
+      const matchCity = cityQ ? (r.city ?? "").toLowerCase().includes(cityQ) : true;
+      const matchCategory = category === "tutte" ? true : (r.category ?? "") === category;
+      const matchFollow = mode === "tutti" ? true : followingIds.includes(r.user_id);
       return matchCity && matchCategory && matchFollow;
     });
   }, [recommendations, city, category, mode, followingIds]);
 
   return (
-    <div className="flex min-h-[calc(100vh-0px)] flex-1 flex-col bg-black text-zinc-50">
-      <header className="sticky top-0 z-10 border-b border-white/10 bg-black/70 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between px-6">
-          <a href="/feed" className="text-sm font-semibold tracking-tight">
-            Filo
-          </a>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="/add"
-              className="inline-flex h-9 items-center justify-center rounded-xl bg-white px-4 text-sm font-medium text-black transition hover:bg-zinc-200"
-            >
-              Aggiungi
-            </a>
-            <a
-              href="/users"
-              className="hidden text-xs text-zinc-400 hover:text-zinc-200 sm:inline-flex"
-            >
-              Persone
-            </a>
-          </div>
-
-          <a
-            href="/profile"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/40 text-sm text-zinc-200 transition hover:bg-zinc-900"
-            aria-label="Profilo"
-            title="Profilo"
-          >
-            <span className="h-2 w-2 rounded-full bg-zinc-600" />
-          </a>
+    <div className="min-h-svh bg-[#0a0a0a] text-white">
+      {/* Top header */}
+      <header className="sticky top-0 z-40 border-b border-[#222222] bg-[#0a0a0a]">
+        <div className="mx-auto flex h-12 max-w-[430px] items-center justify-center px-4">
+          <span className="text-base font-bold tracking-tight text-white">Filo</span>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-8">
-        <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex items-center gap-1 rounded-full bg-zinc-900/80 p-1 text-xs text-zinc-300">
-              <button
-                type="button"
-                onClick={() => setMode("tutti")}
-                className={`h-7 rounded-full px-3 ${
-                  mode === "tutti"
-                    ? "bg-white text-black"
-                    : "text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                Tutti
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("seguiti")}
-                className={`h-7 rounded-full px-3 ${
-                  mode === "seguiti"
-                    ? "bg-white text-black"
-                    : "text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                Seguiti
-              </button>
-            </div>
+      <main className="mx-auto max-w-[430px] px-4 pb-24 pt-4">
+        {/* Mode toggle + filter toggle */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-1 rounded-full bg-[#111111] p-1">
+            <button
+              type="button"
+              onClick={() => setMode("tutti")}
+              className={`h-7 rounded-full px-4 text-xs font-medium transition ${
+                mode === "tutti" ? "bg-white text-black" : "text-[#9CA3AF]"
+              }`}
+            >
+              Tutti
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("seguiti")}
+              className={`h-7 rounded-full px-4 text-xs font-medium transition ${
+                mode === "seguiti" ? "bg-white text-black" : "text-[#9CA3AF]"
+              }`}
+            >
+              Seguiti
+            </button>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-wider text-zinc-500">
-                Città
-              </label>
-              <input
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Es. Milano"
-                className="h-11 w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 text-sm text-zinc-50 placeholder:text-zinc-500 outline-none transition focus:border-white/20 focus:bg-zinc-900"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-wider text-zinc-500">
-                Categoria
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as CategoryFilter)}
-                className="h-11 w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 text-sm text-zinc-50 outline-none transition focus:border-white/20 focus:bg-zinc-900"
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c} className="bg-zinc-950">
-                    {c === "tutte"
-                      ? "Tutte le categorie"
-                      : c.charAt(0).toUpperCase() + c.slice(1)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowFilters((v) => !v)}
+            className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              showFilters || city || category !== "tutte"
+                ? "border-[#8B5CF6] text-[#8B5CF6]"
+                : "border-[#222222] text-[#9CA3AF]"
+            }`}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+            Filtri
+          </button>
         </div>
 
-        <div className="mt-6">
-          {recommendations.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 text-sm text-zinc-300">
-              Nessuna raccomandazione ancora. Aggiungi la prima!
+        {/* Filter panel */}
+        {showFilters && (
+          <div className="mb-4 rounded-2xl border border-[#222222] bg-[#111111] p-4 space-y-3">
+            <input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="Cerca per città…"
+              className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]"
+            />
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCategory(c)}
+                  className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                    category === c
+                      ? "bg-[#8B5CF6] text-white"
+                      : "border border-[#222222] text-[#9CA3AF]"
+                  }`}
+                >
+                  {c === "tutte" ? "Tutte" : c.charAt(0).toUpperCase() + c.slice(1)}
+                </button>
+              ))}
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 text-sm text-zinc-300">
-              Nessuna raccomandazione trovata per questa ricerca
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {filtered.map((r) => (
+          </div>
+        )}
+
+        {/* Cards */}
+        {recommendations.length === 0 ? (
+          <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 text-center text-sm text-[#9CA3AF]">
+            Nessuna raccomandazione ancora.<br />Aggiungi la prima!
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-[#222222] bg-[#111111] p-6 text-center text-sm text-[#9CA3AF]">
+            Nessun risultato per questa ricerca.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {filtered.map((r) => {
+              const profColor = avatarColor(r.professional_name);
+              const recColor = avatarColor(r.profile?.full_name ?? "");
+              const recommenderName = r.profile?.full_name ?? "Sconosciuto";
+
+              return (
                 <article
                   key={r.id}
-                  className="rounded-2xl border border-white/10 bg-zinc-950/60 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]"
+                  className="rounded-2xl border border-[#222222] bg-[#111111] p-4"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-lg font-semibold tracking-tight">
-                        {r.professional_name}
-                      </h2>
-                      <p className="mt-1 text-sm text-zinc-400">
-                        {r.category} · {r.city}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-col items-end gap-1.5">
-                      <ConnectionBadge
-                        userId={r.user_id}
-                        followingIds={followingIds}
-                        secondDegreeIds={secondDegreeIds}
-                      />
-                      <time
-                        className="text-xs text-zinc-500"
-                        dateTime={r.created_at}
-                        title={r.created_at}
+                  {/* Top row: avatar + info + badge */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white ${profColor}`}
                       >
-                        {formatDate(r.created_at)}
-                      </time>
+                        {initials(r.professional_name)}
+                      </div>
+                      <div className="min-w-0">
+                        <h2 className="text-[17px] font-bold leading-tight text-white">
+                          {r.professional_name}
+                        </h2>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                          <span className="rounded-full bg-[#8B5CF6]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#A78BFA]">
+                            {r.category.charAt(0).toUpperCase() + r.category.slice(1)}
+                          </span>
+                          <span className="flex items-center gap-1 text-[11px] text-[#9CA3AF]">
+                            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0">
+                              <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.003 3.5-4.697 3.5-8.333 0-4.36-3.515-7.498-7.5-7.498S4.5 7.64 4.5 12c0 3.636 1.556 6.33 3.5 8.333a19.583 19.583 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+                            </svg>
+                            {r.city}
+                          </span>
+                        </div>
+                      </div>
                     </div>
+                    <ConnectionBadge
+                      userId={r.user_id}
+                      followingIds={followingIds}
+                      secondDegreeIds={secondDegreeIds}
+                    />
                   </div>
 
+                  {/* Note */}
                   {r.note ? (
-                    <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-zinc-200">
+                    <p className="mt-3 text-sm leading-relaxed text-[#D1D5DB]">
                       {r.note}
                     </p>
                   ) : null}
 
-                  <div className="mt-4 flex items-center justify-between gap-4 text-xs text-zinc-500">
-                    <span>Consigliato da {getRecommenderName(r)}</span>
+                  {/* Footer */}
+                  <div className="mt-3 flex items-center gap-2 border-t border-[#222222] pt-3">
+                    <div
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${recColor}`}
+                    >
+                      {initials(recommenderName)}
+                    </div>
+                    <span className="text-xs text-[#9CA3AF]">
+                      Consigliato da{" "}
+                      <span className="font-medium text-white">{recommenderName}</span>
+                    </span>
                   </div>
                 </article>
-              ))}
-            </div>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </main>
+
+      <BottomNav />
     </div>
   );
 }
-

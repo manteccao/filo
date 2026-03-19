@@ -16,7 +16,7 @@ export function ShareProfileButton({ username }: { username: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/50 px-4 text-sm text-zinc-100 transition hover:bg-zinc-900"
+      className="h-10 w-full rounded-2xl border border-[#222222] bg-[#111111] text-sm font-medium text-white transition hover:border-[#8B5CF6]/50 hover:text-[#A78BFA]"
     >
       {copied ? "Link copiato!" : "Condividi il tuo profilo"}
     </button>

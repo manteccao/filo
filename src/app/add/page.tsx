@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { BottomNav } from "@/components/BottomNav";
 
 const CATEGORIES = [
   "dentista",
@@ -75,113 +75,106 @@ export default async function AddRecommendationPage({
   const { error } = await searchParams;
 
   return (
-    <div className="flex flex-1 items-center justify-center bg-black px-6 py-16 text-zinc-50">
-      <div className="w-full max-w-xl">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200"
-        >
-          <span className="h-2 w-2 rounded-full bg-zinc-700" />
-          Torna alla home
-        </Link>
-
-        <div className="mt-6 rounded-2xl border border-white/10 bg-zinc-950/60 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Aggiungi una raccomandazione
-          </h1>
-          <p className="mt-2 text-sm leading-6 text-zinc-400">
-            Consiglia un professionista di fiducia con una nota personale.
-          </p>
-
-          <form action={addRecommendation} className="mt-6 space-y-4">
-            {error ? (
-              <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                {error}
-              </div>
-            ) : null}
-
-            <div className="space-y-2">
-              <label
-                className="text-sm text-zinc-300"
-                htmlFor="professionalName"
-              >
-                Nome del professionista
-              </label>
-              <input
-                id="professionalName"
-                name="professionalName"
-                type="text"
-                required
-                placeholder="Es. Dott. Luca Bianchi"
-                className="h-11 w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 text-sm text-zinc-50 placeholder:text-zinc-500 outline-none transition focus:border-white/20 focus:bg-zinc-900"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm text-zinc-300" htmlFor="category">
-                  Categoria
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  required
-                  defaultValue=""
-                  className="h-11 w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 text-sm text-zinc-50 outline-none transition focus:border-white/20 focus:bg-zinc-900"
-                >
-                  <option value="" disabled className="bg-zinc-950">
-                    Seleziona…
-                  </option>
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c} className="bg-zinc-950">
-                      {c.charAt(0).toUpperCase() + c.slice(1)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm text-zinc-300" htmlFor="city">
-                  Città
-                </label>
-                <input
-                  id="city"
-                  name="city"
-                  type="text"
-                  required
-                  placeholder="Es. Milano"
-                  className="h-11 w-full rounded-xl border border-white/10 bg-zinc-900/60 px-4 text-sm text-zinc-50 placeholder:text-zinc-500 outline-none transition focus:border-white/20 focus:bg-zinc-900"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between gap-4">
-                <label className="text-sm text-zinc-300" htmlFor="note">
-                  Nota personale
-                </label>
-                <span className="text-xs text-zinc-500">Max 300 caratteri</span>
-              </div>
-              <textarea
-                id="note"
-                name="note"
-                maxLength={300}
-                rows={5}
-                placeholder="Perché lo/la consigli? Cosa ti ha colpito?"
-                className="w-full resize-none rounded-xl border border-white/10 bg-zinc-900/60 px-4 py-3 text-sm text-zinc-50 placeholder:text-zinc-500 outline-none transition focus:border-white/20 focus:bg-zinc-900"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-white px-4 text-sm font-medium text-black transition hover:bg-zinc-200"
-            >
-              Salva raccomandazione
-            </button>
-          </form>
+    <div className="min-h-svh bg-[#0a0a0a] text-white">
+      {/* Top header */}
+      <header className="sticky top-0 z-40 border-b border-[#222222] bg-[#0a0a0a]">
+        <div className="mx-auto flex h-12 max-w-[430px] items-center justify-center px-4">
+          <span className="text-base font-bold tracking-tight text-white">Filo</span>
         </div>
-      </div>
+      </header>
+
+      <main className="mx-auto max-w-[430px] px-4 pb-24 pt-6">
+        <h1 className="text-xl font-bold tracking-tight">
+          Nuova raccomandazione
+        </h1>
+        <p className="mt-1 text-sm text-[#9CA3AF]">
+          Consiglia un professionista di fiducia con una nota personale.
+        </p>
+
+        <form action={addRecommendation} className="mt-6 space-y-4">
+          {error ? (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {error}
+            </div>
+          ) : null}
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]" htmlFor="professionalName">
+              Nome del professionista
+            </label>
+            <input
+              id="professionalName"
+              name="professionalName"
+              type="text"
+              required
+              placeholder="Es. Dott. Luca Bianchi"
+              className="h-12 w-full rounded-2xl border border-[#222222] bg-[#111111] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-[#8B5CF6]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]" htmlFor="category">
+              Categoria
+            </label>
+            <select
+              id="category"
+              name="category"
+              required
+              defaultValue=""
+              className="h-12 w-full rounded-2xl border border-[#222222] bg-[#111111] px-4 text-sm text-white outline-none transition focus:border-[#8B5CF6]"
+            >
+              <option value="" disabled className="bg-[#111111]">
+                Seleziona…
+              </option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c} className="bg-[#111111]">
+                  {c.charAt(0).toUpperCase() + c.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]" htmlFor="city">
+              Città
+            </label>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              required
+              placeholder="Es. Milano"
+              className="h-12 w-full rounded-2xl border border-[#222222] bg-[#111111] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-[#8B5CF6]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]" htmlFor="note">
+                Nota personale
+              </label>
+              <span className="text-xs text-[#6B7280]">Max 300 caratteri</span>
+            </div>
+            <textarea
+              id="note"
+              name="note"
+              maxLength={300}
+              rows={5}
+              placeholder="Perché lo/la consigli? Cosa ti ha colpito?"
+              className="w-full resize-none rounded-2xl border border-[#222222] bg-[#111111] px-4 py-3 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-[#8B5CF6]"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="mt-2 h-12 w-full rounded-2xl bg-[#8B5CF6] text-sm font-semibold text-white shadow-[0_0_24px_rgba(139,92,246,0.35)] transition hover:bg-[#7C3AED] active:scale-[0.98]"
+          >
+            Salva raccomandazione
+          </button>
+        </form>
+      </main>
+
+      <BottomNav />
     </div>
   );
 }
-
