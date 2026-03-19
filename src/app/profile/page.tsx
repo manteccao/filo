@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { ShareProfileButton } from "./ShareProfileButton";
+import { InviteFriendsSection } from "./InviteFriendsSection";
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -86,6 +87,10 @@ export default async function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {username ? (
+          <InviteFriendsSection username={username} fullName={fullName} />
+        ) : null}
       </div>
     </div>
   );
