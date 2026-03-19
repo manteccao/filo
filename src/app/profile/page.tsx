@@ -2,6 +2,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { ShareProfileButton } from "./ShareProfileButton";
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -21,6 +22,14 @@ export default async function ProfilePage() {
   const fullName = String(user.user_metadata?.full_name ?? "Utente");
   const city = String(user.user_metadata?.city ?? "");
   const avatarUrl = String(user.user_metadata?.avatar_url ?? "");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username")
+    .eq("id", user.id)
+    .single();
+
+  const username = profile?.username ?? null;
 
   return (
     <div className="flex flex-1 items-center justify-center bg-black px-6 py-16 text-zinc-50">
@@ -49,14 +58,19 @@ export default async function ProfilePage() {
             </div>
           </div>
 
-          <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/50 px-4 text-sm text-zinc-100 transition hover:bg-zinc-900"
-            >
-              Logout
-            </button>
-          </form>
+          <div className="flex flex-col items-end gap-2">
+            {username ? (
+              <ShareProfileButton username={username} />
+            ) : null}
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                className="inline-flex h-10 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/50 px-4 text-sm text-zinc-100 transition hover:bg-zinc-900"
+              >
+                Logout
+              </button>
+            </form>
+          </div>
         </div>
 
         <div className="mt-6 rounded-xl border border-white/10 bg-black/30 p-4">
