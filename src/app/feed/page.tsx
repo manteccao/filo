@@ -47,10 +47,31 @@ export default async function FeedPage() {
 
   const followingIds = (follows ?? []).map((f) => f.following_id as string);
 
+  const { data: secondDegreeFollows } = followingIds.length
+    ? await supabase
+        .from("follows")
+        .select("following_id")
+        .in("follower_id", followingIds)
+    : Promise.resolve({ data: [] });
+
+  const secondDegreeIds = Array.from(
+    new Set(
+      (secondDegreeFollows ?? [])
+        .map((f) => f.following_id as string)
+        .filter((id) => id !== data.user.id && !followingIds.includes(id)),
+    ),
+  );
+
   const merged: FeedRecommendation[] = recommendations.map((r) => ({
     ...r,
     profile: profileById.get(r.user_id) ?? null,
   }));
 
-  return <FeedClient recommendations={merged} followingIds={followingIds} />;
+  return (
+    <FeedClient
+      recommendations={merged}
+      followingIds={followingIds}
+      secondDegreeIds={secondDegreeIds}
+    />
+  );
 }

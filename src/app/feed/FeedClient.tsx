@@ -40,12 +40,44 @@ function getRecommenderName(r: FeedRecommendation) {
   return r.profile?.full_name ?? "Sconosciuto";
 }
 
+function ConnectionBadge({
+  userId,
+  followingIds,
+  secondDegreeIds,
+}: {
+  userId: string;
+  followingIds: string[];
+  secondDegreeIds: string[];
+}) {
+  if (followingIds.includes(userId)) {
+    return (
+      <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-400 ring-1 ring-emerald-500/30">
+        1° grado
+      </span>
+    );
+  }
+  if (secondDegreeIds.includes(userId)) {
+    return (
+      <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-medium text-amber-400 ring-1 ring-amber-500/30">
+        2° grado
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-full bg-zinc-700/40 px-2 py-0.5 text-[10px] font-medium text-zinc-400 ring-1 ring-white/10">
+      Community
+    </span>
+  );
+}
+
 export function FeedClient({
   recommendations,
   followingIds,
+  secondDegreeIds,
 }: {
   recommendations: FeedRecommendation[];
   followingIds: string[];
+  secondDegreeIds: string[];
 }) {
   const [city, setCity] = useState("");
   const [category, setCategory] = useState<CategoryFilter>("tutte");
@@ -189,13 +221,20 @@ export function FeedClient({
                         {r.category} · {r.city}
                       </p>
                     </div>
-                    <time
-                      className="shrink-0 text-xs text-zinc-500"
-                      dateTime={r.created_at}
-                      title={r.created_at}
-                    >
-                      {formatDate(r.created_at)}
-                    </time>
+                    <div className="flex shrink-0 flex-col items-end gap-1.5">
+                      <ConnectionBadge
+                        userId={r.user_id}
+                        followingIds={followingIds}
+                        secondDegreeIds={secondDegreeIds}
+                      />
+                      <time
+                        className="text-xs text-zinc-500"
+                        dateTime={r.created_at}
+                        title={r.created_at}
+                      >
+                        {formatDate(r.created_at)}
+                      </time>
+                    </div>
                   </div>
 
                   {r.note ? (
