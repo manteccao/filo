@@ -47,12 +47,12 @@ export default async function FeedPage() {
 
   const followingIds = (follows ?? []).map((f) => f.following_id as string);
 
-  const { data: secondDegreeFollows } = followingIds.length
-    ? await supabase
+  const { data: secondDegreeFollows } = await (followingIds.length
+    ? supabase
         .from("follows")
         .select("following_id")
         .in("follower_id", followingIds)
-    : Promise.resolve({ data: [] });
+    : Promise.resolve({ data: [] }));
 
   const secondDegreeIds = Array.from(
     new Set(
