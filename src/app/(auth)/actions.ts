@@ -21,7 +21,7 @@ export async function signUp(formData: FormData) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -34,6 +34,21 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     errorRedirect("/register", error.message);
+  }
+
+  // Best-effort profile creation. If email confirmation is enabled,
+  // `data.user` can be null here until the user verifies.
+  if (data.user?.id) {
+    const { error: profileError } = await supabase.from("profiles").insert({
+      id: data.user.id,
+      full_name: fullName,
+      city,
+    });
+
+    // Ignore duplicates (e.g., if a trigger already created it)
+    if (profileError && profileError.code !== "23505") {
+      errorRedirect("/register", profileError.message);
+    }
   }
 
   redirect("/feed");

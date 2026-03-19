@@ -52,30 +52,25 @@ export default async function UsersPage() {
         </p>
 
         <div className="mt-6 flex flex-col gap-3">
-          {(profiles ?? []).map((p) => {
-            const isCurrent = p.id === user.id;
-            const isFollowing = followingIds.has(p.id);
+          {(profiles ?? [])
+            .filter((p) => p.id !== user.id)
+            .map((p) => {
+              const isFollowing = followingIds.has(p.id);
 
-            return (
-              <div
-                key={p.id}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-zinc-950/60 px-4 py-3"
-              >
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-zinc-100">
-                    {p.full_name ?? "Senza nome"}
-                    {isCurrent ? (
-                      <span className="ml-2 rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300">
-                        Tu
-                      </span>
-                    ) : null}
-                  </span>
-                  <span className="text-xs text-zinc-500">
-                    {p.city ?? "Città non specificata"}
-                  </span>
-                </div>
+              return (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-zinc-950/60 px-4 py-3"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-zinc-100">
+                      {p.full_name ?? "Senza nome"}
+                    </span>
+                    <span className="text-xs text-zinc-500">
+                      {p.city ?? "Città non specificata"}
+                    </span>
+                  </div>
 
-                {isCurrent ? null : (
                   <form
                     action={isFollowing ? unfollowUser : followUser}
                     className="shrink-0"
@@ -92,10 +87,9 @@ export default async function UsersPage() {
                       {isFollowing ? "Smetti di seguire" : "Segui"}
                     </button>
                   </form>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
         </div>
       </main>
     </div>
