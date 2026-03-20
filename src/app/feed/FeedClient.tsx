@@ -172,9 +172,10 @@ function CommentsDrawer({
 
       {/* Drawer panel */}
       <div
-        className={`relative flex max-h-[75dvh] min-h-[40dvh] flex-col rounded-t-3xl bg-[#111111] border-t border-[#1F2937] transition-transform duration-300 ease-out ${
+        className={`relative flex flex-col rounded-t-3xl bg-[#111111] border-t border-[#1F2937] transition-transform duration-300 ease-out ${
           visible ? "translate-y-0" : "translate-y-full"
         }`}
+        style={{ maxHeight: "75dvh" }}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
@@ -225,7 +226,7 @@ function CommentsDrawer({
         </div>
 
         {/* Input */}
-        <div className="shrink-0 border-t border-[#1F2937] px-4 py-3 pb-safe">
+        <div className="shrink-0 border-t border-[#1F2937] px-4 py-4">
           <form onSubmit={handlePost} className="flex items-center gap-2">
             <input
               value={text}
