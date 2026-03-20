@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { BottomNav } from "@/components/BottomNav";
 import { deleteRecommendation, updateRecommendation } from "./actions";
+import { createClient } from "@/lib/supabase/browser";
 
 export type FeedRecommendation = {
   id: string;
@@ -14,6 +15,14 @@ export type FeedRecommendation = {
   note: string | null;
   created_at: string;
   profile: { full_name: string | null; city: string | null } | null;
+};
+
+type Comment = {
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  full_name: string | null;
 };
 
 const EDIT_CATEGORIES = [
@@ -43,6 +52,10 @@ function initials(name: string) {
     .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
 }
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+}
+
 function ConnectionBadge({ userId, followingIds, secondDegreeIds }: {
   userId: string;
   followingIds: string[];
@@ -69,11 +82,185 @@ function ConnectionBadge({ userId, followingIds, secondDegreeIds }: {
   );
 }
 
-function PostCard({ r, followingIds, secondDegreeIds, isOwner }: {
+// ─── Comments Drawer ──────────────────────────────────────────────────────────
+
+function CommentsDrawer({
+  recommendationId,
+  currentUserId,
+  onClose,
+  onCountChange,
+}: {
+  recommendationId: string;
+  currentUserId: string;
+  onClose: () => void;
+  onCountChange: (n: number) => void;
+}) {
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [text, setText] = useState("");
+  const [posting, setPosting] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setVisible(true));
+
+    async function load() {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("comments_with_profile")
+        .select("id, user_id, content, created_at, full_name")
+        .eq("recommendation_id", recommendationId)
+        .order("created_at", { ascending: true });
+      const list = (data as Comment[]) ?? [];
+      setComments(list);
+      onCountChange(list.length);
+      setLoading(false);
+    }
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recommendationId]);
+
+  // Lock body scroll while drawer is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  function handleClose() {
+    setVisible(false);
+    setTimeout(onClose, 280);
+  }
+
+  async function handlePost(e: React.FormEvent) {
+    e.preventDefault();
+    const content = text.trim();
+    if (!content || posting) return;
+    setPosting(true);
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("comments")
+      .insert({ recommendation_id: recommendationId, user_id: currentUserId, content })
+      .select("id, user_id, content, created_at")
+      .single();
+    if (!error && data) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", currentUserId)
+        .single();
+      const newComment: Comment = {
+        ...(data as Omit<Comment, "full_name">),
+        full_name: (profile as { full_name: string | null } | null)?.full_name ?? null,
+      };
+      const updated = [...comments, newComment];
+      setComments(updated);
+      onCountChange(updated.length);
+      setText("");
+      setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+    }
+    setPosting(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+      {/* Backdrop */}
+      <div
+        className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
+        onClick={handleClose}
+      />
+
+      {/* Drawer panel */}
+      <div
+        className={`relative flex max-h-[75dvh] min-h-[40dvh] flex-col rounded-t-3xl bg-[#111111] border-t border-[#1F2937] transition-transform duration-300 ease-out ${
+          visible ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1 shrink-0">
+          <div className="h-1 w-10 rounded-full bg-[#374151]" />
+        </div>
+
+        {/* Title */}
+        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-[#1F2937]">
+          <h3 className="text-sm font-semibold text-white">Commenti</h3>
+          <button type="button" onClick={handleClose} className="rounded-full p-1 text-[#6B7280] transition hover:text-white">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Comments list */}
+        <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+            </div>
+          ) : comments.length === 0 ? (
+            <p className="py-10 text-center text-sm text-[#6B7280]">
+              Nessun commento ancora. Sii il primo!
+            </p>
+          ) : (
+            <div className="space-y-5">
+              {comments.map((c) => {
+                const name = c.full_name ?? "Utente";
+                return (
+                  <div key={c.id} className="flex gap-3">
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${avatarColor(name)}`}>
+                      {initials(name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-semibold text-white">{name}</span>
+                        <span className="text-[10px] text-[#6B7280]">{formatDate(c.created_at)}</span>
+                      </div>
+                      <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{c.content}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        <div className="shrink-0 border-t border-[#1F2937] px-4 py-3 pb-safe">
+          <form onSubmit={handlePost} className="flex items-center gap-2">
+            <input
+              value={text}
+              onChange={(e) => setText(e.target.value.slice(0, 500))}
+              placeholder="Scrivi un commento…"
+              className="h-10 flex-1 rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-600"
+            />
+            <button
+              type="submit"
+              disabled={!text.trim() || posting}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-teal-600 to-cyan-500 text-white transition disabled:opacity-40"
+            >
+              {posting ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Post Card ────────────────────────────────────────────────────────────────
+
+function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId }: {
   r: FeedRecommendation;
   followingIds: string[];
   secondDegreeIds: string[];
   isOwner: boolean;
+  currentUserId: string;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -82,7 +269,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner }: {
   const [saving, setSaving] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likesCount] = useState(() => Math.floor(Math.random() * 40 + 1));
-  const [commentsCount] = useState(() => Math.floor(Math.random() * 10));
+  const [commentsCount, setCommentsCount] = useState(0);
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const [draft, setDraft] = useState({
@@ -178,138 +366,152 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner }: {
   }
 
   return (
-    <article className="rounded-[20px] border border-teal-900/40 bg-[#111111] overflow-hidden">
-      {/* TOP — avatar + nome recommender + badge + menu */}
-      <div className="flex items-center gap-3 px-5 pt-5 pb-4">
-        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white ${recColor}`}>
-          {initials(recommenderName)}
+    <>
+      <article className="rounded-[20px] border border-teal-900/40 bg-[#111111] overflow-hidden">
+        {/* TOP */}
+        <div className="flex items-center gap-3 px-5 pt-5 pb-4">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-xs font-bold text-white ${recColor}`}>
+            {initials(recommenderName)}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-white">{recommenderName}</p>
+            <p className="text-[11px] text-[#9CA3AF]">ha consigliato</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <ConnectionBadge userId={r.user_id} followingIds={followingIds} secondDegreeIds={secondDegreeIds} />
+            {isOwner && (
+              <div ref={menuRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#6B7280] transition hover:bg-[#1F2937] hover:text-white"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                    <path d="M12 6a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4z" />
+                  </svg>
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 top-8 z-10 min-w-[130px] overflow-hidden rounded-2xl border border-[#1F2937] bg-[#0a0a0a] shadow-2xl">
+                    <button type="button" onClick={() => { setMenuOpen(false); setEditing(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-white hover:bg-[#111111]">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4 text-teal-400">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                      </svg>
+                      Modifica
+                    </button>
+                    <button type="button" onClick={() => { setMenuOpen(false); setConfirming(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-[#111111]">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                      </svg>
+                      Elimina
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-white">{recommenderName}</p>
-          <p className="text-[11px] text-[#9CA3AF]">ha consigliato</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <ConnectionBadge userId={r.user_id} followingIds={followingIds} secondDegreeIds={secondDegreeIds} />
-          {isOwner && (
-            <div ref={menuRef} className="relative">
-              <button
-                type="button"
-                onClick={() => setMenuOpen((v) => !v)}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-[#6B7280] transition hover:bg-[#1F2937] hover:text-white"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                  <path d="M12 6a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4zm0 8a2 2 0 110-4 2 2 0 010 4z" />
-                </svg>
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 top-8 z-10 min-w-[130px] overflow-hidden rounded-2xl border border-[#1F2937] bg-[#0a0a0a] shadow-2xl">
-                  <button type="button" onClick={() => { setMenuOpen(false); setEditing(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-white hover:bg-[#111111]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4 text-teal-400">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-                    </svg>
-                    Modifica
-                  </button>
-                  <button type="button" onClick={() => { setMenuOpen(false); setConfirming(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-[#111111]">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                    </svg>
-                    Elimina
-                  </button>
-                </div>
-              )}
+
+        {/* Divider */}
+        <div className="mx-5 h-px bg-[#1F2937]" />
+
+        {/* CENTER */}
+        <div className="px-5 py-4">
+          <h2 className="text-2xl font-bold leading-tight text-white">{r.professional_name}</h2>
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 px-3 py-1 text-xs font-semibold text-white">
+              {r.category.charAt(0).toUpperCase() + r.category.slice(1)}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-[#9CA3AF]">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0 text-teal-500">
+                <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.003 3.5-4.697 3.5-8.333 0-4.36-3.515-7.498-7.5-7.498S4.5 7.64 4.5 12c0 3.636 1.556 6.33 3.5 8.333a19.583 19.583 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+              </svg>
+              {r.city}
+            </span>
+          </div>
+
+          {r.note ? (
+            <p className="mt-3 text-sm leading-relaxed text-[#9CA3AF]">{r.note}</p>
+          ) : null}
+
+          {confirming && (
+            <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
+              <p className="text-xs text-red-300">Eliminare questa raccomandazione?</p>
+              <div className="mt-2 flex gap-2">
+                <button type="button" onClick={() => setConfirming(false)} className="h-8 flex-1 rounded-lg border border-[#1F2937] text-xs text-[#9CA3AF] hover:text-white">
+                  Annulla
+                </button>
+                <button type="button" onClick={handleDelete} disabled={deleting} className="h-8 flex-1 rounded-lg bg-red-500 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50">
+                  {deleting ? "…" : "Elimina"}
+                </button>
+              </div>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Divider */}
-      <div className="mx-5 h-px bg-[#1F2937]" />
-
-      {/* CENTER — professional info */}
-      <div className="px-5 py-4">
-        <h2 className="text-2xl font-bold leading-tight text-white">{r.professional_name}</h2>
-        <div className="mt-2.5 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 px-3 py-1 text-xs font-semibold text-white">
-            {r.category.charAt(0).toUpperCase() + r.category.slice(1)}
-          </span>
-          <span className="flex items-center gap-1 text-xs text-[#9CA3AF]">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0 text-teal-500">
-              <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.003 3.5-4.697 3.5-8.333 0-4.36-3.515-7.498-7.5-7.498S4.5 7.64 4.5 12c0 3.636 1.556 6.33 3.5 8.333a19.583 19.583 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
-            </svg>
-            {r.city}
-          </span>
-        </div>
-
-        {r.note ? (
-          <p className="mt-3 text-sm leading-relaxed text-[#9CA3AF]">{r.note}</p>
-        ) : null}
-
-        {/* Confirm delete */}
-        {confirming && (
-          <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
-            <p className="text-xs text-red-300">Eliminare questa raccomandazione?</p>
-            <div className="mt-2 flex gap-2">
-              <button type="button" onClick={() => setConfirming(false)} className="h-8 flex-1 rounded-lg border border-[#1F2937] text-xs text-[#9CA3AF] hover:text-white">
-                Annulla
-              </button>
-              <button type="button" onClick={handleDelete} disabled={deleting} className="h-8 flex-1 rounded-lg bg-red-500 text-xs font-semibold text-white hover:bg-red-600 disabled:opacity-50">
-                {deleting ? "…" : "Elimina"}
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* BOTTOM — like, comment, share */}
-      <div className="flex items-center gap-1 border-t border-[#1F2937] px-4 py-3">
-        {/* Like */}
-        <button
-          type="button"
-          onClick={() => setLiked((v) => !v)}
-          className="flex items-center gap-1.5 rounded-xl px-3 py-2 transition hover:bg-[#1F2937]"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill={liked ? "currentColor" : "none"}
-            stroke="currentColor"
-            strokeWidth={1.8}
-            className={`h-5 w-5 transition-all duration-200 ${liked ? "scale-110 text-red-500" : "text-[#6B7280]"}`}
+        {/* BOTTOM */}
+        <div className="flex items-center gap-1 border-t border-[#1F2937] px-4 py-3">
+          {/* Like */}
+          <button
+            type="button"
+            onClick={() => setLiked((v) => !v)}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2 transition hover:bg-[#1F2937]"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-          </svg>
-          <span className={`text-xs font-medium ${liked ? "text-red-500" : "text-[#6B7280]"}`}>
-            {liked ? likesCount + 1 : likesCount}
-          </span>
-        </button>
+            <svg
+              viewBox="0 0 24 24"
+              fill={liked ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth={1.8}
+              className={`h-5 w-5 transition-all duration-200 ${liked ? "scale-110 text-red-500" : "text-[#6B7280]"}`}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+            </svg>
+            <span className={`text-xs font-medium ${liked ? "text-red-500" : "text-[#6B7280]"}`}>
+              {liked ? likesCount + 1 : likesCount}
+            </span>
+          </button>
 
-        {/* Comment */}
-        <button
-          type="button"
-          className="flex items-center gap-1.5 rounded-xl px-3 py-2 transition hover:bg-[#1F2937]"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-[#6B7280]">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
-          </svg>
-          <span className="text-xs font-medium text-[#6B7280]">{commentsCount}</span>
-        </button>
+          {/* Comment */}
+          <button
+            type="button"
+            onClick={() => setCommentsOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2 transition hover:bg-[#1F2937]"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-[#6B7280]">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
+            </svg>
+            <span className="text-xs font-medium text-[#6B7280]">{commentsCount}</span>
+          </button>
 
-        {/* Share */}
-        <button
-          type="button"
-          onClick={handleShare}
-          className="flex items-center gap-1.5 rounded-xl px-3 py-2 transition hover:bg-[#1F2937]"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-5 w-5 transition ${copied ? "text-teal-400" : "text-[#6B7280]"}`}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
-          </svg>
-          <span className={`text-xs font-medium transition ${copied ? "text-teal-400" : "text-[#6B7280]"}`}>
-            {copied ? "Copiato!" : "Condividi"}
-          </span>
-        </button>
-      </div>
-    </article>
+          {/* Share */}
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex items-center gap-1.5 rounded-xl px-3 py-2 transition hover:bg-[#1F2937]"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-5 w-5 transition ${copied ? "text-teal-400" : "text-[#6B7280]"}`}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
+            </svg>
+            <span className={`text-xs font-medium transition ${copied ? "text-teal-400" : "text-[#6B7280]"}`}>
+              {copied ? "Copiato!" : "Condividi"}
+            </span>
+          </button>
+        </div>
+      </article>
+
+      {/* Comments Drawer */}
+      {commentsOpen && (
+        <CommentsDrawer
+          recommendationId={r.id}
+          currentUserId={currentUserId}
+          onClose={() => setCommentsOpen(false)}
+          onCountChange={setCommentsCount}
+        />
+      )}
+    </>
   );
 }
+
+// ─── Feed Client ──────────────────────────────────────────────────────────────
 
 export function FeedClient({
   recommendations,
@@ -379,6 +581,7 @@ export function FeedClient({
                 followingIds={followingIds}
                 secondDegreeIds={secondDegreeIds}
                 isOwner={r.user_id === currentUserId}
+                currentUserId={currentUserId}
               />
             ))}
           </div>
