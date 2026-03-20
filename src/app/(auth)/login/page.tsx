@@ -68,6 +68,12 @@ export default async function LoginPage({
         >
           Accedi
         </button>
+
+        <div className="text-center">
+          <Link href="/forgot-password" className="text-sm text-zinc-500 hover:text-zinc-300">
+            Hai dimenticato la password?
+          </Link>
+        </div>
       </form>
     </AuthShell>
   );
