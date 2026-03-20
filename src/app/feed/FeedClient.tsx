@@ -176,6 +176,7 @@ function CommentsDrawer({
           visible ? "translate-y-0" : "translate-y-full"
         }`}
         style={{ maxHeight: "75dvh" }}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
