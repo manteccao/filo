@@ -99,12 +99,9 @@ function CommentsDrawer({
   const [loading, setLoading] = useState(true);
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
-  const [visible, setVisible] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    requestAnimationFrame(() => setVisible(true));
-
     async function load() {
       const supabase = createClient();
       const { data } = await supabase
@@ -120,17 +117,6 @@ function CommentsDrawer({
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recommendationId]);
-
-  // Lock body scroll while drawer is open
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, []);
-
-  function handleClose() {
-    setVisible(false);
-    setTimeout(onClose, 280);
-  }
 
   async function handlePost(e: React.FormEvent) {
     e.preventDefault();
@@ -163,93 +149,84 @@ function CommentsDrawer({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end">
-      {/* Backdrop */}
-      <div
-        className={`absolute inset-0 bg-black/60 transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"}`}
-        onClick={handleClose}
-      />
-
-      {/* Drawer panel */}
-      <div
-        className={`relative flex flex-col rounded-t-3xl bg-[#111111] border-t border-[#1F2937] transition-transform duration-300 ease-out ${
-          visible ? "translate-y-0" : "translate-y-full"
-        }`}
-        style={{ maxHeight: "75dvh" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Handle */}
-        <div className="flex justify-center pt-3 pb-1 shrink-0">
+    <div
+      className="fixed bottom-0 left-0 right-0 z-[100] flex flex-col rounded-t-3xl bg-[#111111] border-t border-[#1F2937]"
+      style={{ maxHeight: "70vh" }}
+    >
+      {/* Handle + header */}
+      <div className="shrink-0">
+        <div className="flex justify-center pt-3 pb-1">
           <div className="h-1 w-10 rounded-full bg-[#374151]" />
         </div>
-
-        {/* Title */}
-        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-[#1F2937]">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[#1F2937]">
           <h3 className="text-sm font-semibold text-white">Commenti</h3>
-          <button type="button" onClick={handleClose} className="rounded-full p-1 text-[#6B7280] transition hover:text-white">
+          <button type="button" onClick={onClose} className="rounded-full p-1 text-[#6B7280] transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
+      </div>
 
-        {/* Comments list */}
-        <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4">
-          {loading ? (
-            <div className="flex justify-center py-10">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
-            </div>
-          ) : comments.length === 0 ? (
-            <p className="py-10 text-center text-sm text-[#6B7280]">
-              Nessun commento ancora. Sii il primo!
-            </p>
-          ) : (
-            <div className="space-y-5">
-              {comments.map((c) => {
-                const name = c.full_name ?? "Utente";
-                return (
-                  <div key={c.id} className="flex gap-3">
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${avatarColor(name)}`}>
-                      {initials(name)}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-semibold text-white">{name}</span>
-                        <span className="text-[10px] text-[#6B7280]">{formatDate(c.created_at)}</span>
-                      </div>
-                      <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{c.content}</p>
-                    </div>
+      {/* Comments list */}
+      <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+          </div>
+        ) : comments.length === 0 ? (
+          <p className="py-10 text-center text-sm text-[#6B7280]">
+            Nessun commento ancora. Sii il primo!
+          </p>
+        ) : (
+          <div className="space-y-5">
+            {comments.map((c) => {
+              const name = c.full_name ?? "Utente";
+              return (
+                <div key={c.id} className="flex gap-3">
+                  <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${avatarColor(name)}`}>
+                    {initials(name)}
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xs font-semibold text-white">{name}</span>
+                      <span className="text-[10px] text-[#6B7280]">{formatDate(c.created_at)}</span>
+                    </div>
+                    <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{c.content}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
 
-        {/* Input */}
-        <div className="shrink-0 border-t border-[#1F2937] px-4 py-4">
-          <form onSubmit={handlePost} className="flex items-center gap-2">
-            <input
-              value={text}
-              onChange={(e) => setText(e.target.value.slice(0, 500))}
-              placeholder="Scrivi un commento…"
-              className="h-10 flex-1 rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-600"
-            />
-            <button
-              type="submit"
-              disabled={!text.trim() || posting}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-teal-600 to-cyan-500 text-white transition disabled:opacity-40"
-            >
-              {posting ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                </svg>
-              )}
-            </button>
-          </form>
-        </div>
+      {/* Input */}
+      <div className="shrink-0 border-t border-[#1F2937] px-4 py-3">
+        <form onSubmit={handlePost} className="flex items-end gap-2">
+          <textarea
+            autoFocus
+            value={text}
+            onChange={(e) => setText(e.target.value.slice(0, 500))}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }}
+            rows={1}
+            placeholder="Scrivi un commento..."
+            className="flex-1 resize-none rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-600"
+          />
+          <button
+            type="submit"
+            disabled={!text.trim() || posting}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-teal-600 to-cyan-500 text-white transition disabled:opacity-40"
+          >
+            {posting ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+              </svg>
+            )}
+          </button>
+        </form>
       </div>
     </div>
   );
