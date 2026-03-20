@@ -8,12 +8,56 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* TikTok scroll snapping */
+.snap-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: calc(100dvh - 112px); /* 48px header + 64px bottom nav */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.snap-container::-webkit-scrollbar {
+  display: none;
+}
+.snap-card {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: calc(100dvh - 112px);
+  flex-shrink: 0;
+}
+
+/* Fade-in animation for TikTok cards */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-visible {
+  animation: fadeInUp 0.4s ease forwards;
+}
+.card-hidden {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+/* Gradient text utility */
+.text-gradient-teal {
+  background: linear-gradient(135deg, #0D9488, #06B6D4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

@@ -29,7 +29,7 @@ const ITEMS = [
     label: "",
     match: "/add",
     icon: (_active: boolean) => (
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#8B5CF6] shadow-[0_0_20px_rgba(139,92,246,0.45)]">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-600 to-cyan-500 shadow-[0_0_24px_rgba(13,148,136,0.5)]">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.2} className="h-6 w-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
         </svg>
@@ -62,7 +62,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#222222] bg-[#0a0a0a]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#1F2937] bg-[#0a0a0a]/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[430px] items-center justify-around px-2">
         {ITEMS.map((item, i) => {
           const isAdd = item.label === "";
@@ -73,7 +73,7 @@ export function BottomNav() {
               key={i}
               href={item.href}
               className={`flex flex-col items-center gap-0.5 transition ${
-                isAdd ? "-mt-3" : active ? "text-[#8B5CF6]" : "text-[#6B7280]"
+                isAdd ? "-mt-4" : active ? "text-teal-400" : "text-[#6B7280]"
               }`}
             >
               {item.icon(active)}
