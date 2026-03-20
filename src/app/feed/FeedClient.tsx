@@ -13,6 +13,8 @@ export type FeedRecommendation = {
   category: string;
   city: string;
   note: string | null;
+  address: string | null;
+  price_range: string | null;
   created_at: string;
   profile: { full_name: string | null; city: string | null } | null;
 };
@@ -257,6 +259,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId }: 
     category: r.category,
     city: r.city,
     note: r.note ?? "",
+    address: r.address ?? "",
+    price_range: r.price_range ?? "",
   });
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -324,6 +328,22 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId }: 
               className="h-11 rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-teal-600"
             />
           </div>
+          <input
+            value={draft.address}
+            onChange={(e) => setDraft({ ...draft, address: e.target.value })}
+            placeholder="Indirizzo o zona (opzionale)"
+            className="h-11 w-full rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-teal-600"
+          />
+          <select
+            value={draft.price_range}
+            onChange={(e) => setDraft({ ...draft, price_range: e.target.value })}
+            className="h-11 w-full rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-3 text-sm text-white outline-none focus:border-teal-600"
+          >
+            <option value="" className="bg-[#111111]">Fascia di prezzo (opzionale)</option>
+            <option value="€" className="bg-[#111111]">€ — Economico</option>
+            <option value="€€" className="bg-[#111111]">€€ — Nella media</option>
+            <option value="€€€" className="bg-[#111111]">€€€ — Premium</option>
+          </select>
           <textarea
             value={draft.note}
             onChange={(e) => setDraft({ ...draft, note: e.target.value.slice(0, 300) })}
@@ -406,7 +426,25 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId }: 
               </svg>
               {r.city}
             </span>
+            {r.price_range ? (
+              <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                r.price_range === "€"   ? "bg-emerald-500/20 text-emerald-400" :
+                r.price_range === "€€"  ? "bg-amber-500/20 text-amber-400" :
+                                          "bg-rose-500/20 text-rose-400"
+              }`}>
+                {r.price_range}
+              </span>
+            ) : null}
           </div>
+          {r.address ? (
+            <p className="mt-2 flex items-center gap-1.5 text-xs text-[#6B7280]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3 w-3 shrink-0">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              {r.address}
+            </p>
+          ) : null}
 
           {r.note ? (
             <p className="mt-3 text-sm leading-relaxed text-[#9CA3AF]">{r.note}</p>

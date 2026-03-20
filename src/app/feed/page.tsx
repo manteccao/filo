@@ -13,7 +13,7 @@ export default async function FeedPage() {
 
   const { data: recs, error: recsError } = await supabase
     .from("recommendations")
-    .select("id,user_id,professional_name,category,city,note,created_at")
+    .select("id,user_id,professional_name,category,city,note,address,price_range,created_at")
     .order("created_at", { ascending: false });
 
   if (recsError) {

@@ -26,6 +26,8 @@ async function addRecommendation(formData: FormData) {
   const categoryRaw = String(formData.get("category") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
+  const address = String(formData.get("address") ?? "").trim();
+  const priceRange = String(formData.get("priceRange") ?? "").trim();
 
   if (!professionalName || !categoryRaw || !city) {
     errorRedirect("Compila tutti i campi obbligatori.");
@@ -52,6 +54,8 @@ async function addRecommendation(formData: FormData) {
     category: categoryRaw,
     city,
     note,
+    address: address || null,
+    price_range: priceRange || null,
   });
 
   if (error) {
@@ -146,6 +150,36 @@ export default async function AddRecommendationPage({
               placeholder="Es. Milano"
               className="h-12 w-full rounded-2xl border border-[#222222] bg-[#111111] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-[#8B5CF6]"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]" htmlFor="address">
+              Indirizzo o zona <span className="normal-case text-[#6B7280]">(opzionale)</span>
+            </label>
+            <input
+              id="address"
+              name="address"
+              type="text"
+              placeholder="Es. Via Roma 15, Torino centro"
+              className="h-12 w-full rounded-2xl border border-[#222222] bg-[#111111] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-600"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]" htmlFor="priceRange">
+              Fascia di prezzo <span className="normal-case text-[#6B7280]">(opzionale)</span>
+            </label>
+            <select
+              id="priceRange"
+              name="priceRange"
+              defaultValue=""
+              className="h-12 w-full rounded-2xl border border-[#222222] bg-[#111111] px-4 text-sm text-white outline-none transition focus:border-teal-600"
+            >
+              <option value="" className="bg-[#111111]">Seleziona…</option>
+              <option value="€" className="bg-[#111111]">€ — Economico</option>
+              <option value="€€" className="bg-[#111111]">€€ — Nella media</option>
+              <option value="€€€" className="bg-[#111111]">€€€ — Premium</option>
+            </select>
           </div>
 
           <div className="space-y-1.5">

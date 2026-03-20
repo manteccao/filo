@@ -21,7 +21,7 @@ export async function deleteRecommendation(id: string) {
 
 export async function updateRecommendation(
   id: string,
-  fields: { professional_name: string; category: string; city: string; note: string },
+  fields: { professional_name: string; category: string; city: string; note: string; address: string; price_range: string },
 ) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
