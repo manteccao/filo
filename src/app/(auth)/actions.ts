@@ -51,7 +51,7 @@ export async function signUp(formData: FormData) {
     }
   }
 
-  redirect("/feed");
+  redirect("/onboarding");
 }
 
 export async function signIn(formData: FormData) {
