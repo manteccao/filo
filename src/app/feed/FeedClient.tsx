@@ -19,6 +19,7 @@ import { deleteRecommendation, updateRecommendation } from "./actions";
 import { createClient } from "@/lib/supabase/browser";
 
 export type FeedRecommendation = {
+  type: "recommendation";
   id: string;
   user_id: string;
   professional_name: string;
@@ -30,6 +31,19 @@ export type FeedRecommendation = {
   created_at: string;
   profile: { full_name: string | null; city: string | null } | null;
 };
+
+export type FeedRequest = {
+  type: "request";
+  id: string;
+  user_id: string;
+  content: string;
+  category: string;
+  city: string;
+  created_at: string;
+  profile: { full_name: string | null } | null;
+};
+
+export type FeedItem = FeedRecommendation | FeedRequest;
 
 type Comment = {
   id: string;
@@ -95,6 +109,262 @@ function ConnectionBadge({ userId, followingIds, secondDegreeIds }: {
     <Badge variant="outline" className="rounded-full border-[#374151] text-[#9CA3AF] text-[10px] px-2.5">
       Community
     </Badge>
+  );
+}
+
+// ─── Request Replies Sheet ────────────────────────────────────────────────────
+
+type RequestReply = {
+  id: string;
+  user_id: string;
+  content: string;
+  created_at: string;
+  full_name: string | null;
+  professional_name: string | null;
+  rec_category: string | null;
+  rec_city: string | null;
+};
+
+type MyRec = { id: string; professional_name: string; category: string; city: string };
+
+function RequestRepliesSheet({
+  open,
+  onOpenChange,
+  request,
+  currentUserId,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  request: FeedRequest;
+  currentUserId: string;
+}) {
+  const [replies, setReplies] = useState<RequestReply[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [myRecs, setMyRecs] = useState<MyRec[]>([]);
+  const [text, setText] = useState("");
+  const [selectedRec, setSelectedRec] = useState("");
+  const [posting, setPosting] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open || loaded) return;
+    setLoading(true);
+    async function load() {
+      const supabase = createClient();
+      const [{ data: repliesData }, { data: recsData }] = await Promise.all([
+        supabase
+          .from("request_replies_with_profile")
+          .select("id, user_id, content, created_at, full_name, professional_name, rec_category, rec_city")
+          .eq("request_id", request.id)
+          .order("created_at", { ascending: true }),
+        supabase
+          .from("recommendations")
+          .select("id, professional_name, category, city")
+          .eq("user_id", currentUserId),
+      ]);
+      setReplies((repliesData as RequestReply[]) ?? []);
+      setMyRecs((recsData as MyRec[]) ?? []);
+      setLoading(false);
+      setLoaded(true);
+    }
+    load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, request.id]);
+
+  async function handlePost(e: React.FormEvent) {
+    e.preventDefault();
+    if (!text.trim() || posting) return;
+    setPosting(true);
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("request_replies")
+      .insert({ request_id: request.id, user_id: currentUserId, content: text.trim(), recommendation_id: selectedRec || null })
+      .select("id, user_id, content, created_at")
+      .single();
+    if (!error && data) {
+      const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", currentUserId).single();
+      const rec = myRecs.find((r) => r.id === selectedRec) ?? null;
+      setReplies([...replies, {
+        ...(data as Pick<RequestReply, "id" | "user_id" | "content" | "created_at">),
+        full_name: (profile as { full_name: string | null } | null)?.full_name ?? null,
+        professional_name: rec?.professional_name ?? null,
+        rec_category: rec?.category ?? null,
+        rec_city: rec?.city ?? null,
+      }]);
+      setText("");
+      setSelectedRec("");
+      setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+    }
+    setPosting(false);
+  }
+
+  const authorName = request.profile?.full_name ?? "Utente";
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl bg-[#111111] border-t border-[#1F2937] gap-0 p-0 flex flex-col" style={{ maxHeight: "80vh" }}>
+        <SheetTitle className="sr-only">Risposte alla richiesta</SheetTitle>
+        <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-[#374151]" /></div>
+
+        {/* Request summary */}
+        <div className="shrink-0 px-5 py-3 border-b border-[#1F2937]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <Avatar className={`bg-gradient-to-br ${avatarColor(authorName)} after:hidden`}>
+                <AvatarFallback className="bg-transparent text-white text-xs font-bold">{initials(authorName)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-white">{authorName}</p>
+                <p className="mt-0.5 text-sm leading-relaxed text-[#D1D5DB]">{request.content}</p>
+                <div className="mt-1.5 flex items-center gap-2">
+                  <Badge className="rounded-full bg-violet-500/20 text-violet-400 border-0 text-[10px] px-2">
+                    {request.category.charAt(0).toUpperCase() + request.category.slice(1)}
+                  </Badge>
+                  <span className="text-[10px] text-[#6B7280]">{request.city}</span>
+                </div>
+              </div>
+            </div>
+            <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="shrink-0 rounded-full p-1 text-[#6B7280] transition hover:text-white">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </motion.button>
+          </div>
+          <p className="mt-2 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">{replies.length} {replies.length === 1 ? "risposta" : "risposte"}</p>
+        </div>
+
+        {/* Replies */}
+        <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
+          {loading ? (
+            <div className="flex justify-center py-10"><div className="h-5 w-5 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" /></div>
+          ) : replies.length === 0 ? (
+            <p className="py-8 text-center text-sm text-[#6B7280]">Nessuna risposta ancora. Sii il primo!</p>
+          ) : (
+            <div className="space-y-5">
+              {replies.map((rep) => {
+                const name = rep.full_name ?? "Utente";
+                return (
+                  <div key={rep.id} className="flex gap-3">
+                    <Avatar className={`bg-gradient-to-br ${avatarColor(name)} after:hidden`}>
+                      <AvatarFallback className="bg-transparent text-white text-xs font-bold">{initials(name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xs font-semibold text-white">{name}</span>
+                        <span className="text-[10px] text-[#6B7280]">{formatDate(rep.created_at)}</span>
+                      </div>
+                      <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{rep.content}</p>
+                      {rep.professional_name && (
+                        <div className="mt-2 rounded-xl border border-teal-900/40 bg-[#0a0a0a] px-3 py-2">
+                          <p className="text-xs font-semibold text-teal-400">{rep.professional_name}</p>
+                          <p className="text-[11px] text-[#6B7280]">{rep.rec_category} · {rep.rec_city}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Input */}
+        <div className="shrink-0 border-t border-[#1F2937] px-4 py-3">
+          <form onSubmit={handlePost} className="space-y-2">
+            {myRecs.length > 0 && (
+              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-3 text-xs text-white outline-none transition focus:border-violet-500">
+                <option value="" className="bg-[#111111]">Allega una tua raccomandazione (opzionale)</option>
+                {myRecs.map((r) => <option key={r.id} value={r.id} className="bg-[#111111]">{r.professional_name} · {r.category} · {r.city}</option>)}
+              </select>
+            )}
+            <div className="flex items-end gap-2">
+              <textarea autoFocus value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }} rows={1} placeholder="Scrivi una risposta..." className="flex-1 resize-none rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-violet-500" />
+              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8B5CF6] text-white transition disabled:opacity-40">
+                {posting ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}
+              </motion.button>
+            </div>
+          </form>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+// ─── Feed Request Card ────────────────────────────────────────────────────────
+
+function FeedRequestCard({ r, followingIds, secondDegreeIds, currentUserId, index }: {
+  r: FeedRequest;
+  followingIds: string[];
+  secondDegreeIds: string[];
+  currentUserId: string;
+  index: number;
+}) {
+  const [repliesOpen, setRepliesOpen] = useState(false);
+  const name = r.profile?.full_name ?? "Sconosciuto";
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
+      >
+        <Card className="rounded-[20px] border border-violet-900/40 bg-[#111111] gap-0 py-0 shadow-none ring-0 overflow-hidden">
+          {/* TOP */}
+          <CardContent className="flex items-center gap-3 px-5 pt-5 pb-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-500/20">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5 text-violet-400">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-white">{name}</p>
+              <p className="text-[11px] text-[#9CA3AF]">sta cercando…</p>
+            </div>
+            <ConnectionBadge userId={r.user_id} followingIds={followingIds} secondDegreeIds={secondDegreeIds} />
+          </CardContent>
+
+          <div className="mx-5 h-px bg-[#1F2937]" />
+
+          {/* CENTER */}
+          <CardContent className="px-5 py-4">
+            <p className="text-lg font-semibold leading-snug text-white">{r.content}</p>
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <Badge className="rounded-full bg-violet-500/20 text-violet-400 border-0 px-3 text-xs">
+                {r.category.charAt(0).toUpperCase() + r.category.slice(1)}
+              </Badge>
+              <span className="flex items-center gap-1 text-xs text-[#9CA3AF]">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0 text-violet-500">
+                  <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.003 3.5-4.697 3.5-8.333 0-4.36-3.515-7.498-7.5-7.498S4.5 7.64 4.5 12c0 3.636 1.556 6.33 3.5 8.333a19.583 19.583 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+                </svg>
+                {r.city}
+              </span>
+            </div>
+          </CardContent>
+
+          {/* BOTTOM */}
+          <CardFooter className="px-4 py-3 border-t border-[#1F2937] bg-transparent gap-1">
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.96 }}
+              onClick={() => setRepliesOpen(true)}
+              className="flex h-8 items-center gap-1.5 rounded-xl bg-violet-500/20 px-4 text-xs font-semibold text-violet-400 transition hover:bg-violet-500/30"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10.5h.75m15.75 0H21m-9 0V3m0 7.5V21M3 10.5C3 6.358 7.03 3 12 3s9 3.358 9 7.5c0 4.142-4.03 7.5-9 7.5-1.518 0-2.95-.352-4.2-.976L3 21l2.8-5.476A7.29 7.29 0 013 10.5z" />
+              </svg>
+              Rispondi
+            </motion.button>
+          </CardFooter>
+        </Card>
+      </motion.div>
+
+      <RequestRepliesSheet
+        open={repliesOpen}
+        onOpenChange={setRepliesOpen}
+        request={r}
+        currentUserId={currentUserId}
+      />
+    </>
   );
 }
 
@@ -529,12 +799,12 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
 // ─── Feed Client ──────────────────────────────────────────────────────────────
 
 export function FeedClient({
-  recommendations,
+  items,
   followingIds,
   secondDegreeIds,
   currentUserId,
 }: {
-  recommendations: FeedRecommendation[];
+  items: FeedItem[];
   followingIds: string[];
   secondDegreeIds: string[];
   currentUserId: string;
@@ -542,10 +812,10 @@ export function FeedClient({
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
 
   const filtered = useMemo(() => {
-    return recommendations.filter((r) =>
+    return items.filter((r) =>
       mode === "tutti" ? true : followingIds.includes(r.user_id)
     );
-  }, [recommendations, mode, followingIds]);
+  }, [items, mode, followingIds]);
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] text-white">
@@ -560,7 +830,7 @@ export function FeedClient({
       </header>
 
       <main className="mx-auto max-w-[430px] px-4 pb-24 pt-4">
-        {recommendations.length === 0 ? (
+        {items.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-20 text-center">
             <p className="text-sm text-[#9CA3AF]">Nessuna raccomandazione ancora.</p>
             <motion.div whileTap={{ scale: 0.97 }}>
@@ -570,20 +840,31 @@ export function FeedClient({
             </motion.div>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-sm text-[#9CA3AF]">Nessuna raccomandazione da chi segui.</div>
+          <div className="py-20 text-center text-sm text-[#9CA3AF]">Nessun contenuto da chi segui.</div>
         ) : (
           <div className="flex flex-col gap-4">
-            {filtered.map((r, i) => (
-              <PostCard
-                key={r.id}
-                r={r}
-                followingIds={followingIds}
-                secondDegreeIds={secondDegreeIds}
-                isOwner={r.user_id === currentUserId}
-                currentUserId={currentUserId}
-                index={i}
-              />
-            ))}
+            {filtered.map((item, i) =>
+              item.type === "recommendation" ? (
+                <PostCard
+                  key={item.id}
+                  r={item}
+                  followingIds={followingIds}
+                  secondDegreeIds={secondDegreeIds}
+                  isOwner={item.user_id === currentUserId}
+                  currentUserId={currentUserId}
+                  index={i}
+                />
+              ) : (
+                <FeedRequestCard
+                  key={item.id}
+                  r={item}
+                  followingIds={followingIds}
+                  secondDegreeIds={secondDegreeIds}
+                  currentUserId={currentUserId}
+                  index={i}
+                />
+              )
+            )}
           </div>
         )}
       </main>
