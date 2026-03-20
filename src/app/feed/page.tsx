@@ -72,6 +72,7 @@ export default async function FeedPage() {
       recommendations={merged}
       followingIds={followingIds}
       secondDegreeIds={secondDegreeIds}
+      currentUserId={data.user.id}
     />
   );
 }
