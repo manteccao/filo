@@ -1,13 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
-
-const BASE_URL = "https://filo-kappa.vercel.app";
 
 const AVATAR_COLORS = [
   "bg-violet-600", "bg-blue-600", "bg-emerald-600", "bg-rose-600",
@@ -25,37 +24,34 @@ function initials(name: string) {
     .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "U";
 }
 
-function toSlug(name: string) {
-  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-}
-
-type Profile = {
+type Rec = {
   id: string;
-  full_name: string | null;
-  city: string | null;
-  username: string | null;
-  avatar_url: string | null;
+  professional_name: string;
+  category: string;
+  city: string;
+  note: string | null;
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  dentista: "bg-blue-500/20 text-blue-300",
+  medico: "bg-emerald-500/20 text-emerald-300",
+  avvocato: "bg-amber-500/20 text-amber-300",
+  commercialista: "bg-orange-500/20 text-orange-300",
+  idraulico: "bg-cyan-500/20 text-cyan-300",
+  elettricista: "bg-yellow-500/20 text-yellow-300",
+  altro: "bg-[#8B5CF6]/20 text-[#A78BFA]",
 };
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fullName, setFullName] = useState("");
+  const [city, setCity] = useState("");
+  const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [copiedProfile, setCopiedProfile] = useState(false);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [pwCurrent, setPwCurrent] = useState("");
-  const [pwNew, setPwNew] = useState("");
-  const [pwConfirm, setPwConfirm] = useState("");
-  const [pwLoading, setPwLoading] = useState(false);
-  const [pwError, setPwError] = useState<string | null>(null);
-  const [pwSuccess, setPwSuccess] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recs, setRecs] = useState<Rec[]>([]);
+  const [followingCount, setFollowingCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -64,24 +60,23 @@ export default function ProfilePage() {
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error || !user) { router.push("/login"); return; }
 
-        const { data } = await supabase
-          .from("profiles")
-          .select("id, full_name, city, username, avatar_url")
-          .eq("id", user.id)
-          .single();
+        const [{ data: profile }, { data: myRecs }, { count: following }, { count: followers }] =
+          await Promise.all([
+            supabase.from("profiles").select("full_name, city, avatar_url, bio").eq("id", user.id).single(),
+            supabase.from("recommendations").select("id, professional_name, category, city, note").eq("user_id", user.id).order("created_at", { ascending: false }),
+            supabase.from("follows").select("*", { count: "exact", head: true }).eq("follower_id", user.id),
+            supabase.from("follows").select("*", { count: "exact", head: true }).eq("following_id", user.id),
+          ]);
 
-        const profileData = (data ?? {}) as Profile;
-        // fallback full_name e city da user_metadata se il profilo non li ha
-        if (!profileData.full_name) {
-          profileData.full_name = user.user_metadata?.full_name ?? null;
-        }
-        if (!profileData.city) {
-          profileData.city = user.user_metadata?.city ?? null;
-        }
-        setUserId(user.id);
-        setEmail(user.email ?? "");
-        setProfile(profileData);
-        setAvatarUrl(profileData.avatar_url ?? user.user_metadata?.avatar_url ?? "");
+        const name = (profile as { full_name?: string | null } | null)?.full_name
+          ?? user.user_metadata?.full_name ?? "Utente";
+        setFullName(name);
+        setCity((profile as { city?: string | null } | null)?.city ?? user.user_metadata?.city ?? "");
+        setAvatarUrl((profile as { avatar_url?: string | null } | null)?.avatar_url ?? user.user_metadata?.avatar_url ?? "");
+        setBio((profile as { bio?: string | null } | null)?.bio ?? "");
+        setRecs((myRecs ?? []) as Rec[]);
+        setFollowingCount(following ?? 0);
+        setFollowersCount(followers ?? 0);
       } finally {
         setLoading(false);
       }
@@ -90,61 +85,7 @@ export default function ProfilePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fullName = profile?.full_name ?? "Utente";
-  const city = profile?.city ?? "";
-  const username = profile?.username ?? toSlug(fullName);
   const color = avatarColor(fullName);
-  const profileUrl = `${BASE_URL}/p/${username}`;
-  const inviteUrl = `${BASE_URL}/invite/${username}`;
-  const whatsappText = `Ho trovato un'app fantastica per trovare professionisti di fiducia — iscriviti gratis: ${inviteUrl}`;
-
-  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !userId) return;
-    setUploading(true);
-    try {
-      const supabase = createClient();
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${userId}/avatar.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("avatars").upload(path, file, { upsert: true });
-      if (uploadError) throw uploadError;
-      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-      const url = urlData.publicUrl;
-      await supabase.from("profiles").update({ avatar_url: url }).eq("id", userId);
-      await supabase.auth.updateUser({ data: { avatar_url: url } });
-      setAvatarUrl(url);
-    } catch (err) {
-      console.error("Avatar upload error:", err);
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  }
-
-  async function handlePasswordChange(e: React.FormEvent) {
-    e.preventDefault();
-    setPwError(null);
-    if (pwNew.length < 6) { setPwError("La password deve essere di almeno 6 caratteri."); return; }
-    if (pwNew !== pwConfirm) { setPwError("Le password non coincidono."); return; }
-    setPwLoading(true);
-    const supabase = createClient();
-    // re-authenticate with current password first
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: pwCurrent });
-    if (signInError) { setPwError("Password attuale non corretta."); setPwLoading(false); return; }
-    const { error } = await supabase.auth.updateUser({ password: pwNew });
-    setPwLoading(false);
-    if (error) { setPwError(error.message); return; }
-    setPwSuccess(true);
-    setPwCurrent(""); setPwNew(""); setPwConfirm("");
-    setTimeout(() => { setPwSuccess(false); setShowPasswordForm(false); }, 2000);
-  }
-
-  async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-  }
 
   if (loading) {
     return (
@@ -156,168 +97,107 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-svh bg-[#0a0a0a] text-white">
+      {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#222222] bg-[#0a0a0a]">
-        <div className="mx-auto flex h-12 max-w-[430px] items-center justify-center px-4">
-          <span className="text-base font-bold tracking-tight">Filo</span>
+        <div className="mx-auto flex h-12 max-w-[430px] items-center justify-between px-4">
+          <span className="text-base font-bold tracking-tight">{fullName}</span>
+          <Link href="/settings" aria-label="Impostazioni">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-[#9CA3AF] transition hover:text-white">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 010 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 010-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </Link>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[430px] px-4 pb-24 pt-6 space-y-4">
+      <main className="mx-auto max-w-[430px] pb-24">
 
-        {/* Avatar + nome */}
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl ring-2 ring-[#8B5CF6]/60 transition hover:ring-[#8B5CF6] active:scale-95 ${color}`}
-            aria-label="Cambia foto profilo"
-          >
-            {avatarUrl ? (
-              <Image src={avatarUrl} alt={fullName} fill className="object-cover" unoptimized />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center text-lg font-bold text-white">
-                {initials(fullName)}
-              </span>
-            )}
-            <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition hover:opacity-100">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={1.8} className="h-5 w-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-              </svg>
-            </span>
-            {uploading && (
-              <span className="absolute inset-0 flex items-center justify-center bg-black/60">
-                <svg className="h-5 w-5 animate-spin text-white" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-              </span>
-            )}
-          </button>
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">{fullName}</h1>
-            {city ? <p className="mt-0.5 text-sm text-[#9CA3AF]">{city}</p> : null}
-          </div>
-        </div>
-
-        {/* Condividi profilo */}
-        <button
-          type="button"
-          onClick={async () => {
-            await navigator.clipboard.writeText(profileUrl);
-            setCopiedProfile(true);
-            setTimeout(() => setCopiedProfile(false), 2000);
-          }}
-          className="h-10 w-full rounded-2xl border border-[#222222] bg-[#111111] text-sm font-medium text-white transition hover:border-[#8B5CF6]/50 hover:text-[#A78BFA]"
-        >
-          {copiedProfile ? "Link copiato!" : "Condividi il tuo profilo"}
-        </button>
-
-        {/* Invita amici */}
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(whatsappText)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] text-sm font-semibold text-white shadow-[0_0_20px_rgba(37,211,102,0.25)] transition hover:bg-[#1ebe5d] active:scale-[0.98]"
-        >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden>
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-          </svg>
-          Invita un amico
-        </a>
-
-        {/* Email */}
-        <div className="rounded-2xl border border-[#222222] bg-[#111111] p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">Account</p>
-          <div className="mt-3 flex items-center justify-between gap-4">
-            <span className="text-sm text-[#9CA3AF]">Email</span>
-            <span className="truncate text-sm text-white">{email}</span>
-          </div>
-        </div>
-
-        {/* Sicurezza */}
-        <div className="rounded-2xl border border-[#222222] bg-[#111111] p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">Sicurezza</p>
-            {!showPasswordForm && (
-              <button
-                type="button"
-                onClick={() => { setShowPasswordForm(true); setPwError(null); setPwSuccess(false); }}
-                className="text-xs text-[#9CA3AF] transition hover:text-white"
-              >
-                Cambia password
-              </button>
-            )}
-          </div>
-
-          {showPasswordForm && (
-            <form onSubmit={handlePasswordChange} className="mt-4 space-y-3">
-              {pwError && (
-                <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
-                  {pwError}
-                </div>
+        {/* Profile section */}
+        <div className="px-4 pt-5">
+          <div className="flex items-center gap-5">
+            {/* Avatar */}
+            <div className={`relative h-20 w-20 shrink-0 overflow-hidden rounded-full ring-2 ring-[#8B5CF6]/40 ${color}`}>
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt={fullName} fill className="object-cover" unoptimized />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center text-2xl font-bold text-white">
+                  {initials(fullName)}
+                </span>
               )}
-              {pwSuccess && (
-                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">
-                  Password aggiornata!
+            </div>
+
+            {/* Name + city + counters */}
+            <div className="flex-1">
+              <h1 className="text-lg font-bold leading-tight">{fullName}</h1>
+              {city ? <p className="mt-0.5 text-sm text-[#9CA3AF]">{city}</p> : null}
+
+              {/* Counters */}
+              <div className="mt-3 flex gap-5">
+                <div className="text-center">
+                  <p className="text-base font-bold leading-none">{recs.length}</p>
+                  <p className="mt-0.5 text-[11px] text-[#9CA3AF]">raccomandazioni</p>
                 </div>
-              )}
-              <input
-                type="password"
-                placeholder="Password attuale"
-                required
-                value={pwCurrent}
-                onChange={(e) => setPwCurrent(e.target.value)}
-                className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]"
-              />
-              <input
-                type="password"
-                placeholder="Nuova password"
-                required
-                value={pwNew}
-                onChange={(e) => setPwNew(e.target.value)}
-                className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]"
-              />
-              <input
-                type="password"
-                placeholder="Conferma nuova password"
-                required
-                value={pwConfirm}
-                onChange={(e) => setPwConfirm(e.target.value)}
-                className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]"
-              />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => { setShowPasswordForm(false); setPwError(null); }}
-                  className="h-9 flex-1 rounded-xl border border-[#222222] text-xs text-[#9CA3AF] transition hover:text-white"
-                >
-                  Annulla
-                </button>
-                <button
-                  type="submit"
-                  disabled={pwLoading}
-                  className="h-9 flex-1 rounded-xl bg-[#8B5CF6] text-xs font-semibold text-white transition hover:bg-[#7C3AED] disabled:opacity-50"
-                >
-                  {pwLoading ? "Salvataggio…" : "Salva"}
-                </button>
+                <div className="text-center">
+                  <p className="text-base font-bold leading-none">{followingCount}</p>
+                  <p className="mt-0.5 text-[11px] text-[#9CA3AF]">seguiti</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-base font-bold leading-none">{followersCount}</p>
+                  <p className="mt-0.5 text-[11px] text-[#9CA3AF]">follower</p>
+                </div>
               </div>
-            </form>
+            </div>
+          </div>
+
+          {/* Bio */}
+          {bio ? (
+            <p className="mt-3 text-sm leading-relaxed text-[#D1D5DB]">{bio}</p>
+          ) : null}
+        </div>
+
+        {/* Divider */}
+        <div className="mt-5 border-t border-[#222222]" />
+
+        {/* Recommendations */}
+        <div className="px-4 pt-4">
+          {recs.length === 0 ? (
+            <div className="flex flex-col items-center py-12 text-center">
+              <p className="text-sm text-[#9CA3AF]">Nessuna raccomandazione ancora.</p>
+              <p className="mt-1 text-sm text-[#6B7280]">Aggiungi la prima!</p>
+              <Link
+                href="/add"
+                className="mt-5 inline-flex h-10 items-center gap-2 rounded-2xl bg-[#8B5CF6] px-5 text-sm font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.3)] transition hover:bg-[#7C3AED]"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Aggiungi
+              </Link>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {recs.map((r) => (
+                <div key={r.id} className="rounded-2xl border border-[#222222] bg-[#111111] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <h2 className="font-semibold leading-tight text-white">{r.professional_name}</h2>
+                    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${CATEGORY_COLORS[r.category] ?? CATEGORY_COLORS.altro}`}>
+                      {r.category.charAt(0).toUpperCase() + r.category.slice(1)}
+                    </span>
+                  </div>
+                  <p className="mt-1.5 flex items-center gap-1 text-xs text-[#9CA3AF]">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0">
+                      <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.003 3.5-4.697 3.5-8.333 0-4.36-3.515-7.498-7.5-7.498S4.5 7.64 4.5 12c0 3.636 1.556 6.33 3.5 8.333a19.583 19.583 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+                    </svg>
+                    {r.city}
+                  </p>
+                  {r.note ? (
+                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#9CA3AF]">{r.note}</p>
+                  ) : null}
+                </div>
+              ))}
+            </div>
           )}
         </div>
-
-        {/* Logout */}
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="h-11 w-full rounded-2xl border border-[#222222] bg-[#111111] text-sm font-medium text-[#9CA3AF] transition hover:border-red-500/40 hover:text-red-400"
-        >
-          Logout
-        </button>
-
       </main>
 
       <BottomNav />
