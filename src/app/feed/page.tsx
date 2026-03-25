@@ -33,9 +33,11 @@ export default async function FeedPage() {
   const requests = reqs ?? [];
   const followingIds = (follows ?? []).map((f) => String(f.following_id));
 
-  // Collect all user_ids that need profiles
-  const recUserIds = recommendations.map((r) => String(r.user_id));
-  const reqUserIds = requests.map((r) => String(r.user_id));
+  // Collect all user_ids that need profiles — filter out nulls before building the set
+  const isValidId = (v: unknown): v is string =>
+    typeof v === "string" && v.length > 0 && v !== "null" && v !== "undefined";
+  const recUserIds = recommendations.map((r) => r.user_id).filter(isValidId);
+  const reqUserIds = requests.map((r) => r.user_id).filter(isValidId);
   const allProfileIds = Array.from(new Set([...recUserIds, ...reqUserIds, ...followingIds]));
 
   const recIds = recommendations.map((r) => r.id);
@@ -93,8 +95,8 @@ export default async function FeedPage() {
   }
 
   // Build typed arrays
-  const recItems: FeedRecommendation[] = recommendations.map((r) => {
-    const uid = String(r.user_id);
+  const recItems: FeedRecommendation[] = recommendations.filter((r) => isValidId(r.user_id)).map((r) => {
+    const uid = r.user_id as string;
     const prof = profileById.get(uid) ?? null;
     return {
       type: "recommendation" as const,
