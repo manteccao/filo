@@ -143,7 +143,7 @@ function NewRequestSheet({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="rounded-t-3xl bg-[#111111] border-t border-[#1F2937] gap-0 p-0 flex flex-col"
+        className="rounded-t-3xl bg-[#16162a] border-t border-[#232340] gap-0 p-0 flex flex-col"
         style={{ maxHeight: "85vh" }}
       >
         <SheetTitle className="sr-only">Nuova richiesta</SheetTitle>
@@ -151,7 +151,7 @@ function NewRequestSheet({
         <div className="flex justify-center pt-3 pb-1 shrink-0">
           <div className="h-1 w-10 rounded-full bg-[#374151]" />
         </div>
-        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-[#1F2937]">
+        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-[#232340]">
           <h3 className="text-sm font-semibold text-white">Nuova richiesta</h3>
           <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="rounded-full p-1 text-[#6B7280] transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
@@ -173,26 +173,26 @@ function NewRequestSheet({
                 onChange={(e) => setContent(e.target.value.slice(0, 200))}
                 rows={3}
                 placeholder="Es. Cerco un buon commercialista a Milano per la partita IVA…"
-                className="w-full resize-none rounded-2xl border border-[#1F2937] bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-violet-500"
+                className="w-full resize-none rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 py-3 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-500"
               />
               <p className="text-right text-[11px] text-[#6B7280]">{content.length}/200</p>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">Categoria</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} required className="h-12 w-full rounded-2xl border border-[#1F2937] bg-[#0a0a0a] px-4 text-sm text-white outline-none transition focus:border-violet-500">
-                <option value="" className="bg-[#111111]">Seleziona…</option>
-                {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111111]">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+              <select value={category} onChange={(e) => setCategory(e.target.value)} required className="h-12 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 text-sm text-white outline-none transition focus:border-teal-500">
+                <option value="" className="bg-[#16162a]">Seleziona…</option>
+                {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#16162a]">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">Città</label>
-              <input value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Es. Milano" className="h-12 w-full rounded-2xl border border-[#1F2937] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-violet-500" />
+              <input value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Es. Milano" className="h-12 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-500" />
             </div>
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 type="submit"
                 disabled={saving || !content.trim() || !category || !city.trim()}
-                className="h-12 w-full rounded-2xl bg-[#8B5CF6] text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:bg-[#7C3AED] disabled:opacity-50"
+                className="h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76] disabled:opacity-50"
               >
                 {saving ? "Pubblicazione…" : "Pubblica richiesta"}
               </Button>
@@ -287,7 +287,7 @@ function RepliesSheet({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="rounded-t-3xl bg-[#111111] border-t border-[#1F2937] gap-0 p-0 flex flex-col"
+        className="rounded-t-3xl bg-[#16162a] border-t border-[#232340] gap-0 p-0 flex flex-col"
         style={{ maxHeight: "80vh" }}
       >
         <SheetTitle className="sr-only">Risposte</SheetTitle>
@@ -297,7 +297,7 @@ function RepliesSheet({
         </div>
 
         {/* Original request header */}
-        <div className="shrink-0 px-5 py-3 border-b border-[#1F2937]">
+        <div className="shrink-0 px-5 py-3 border-b border-[#232340]">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <Avatar className={`bg-gradient-to-br ${avatarColor(authorName)} after:hidden`}>
@@ -307,7 +307,7 @@ function RepliesSheet({
                 <p className="text-xs font-semibold text-white">{authorName}</p>
                 <p className="mt-0.5 text-sm leading-relaxed text-[#D1D5DB]">{request.content}</p>
                 <div className="mt-1.5 flex items-center gap-2">
-                  <Badge className="rounded-full bg-violet-500/20 text-violet-400 border-0 text-[10px] px-2">
+                  <Badge className="rounded-full bg-teal-500/20 text-teal-400 border-0 text-[10px] px-2">
                     {request.category.charAt(0).toUpperCase() + request.category.slice(1)}
                   </Badge>
                   <span className="text-[10px] text-[#6B7280]">{request.city}</span>
@@ -329,7 +329,7 @@ function RepliesSheet({
         <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
             </div>
           ) : replies.length === 0 ? (
             <p className="py-8 text-center text-sm text-[#6B7280]">Nessuna risposta ancora. Sii il primo!</p>
@@ -349,7 +349,7 @@ function RepliesSheet({
                       </div>
                       <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{rep.content}</p>
                       {rep.professional_name && (
-                        <div className="mt-2 rounded-xl border border-teal-900/40 bg-[#0a0a0a] px-3 py-2">
+                        <div className="mt-2 rounded-xl border border-teal-900/40 bg-[#0d0d17] px-3 py-2">
                           <p className="text-xs font-semibold text-teal-400">{rep.professional_name}</p>
                           <p className="text-[11px] text-[#6B7280]">{rep.rec_category} · {rep.rec_city}</p>
                         </div>
@@ -363,13 +363,13 @@ function RepliesSheet({
         </div>
 
         {/* Reply input */}
-        <div className="shrink-0 border-t border-[#1F2937] px-4 py-3">
+        <div className="shrink-0 border-t border-[#232340] px-4 py-3">
           <form onSubmit={handlePost} className="space-y-2">
             {myRecs.length > 0 && (
-              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-3 text-xs text-white outline-none transition focus:border-violet-500">
-                <option value="" className="bg-[#111111]">Allega una tua raccomandazione (opzionale)</option>
+              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-[#232340] bg-[#0d0d17] px-3 text-xs text-white outline-none transition focus:border-teal-500">
+                <option value="" className="bg-[#16162a]">Allega una tua raccomandazione (opzionale)</option>
                 {myRecs.map((r) => (
-                  <option key={r.id} value={r.id} className="bg-[#111111]">{r.professional_name} · {r.category} · {r.city}</option>
+                  <option key={r.id} value={r.id} className="bg-[#16162a]">{r.professional_name} · {r.category} · {r.city}</option>
                 ))}
               </select>
             )}
@@ -381,9 +381,9 @@ function RepliesSheet({
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }}
                 rows={1}
                 placeholder="Scrivi una risposta..."
-                className="flex-1 resize-none rounded-xl border border-[#1F2937] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-violet-500"
+                className="flex-1 resize-none rounded-xl border border-[#232340] bg-[#0d0d17] px-4 py-2.5 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-500"
               />
-              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#8B5CF6] text-white transition disabled:opacity-40">
+              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D9488] text-white transition disabled:opacity-40">
                 {posting ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 ) : (
@@ -435,7 +435,7 @@ function RequestCard({
       transition={{ duration: 0.3, delay: index * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       <Card
-        className="rounded-[20px] border border-violet-900/30 bg-[#111111] gap-0 py-0 shadow-none ring-0 cursor-pointer active:scale-[0.99] transition-transform"
+        className="rounded-[20px] border border-teal-900/30 bg-[#16162a] gap-0 py-0 shadow-none ring-0 cursor-pointer active:scale-[0.99] transition-transform"
         onClick={onOpen}
       >
         <CardContent className="p-4">
@@ -466,7 +466,7 @@ function RequestCard({
               <p className="mt-1.5 text-sm leading-relaxed text-[#E5E7EB]">{req.content}</p>
 
               <div className="mt-2.5 flex items-center gap-2">
-                <Badge className="rounded-full bg-violet-500/20 text-violet-400 border-0 text-[10px] px-2.5">
+                <Badge className="rounded-full bg-teal-500/20 text-teal-400 border-0 text-[10px] px-2.5">
                   {req.category.charAt(0).toUpperCase() + req.category.slice(1)}
                 </Badge>
                 <span className="flex items-center gap-1 text-[10px] text-[#6B7280]">
@@ -551,8 +551,8 @@ export default function RequestsPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-[#0a0a0a] text-white">
-      <header className="sticky top-0 z-40 border-b border-[#1F2937] bg-[#0a0a0a]/95 backdrop-blur">
+    <div className="min-h-dvh bg-[#0d0d17] text-white">
+      <header className="sticky top-0 z-40 border-b border-[#232340] bg-[#0d0d17]/95 backdrop-blur">
         <div className="mx-auto flex h-12 max-w-[430px] items-center justify-between px-4">
           <span className="text-base font-bold text-white">Richieste</span>
           <span className="text-xs text-[#6B7280]">Dalla tua rete</span>
@@ -563,7 +563,7 @@ export default function RequestsPage() {
         <motion.div whileTap={{ scale: 0.97 }} className="mb-5">
           <Button
             onClick={() => setNewSheetOpen(true)}
-            className="h-12 w-full rounded-2xl bg-[#8B5CF6] text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:bg-[#7C3AED]"
+            className="h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76]"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-5 w-5 mr-2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -574,7 +574,7 @@ export default function RequestsPage() {
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-violet-500 border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
           </div>
         ) : requests.length === 0 ? (
           <div className="py-16 text-center">

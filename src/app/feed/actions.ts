@@ -19,6 +19,35 @@ export async function deleteRecommendation(id: string) {
   revalidatePath("/feed");
 }
 
+export async function toggleLike(recommendationId: string): Promise<{ liked: boolean } | { error: string }> {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "Non autenticato" };
+
+  const { data: existing } = await supabase
+    .from("recommendation_likes")
+    .select("id")
+    .eq("recommendation_id", recommendationId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("recommendation_likes")
+      .delete()
+      .eq("recommendation_id", recommendationId)
+      .eq("user_id", user.id);
+    if (error) return { error: error.message };
+    return { liked: false };
+  } else {
+    const { error } = await supabase
+      .from("recommendation_likes")
+      .insert({ recommendation_id: recommendationId, user_id: user.id });
+    if (error) return { error: error.message };
+    return { liked: true };
+  }
+}
+
 export async function updateRecommendation(
   id: string,
   fields: { professional_name: string; category: string; city: string; note: string; address: string; price_range: string },

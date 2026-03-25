@@ -11,25 +11,28 @@ import { BottomNav } from "@/components/BottomNav";
 const BASE_URL = "https://filo-kappa.vercel.app";
 
 const AVATAR_COLORS = [
-  "bg-violet-600", "bg-blue-600", "bg-emerald-600", "bg-rose-600",
-  "bg-amber-600", "bg-cyan-600", "bg-pink-600", "bg-indigo-600",
+  "from-teal-600 to-cyan-500", "from-blue-600 to-indigo-500",
+  "from-emerald-600 to-teal-500", "from-rose-600 to-pink-500",
+  "from-amber-600 to-orange-500", "from-cyan-600 to-blue-500",
+  "from-fuchsia-600 to-violet-500", "from-violet-600 to-purple-500",
 ];
 
-function avatarColor(name: string) {
+function avatarGradient(name: string) {
   let hash = 0;
   for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2)
-    .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "U";
+  return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "U";
 }
 
 function toSlug(name: string) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
+
+const inputCls = "h-11 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-3.5 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -42,7 +45,6 @@ export default function SettingsPage() {
   const [uploading, setUploading] = useState(false);
   const [copiedProfile, setCopiedProfile] = useState(false);
 
-  // Password
   const [showPw, setShowPw] = useState(false);
   const [pwCurrent, setPwCurrent] = useState("");
   const [pwNew, setPwNew] = useState("");
@@ -61,13 +63,9 @@ export default function SettingsPage() {
         if (error || !user) { router.push("/login"); return; }
 
         const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name, username, avatar_url")
-          .eq("id", user.id)
-          .single();
+          .from("profiles").select("full_name, username, avatar_url").eq("id", user.id).single();
 
-        const name = (profile as { full_name?: string | null } | null)?.full_name
-          ?? user.user_metadata?.full_name ?? "Utente";
+        const name = (profile as { full_name?: string | null } | null)?.full_name ?? user.user_metadata?.full_name ?? "Utente";
         const uname = (profile as { username?: string | null } | null)?.username ?? toSlug(name);
 
         setUserId(user.id);
@@ -129,42 +127,41 @@ export default function SettingsPage() {
     router.push("/login");
   }
 
-  const color = avatarColor(fullName);
+  const gradient = avatarGradient(fullName || "U");
   const profileUrl = `${BASE_URL}/p/${username}`;
   const inviteUrl = `${BASE_URL}/invite/${username}`;
   const whatsappText = `Ho trovato un'app fantastica per trovare professionisti di fiducia — iscriviti gratis: ${inviteUrl}`;
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-[#0a0a0a]">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#8B5CF6] border-t-transparent" />
+      <div className="flex min-h-svh items-center justify-center bg-[#0d0d17]">
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-svh bg-[#0a0a0a] text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#222222] bg-[#0a0a0a]">
-        <div className="mx-auto flex h-12 max-w-[430px] items-center gap-3 px-4">
-          <Link href="/profile" className="text-[#9CA3AF] transition hover:text-white">
+    <div className="min-h-svh bg-[#0d0d17] text-white">
+      <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-[430px] items-center gap-3 px-4">
+          <Link href="/profile" className="text-[#8b8fa8] transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </Link>
-          <span className="text-base font-bold tracking-tight">Impostazioni</span>
+          <span className="text-[15px] font-bold">Impostazioni</span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-[430px] px-4 pb-24 pt-6 space-y-4">
+      <main className="mx-auto max-w-[430px] px-4 pb-28 pt-4 space-y-3">
 
         {/* Avatar */}
-        <div className="flex flex-col items-center gap-2 py-2">
+        <div className="flex flex-col items-center gap-2 py-3">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className={`relative h-20 w-20 overflow-hidden rounded-full ring-2 ring-[#8B5CF6]/60 transition hover:ring-[#8B5CF6] active:scale-95 ${color}`}
+            className={`relative h-20 w-20 overflow-hidden rounded-full bg-gradient-to-br ${gradient} ring-2 ring-teal-500/30 ring-offset-2 ring-offset-[#0d0d17] transition active:scale-95`}
             aria-label="Cambia foto profilo"
           >
             {avatarUrl ? (
@@ -189,25 +186,25 @@ export default function SettingsPage() {
               </span>
             )}
           </button>
-          <p className="text-xs text-[#6B7280]">Tocca per cambiare foto</p>
+          <p className="text-xs text-[#5c5f7a]">Tocca per cambiare foto</p>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
         </div>
 
         {/* Account */}
-        <div className="rounded-2xl border border-[#222222] bg-[#111111] p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">Account</p>
+        <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Account</p>
           <div className="mt-3 flex items-center justify-between gap-4">
-            <span className="text-sm text-[#9CA3AF]">Email</span>
+            <span className="text-sm text-[#8b8fa8]">Email</span>
             <span className="truncate text-sm text-white">{email}</span>
           </div>
         </div>
 
         {/* Sicurezza */}
-        <div className="rounded-2xl border border-[#222222] bg-[#111111] p-4">
+        <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#6B7280]">Sicurezza</p>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Sicurezza</p>
             {!showPw && (
-              <button type="button" onClick={() => { setShowPw(true); setPwError(null); setPwSuccess(false); }} className="text-xs text-[#9CA3AF] transition hover:text-white">
+              <button type="button" onClick={() => { setShowPw(true); setPwError(null); setPwSuccess(false); }} className="text-xs text-[#8b8fa8] transition hover:text-white">
                 Cambia password
               </button>
             )}
@@ -215,13 +212,13 @@ export default function SettingsPage() {
           {showPw && (
             <form onSubmit={handlePasswordChange} className="mt-4 space-y-3">
               {pwError && <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">{pwError}</div>}
-              {pwSuccess && <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">Password aggiornata!</div>}
-              <input type="password" placeholder="Password attuale" required value={pwCurrent} onChange={(e) => setPwCurrent(e.target.value)} className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]" />
-              <input type="password" placeholder="Nuova password" required value={pwNew} onChange={(e) => setPwNew(e.target.value)} className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]" />
-              <input type="password" placeholder="Conferma nuova password" required value={pwConfirm} onChange={(e) => setPwConfirm(e.target.value)} className="h-10 w-full rounded-xl border border-[#222222] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6B7280] outline-none focus:border-[#8B5CF6]" />
+              {pwSuccess && <div className="rounded-xl border border-teal-500/20 bg-teal-500/10 px-3 py-2 text-xs text-teal-300">Password aggiornata!</div>}
+              <input type="password" placeholder="Password attuale" required value={pwCurrent} onChange={(e) => setPwCurrent(e.target.value)} className={inputCls} />
+              <input type="password" placeholder="Nuova password" required value={pwNew} onChange={(e) => setPwNew(e.target.value)} className={inputCls} />
+              <input type="password" placeholder="Conferma nuova password" required value={pwConfirm} onChange={(e) => setPwConfirm(e.target.value)} className={inputCls} />
               <div className="flex gap-2">
-                <button type="button" onClick={() => { setShowPw(false); setPwError(null); }} className="h-9 flex-1 rounded-xl border border-[#222222] text-xs text-[#9CA3AF] transition hover:text-white">Annulla</button>
-                <button type="submit" disabled={pwLoading} className="h-9 flex-1 rounded-xl bg-[#8B5CF6] text-xs font-semibold text-white transition hover:bg-[#7C3AED] disabled:opacity-50">{pwLoading ? "Salvataggio…" : "Salva"}</button>
+                <button type="button" onClick={() => { setShowPw(false); setPwError(null); }} className="h-10 flex-1 rounded-2xl border border-[#232340] text-xs text-[#8b8fa8] transition hover:text-white">Annulla</button>
+                <button type="submit" disabled={pwLoading} className="h-10 flex-1 rounded-2xl bg-[#0D9488] text-xs font-semibold text-white transition hover:bg-[#0b7c76] disabled:opacity-50">{pwLoading ? "Salvataggio…" : "Salva"}</button>
               </div>
             </form>
           )}
@@ -235,19 +232,19 @@ export default function SettingsPage() {
             setCopiedProfile(true);
             setTimeout(() => setCopiedProfile(false), 2000);
           }}
-          className="h-11 w-full rounded-2xl border border-[#222222] bg-[#111111] text-sm font-medium text-white transition hover:border-[#8B5CF6]/50 hover:text-[#A78BFA]"
+          className="h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] text-sm font-medium text-white transition hover:border-teal-500/40 active:scale-[0.98]"
         >
           {copiedProfile ? "Link copiato!" : "Condividi il tuo profilo"}
         </button>
 
-        {/* Invita un amico */}
+        {/* Invita */}
         <a
           href={`https://wa.me/?text=${encodeURIComponent(whatsappText)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-11 w-full items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] text-sm font-semibold text-white shadow-[0_0_20px_rgba(37,211,102,0.2)] transition hover:bg-[#1ebe5d] active:scale-[0.98]"
+          className="flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] text-sm font-semibold text-white shadow-[0_0_20px_rgba(37,211,102,0.2)] transition hover:bg-[#1ebe5d] active:scale-[0.98]"
         >
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5" aria-hidden>
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
           </svg>
           Invita un amico
@@ -257,7 +254,7 @@ export default function SettingsPage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="h-11 w-full rounded-2xl border border-red-500/30 bg-red-500/10 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
+          className="h-12 w-full rounded-2xl border border-red-500/25 bg-red-500/8 text-sm font-medium text-red-400 transition hover:bg-red-500/15 active:scale-[0.98]"
         >
           Logout
         </button>

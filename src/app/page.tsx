@@ -2,36 +2,33 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-1 items-center justify-center bg-black px-6 py-16 text-zinc-50">
-      <main className="w-full max-w-xl rounded-2xl border border-white/10 bg-zinc-950/60 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04),0_20px_60px_rgba(0,0,0,0.6)] backdrop-blur">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Filo</h1>
-            <p className="mt-2 text-sm leading-6 text-zinc-400">
-              Un social network di raccomandazioni: trova professionisti di
-              fiducia, consigliati da persone reali.
-            </p>
-          </div>
-          <div className="h-10 w-10 rounded-2xl border border-white/10 bg-zinc-900" />
+    <div className="flex min-h-svh flex-col items-center justify-center bg-[#0d0d17] px-6 py-16 text-white">
+      <main className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex flex-col items-center text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/filo-logo-3d.png" alt="Filo" className="h-9 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
+          <p className="mt-4 text-[15px] leading-relaxed text-[#8b8fa8]">
+            Il social network della fiducia — trova professionisti
+            consigliati da persone reali.
+          </p>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        {/* CTA */}
+        <div className="mt-10 flex flex-col gap-3">
           <Link
             href="/login"
-            className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-4 text-sm font-medium text-black transition hover:bg-zinc-200"
+            className="flex h-12 items-center justify-center rounded-2xl bg-[#0D9488] text-sm font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.4)] transition hover:bg-[#0b7c76] active:scale-[0.98]"
           >
-            Login
+            Accedi
           </Link>
           <Link
             href="/register"
-            className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-zinc-900/50 px-4 text-sm font-medium text-zinc-100 transition hover:bg-zinc-900"
+            className="flex h-12 items-center justify-center rounded-2xl border border-[#232340] bg-[#16162a] text-sm font-semibold text-white transition hover:border-teal-500/40 hover:bg-[#1e1e38] active:scale-[0.98]"
           >
             Registrati
           </Link>
-        </div>
-
-        <div className="mt-6 text-xs text-zinc-500">
-          La home è pubblica. Il feed è protetto.
         </div>
       </main>
     </div>

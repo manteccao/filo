@@ -51,44 +51,6 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
-/* TikTok scroll snapping */
-.snap-container {
-  scroll-snap-type: y mandatory;
-  overflow-y: scroll;
-  height: calc(100dvh - 112px); /* 48px header + 64px bottom nav */
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.snap-container::-webkit-scrollbar {
-  display: none;
-}
-.snap-card {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  height: calc(100dvh - 112px);
-  flex-shrink: 0;
-}
-
-/* Fade-in animation for TikTok cards */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.card-visible {
-  animation: fadeInUp 0.4s ease forwards;
-}
-.card-hidden {
-  opacity: 0;
-  transform: translateY(24px);
-}
-
 /* Gradient text utility */
 .text-gradient-teal {
   background: linear-gradient(135deg, #0D9488, #06B6D4);
@@ -99,32 +61,32 @@ body {
 
 /* Always dark — app has no light mode */
 :root {
-  --background: #0a0a0a;
+  --background: #0d0d17;
   --foreground: #ffffff;
-  --card: #111111;
+  --card: #16162a;
   --card-foreground: #ffffff;
-  --popover: #111111;
+  --popover: #16162a;
   --popover-foreground: #ffffff;
   --primary: #0d9488;
   --primary-foreground: #ffffff;
-  --secondary: #1F2937;
+  --secondary: #232340;
   --secondary-foreground: #ffffff;
-  --muted: #1F2937;
-  --muted-foreground: #9CA3AF;
-  --accent: #1F2937;
+  --muted: #232340;
+  --muted-foreground: #8b8fa8;
+  --accent: #232340;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #1F2937;
-  --input: #1F2937;
+  --border: #232340;
+  --input: #232340;
   --ring: #0d9488;
   --radius: 0.625rem;
-  --sidebar: #111111;
+  --sidebar: #16162a;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #0d9488;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1F2937;
+  --sidebar-accent: #232340;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1F2937;
+  --sidebar-border: #232340;
   --sidebar-ring: #0d9488;
 }
 
