@@ -13,7 +13,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { deleteRecommendation, toggleLike, toggleSave, updateRecommendation } from "./actions";
+import { deleteRecommendation, toggleLike, updateRecommendation } from "./actions";
 import { createClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -673,9 +673,13 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     const prev = saved;
     setSaved(!prev);
     setSaveLoading(true);
-    const result = await toggleSave(r.id);
+    const supabase = createClient();
+    if (prev) {
+      await supabase.from("saves").delete().eq("recommendation_id", r.id).eq("user_id", currentUserId);
+    } else {
+      await supabase.from("saves").insert({ recommendation_id: r.id, user_id: currentUserId });
+    }
     setSaveLoading(false);
-    if ("error" in result) setSaved(prev);
   }
 
   async function handleShare() {
@@ -949,22 +953,9 @@ export function FeedClient({
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-[#0a0a0a]">
-        <div className="mx-auto flex h-12 max-w-[430px] items-center justify-between px-4">
+        <div className="mx-auto flex max-w-[430px] items-center justify-center px-4 py-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-3d.png" alt="Filo" className="h-9 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
-          <div className="flex items-center gap-3">
-            <button type="button" className="text-[#6b7280] transition hover:text-white">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-              </svg>
-            </button>
-            <button type="button" className="text-[#6b7280] transition hover:text-white">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </button>
-          </div>
+          <img src="/filo-logo-3d.png" alt="Filo" className="h-12 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
         </div>
       </header>
 
@@ -972,7 +963,7 @@ export function FeedClient({
       <StoriesRow profiles={followingProfiles} recentlyPostedIds={recentlyPostedIds} />
 
       {/* Filter pills */}
-      <div className="mx-auto max-w-[430px] px-4 pb-3">
+      <div className="mx-auto max-w-[430px] px-4 pb-3 pt-4">
         <div className="flex gap-2">
           <button
             type="button"

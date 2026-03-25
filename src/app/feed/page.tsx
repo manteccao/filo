@@ -43,16 +43,15 @@ export default async function FeedPage() {
   const recIds = recommendations.map((r) => r.id);
 
   // Fetch profiles, second-degree follows, and likes in parallel
+  const profilesResult = allProfileIds.length
+    ? await supabase.from("profiles").select("id,full_name,city,username,avatar_url").in("id", allProfileIds)
+    : { data: [], error: null };
   const [
-    { data: profiles },
     { data: secondDegreeFollows },
     { data: myLikes },
     { data: allLikes },
     { data: mySaves },
   ] = await Promise.all([
-    allProfileIds.length
-      ? supabase.from("profiles").select("id,full_name,city,username,avatar_url").in("id", allProfileIds)
-      : Promise.resolve({ data: [] }),
     followingIds.length
       ? supabase.from("follows").select("following_id").in("follower_id", followingIds)
       : Promise.resolve({ data: [] }),
@@ -67,8 +66,10 @@ export default async function FeedPage() {
       : Promise.resolve({ data: [] }),
   ]);
 
+  const profiles = profilesResult.data ?? [];
+
   const profileById = new Map(
-    (profiles ?? []).map((p) => [
+    profiles.map((p) => [
       String(p.id),
       {
         full_name: p.full_name as string | null,

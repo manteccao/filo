@@ -14,7 +14,7 @@ const NAV = [
     ),
   },
   {
-    href: "/users",
+    href: "/cerca",
     label: "Cerca",
     icon: (active: boolean) => (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.8} className="h-[22px] w-[22px]">
