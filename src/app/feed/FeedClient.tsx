@@ -13,7 +13,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { deleteRecommendation, toggleLike, updateRecommendation } from "./actions";
+import { deleteRecommendation, toggleLike, toggleSave, updateRecommendation } from "./actions";
 import { createClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -38,7 +38,8 @@ export type FeedRecommendation = {
   created_at: string;
   likes_count: number;
   liked_by_me: boolean;
-  profile: { full_name: string | null; city: string | null; username: string | null } | null;
+  profile: { full_name: string | null; city: string | null; username: string | null; avatar_url: string | null } | null;
+  saved_by_me: boolean;
 };
 
 export type FeedRequest = {
@@ -93,8 +94,21 @@ function initials(name: string) {
     .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
 }
 
-function formatDate(iso: string) {
+function timeAgo(iso: string) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return "adesso";
+  if (mins < 60) return `${mins} min fa`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours === 1 ? "1 ora" : `${hours} ore`} fa`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return "ieri";
+  if (days < 7) return `${days} giorni fa`;
   return new Date(iso).toLocaleDateString("it-IT", { day: "numeric", month: "short" });
+}
+
+function toProSlug(name: string) {
+  return encodeURIComponent(name.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""));
 }
 
 function capitalize(s: string) {
@@ -309,7 +323,7 @@ function RequestRepliesSheet({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xs font-semibold text-white">{name}</span>
-                        <span className="text-[10px] text-[#6b7280]">{formatDate(rep.created_at)}</span>
+                        <span className="text-[10px] text-[#6b7280]">{timeAgo(rep.created_at)}</span>
                       </div>
                       <p className="mt-1 text-sm leading-relaxed text-[#9CA3AF]">{rep.content}</p>
                       {rep.professional_name && (
@@ -463,7 +477,7 @@ function CommentsSheet({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xs font-semibold text-white">{name}</span>
-                        <span className="text-[10px] text-[#6b7280]">{formatDate(c.created_at)}</span>
+                        <span className="text-[10px] text-[#6b7280]">{timeAgo(c.created_at)}</span>
                       </div>
                       <p className="mt-1 text-sm leading-relaxed text-[#9CA3AF]">{c.content}</p>
                     </div>
@@ -549,7 +563,7 @@ function FeedRequestCard({ r, followingIds, secondDegreeIds, currentUserId, inde
             {capitalize(r.category)}
           </span>
           <span className="rounded-full bg-[#1F2937] px-[10px] py-[4px] text-[11px] text-[#9CA3AF]">
-            {r.city}
+            {capitalize(r.city)}
           </span>
         </div>
 
@@ -598,6 +612,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
   const [liked, setLiked] = useState(r.liked_by_me ?? false);
   const [likesCount, setLikesCount] = useState(r.likes_count ?? 0);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [saved, setSaved] = useState(r.saved_by_me ?? false);
+  const [saveLoading, setSaveLoading] = useState(false);
   const [commentsCount, setCommentsCount] = useState(0);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -621,8 +637,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
 
-  const recommenderName = r.profile?.full_name ?? "Sconosciuto";
-  const recColor = avatarColor(recommenderName);
+  const recommenderName = r.profile?.full_name ?? "Utente";
+  const recColor = avatarColor(r.user_id);
 
   async function handleDelete() {
     setDeleting(true);
@@ -650,6 +666,16 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
       setLiked(prevLiked);
       setLikesCount(prevCount);
     }
+  }
+
+  async function handleSaveToggle() {
+    if (saveLoading) return;
+    const prev = saved;
+    setSaved(!prev);
+    setSaveLoading(true);
+    const result = await toggleSave(r.id);
+    setSaveLoading(false);
+    if ("error" in result) setSaved(prev);
   }
 
   async function handleShare() {
@@ -693,8 +719,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
   }
 
   const username = r.profile?.username;
-  const city = r.profile?.city ?? r.city;
-  const metaLine = [username ? `@${username}` : null, city].filter(Boolean).join(" · ");
+  const metaLine = [username ? `@${username}` : null, timeAgo(r.created_at)].filter(Boolean).join(" · ");
 
   return (
     <>
@@ -706,11 +731,26 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
       >
         {/* Header row */}
         <div className="flex items-center gap-3">
-          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${recColor}`}>
-            <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
-          </div>
+          {username ? (
+            <Link href={`/p/${username}`} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
+              {r.profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={r.profile.avatar_url} alt={recommenderName} className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
+              )}
+            </Link>
+          ) : (
+            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
+              <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
+            </div>
+          )}
           <div className="min-w-0 flex-1">
-            <p className="text-[15px] font-bold text-white truncate">{recommenderName}</p>
+            {username ? (
+              <Link href={`/p/${username}`} className="block truncate text-[15px] font-bold text-white transition hover:text-[#0D9488]">{recommenderName}</Link>
+            ) : (
+              <p className="text-[15px] font-bold text-white truncate">{recommenderName}</p>
+            )}
             {metaLine && <p className="text-[12px] text-[#6b7280] truncate">{metaLine}</p>}
           </div>
           <div className="flex items-center gap-2">
@@ -757,7 +797,9 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         </div>
 
         {/* Professional name */}
-        <h2 className="mt-3 text-[17px] font-bold text-white">{r.professional_name}</h2>
+        <Link href={`/pro/${toProSlug(r.professional_name)}`} className="mt-3 block text-[17px] font-bold text-white transition hover:text-[#0D9488]">
+          {r.professional_name}
+        </Link>
 
         {/* Category + city + price badges */}
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -765,7 +807,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             {capitalize(r.category)}
           </span>
           <span className="rounded-full bg-[#1F2937] px-[10px] py-[4px] text-[11px] text-[#9CA3AF]">
-            {r.city}
+            {capitalize(r.city)}
           </span>
           {r.price_range && (
             <span className={`rounded-full px-[10px] py-[4px] text-[11px] ${
@@ -852,8 +894,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
 
           {/* Spacer + bookmark */}
           <div className="flex-1" />
-          <motion.button type="button" whileTap={{ scale: 0.88 }} className="text-[#6b7280]">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5">
+          <motion.button type="button" whileTap={{ scale: 0.88 }} onClick={handleSaveToggle} disabled={saveLoading} className="disabled:opacity-60">
+            <svg viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-5 w-5 transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </motion.button>

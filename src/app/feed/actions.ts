@@ -48,6 +48,35 @@ export async function toggleLike(recommendationId: string): Promise<{ liked: boo
   }
 }
 
+export async function toggleSave(recommendationId: string): Promise<{ saved: boolean } | { error: string }> {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "Non autenticato" };
+
+  const { data: existing } = await supabase
+    .from("saves")
+    .select("id")
+    .eq("recommendation_id", recommendationId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("saves")
+      .delete()
+      .eq("recommendation_id", recommendationId)
+      .eq("user_id", user.id);
+    if (error) return { error: error.message };
+    return { saved: false };
+  } else {
+    const { error } = await supabase
+      .from("saves")
+      .insert({ recommendation_id: recommendationId, user_id: user.id });
+    if (error) return { error: error.message };
+    return { saved: true };
+  }
+}
+
 export async function updateRecommendation(
   id: string,
   fields: { professional_name: string; category: string; city: string; note: string; address: string; price_range: string },

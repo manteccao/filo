@@ -46,6 +46,7 @@ export default async function FeedPage() {
     { data: secondDegreeFollows },
     { data: myLikes },
     { data: allLikes },
+    { data: mySaves },
   ] = await Promise.all([
     allProfileIds.length
       ? supabase.from("profiles").select("id,full_name,city,username,avatar_url").in("id", allProfileIds)
@@ -58,6 +59,9 @@ export default async function FeedPage() {
       : Promise.resolve({ data: [] }),
     recIds.length
       ? supabase.from("recommendation_likes").select("recommendation_id").in("recommendation_id", recIds)
+      : Promise.resolve({ data: [] }),
+    recIds.length
+      ? supabase.from("saves").select("recommendation_id").eq("user_id", userId).in("recommendation_id", recIds)
       : Promise.resolve({ data: [] }),
   ]);
 
@@ -82,6 +86,7 @@ export default async function FeedPage() {
   );
 
   const likedByMe = new Set((myLikes ?? []).map((l) => l.recommendation_id));
+  const savedByMe = new Set((mySaves ?? []).map((s) => s.recommendation_id));
   const likesPerRec = new Map<string, number>();
   for (const l of allLikes ?? []) {
     likesPerRec.set(l.recommendation_id, (likesPerRec.get(l.recommendation_id) ?? 0) + 1);
@@ -104,7 +109,8 @@ export default async function FeedPage() {
       created_at: r.created_at,
       likes_count: likesPerRec.get(r.id) ?? 0,
       liked_by_me: likedByMe.has(r.id),
-      profile: prof ? { full_name: prof.full_name, city: prof.city, username: prof.username } : null,
+      saved_by_me: savedByMe.has(r.id),
+      profile: prof ? { full_name: prof.full_name, city: prof.city, username: prof.username, avatar_url: prof.avatar_url } : null,
     };
   });
 
