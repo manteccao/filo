@@ -29,6 +29,12 @@ export async function followUser(formData: FormData) {
     following_id: targetUserId,
   });
 
+  await supabase.from("notifications").insert({
+    user_id: targetUserId,
+    type: "follow",
+    actor_id: user.id,
+  });
+
   redirect("/users");
 }
 

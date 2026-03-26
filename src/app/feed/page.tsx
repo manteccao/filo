@@ -144,6 +144,12 @@ export default async function FeedPage() {
     })
     .filter((p) => p.full_name !== null);
 
+  const { count: unreadCount } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("read", false);
+
   return (
     <FeedClient
       items={items}
@@ -151,6 +157,7 @@ export default async function FeedPage() {
       secondDegreeIds={secondDegreeIds}
       currentUserId={userId}
       followingProfiles={followingProfiles}
+      initialUnreadCount={unreadCount ?? 0}
     />
   );
 }

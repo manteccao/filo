@@ -276,6 +276,16 @@ function RepliesSheet({
       setText("");
       setSelectedRec("");
       setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+
+      // Notifica al proprietario della richiesta
+      if (currentUserId !== request.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: request.user_id,
+          type: "reply",
+          actor_id: currentUserId,
+          request_id: request.id,
+        });
+      }
     }
     setPosting(false);
   }

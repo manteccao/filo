@@ -44,6 +44,22 @@ export async function toggleLike(recommendationId: string): Promise<{ liked: boo
       .from("recommendation_likes")
       .insert({ recommendation_id: recommendationId, user_id: user.id });
     if (error) return { error: error.message };
+
+    // Notifica al proprietario della raccomandazione
+    const { data: rec } = await supabase
+      .from("recommendations")
+      .select("user_id")
+      .eq("id", recommendationId)
+      .single();
+    if (rec && rec.user_id !== user.id) {
+      await supabase.from("notifications").insert({
+        user_id: rec.user_id,
+        type: "like",
+        actor_id: user.id,
+        recommendation_id: recommendationId,
+      });
+    }
+
     return { liked: true };
   }
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { BottomNav } from "@/components/BottomNav";
+import { NotificationsDrawer } from "@/components/NotificationsDrawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -270,6 +271,16 @@ function RequestRepliesSheet({
       setText("");
       setSelectedRec("");
       setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+
+      // Notifica al proprietario della richiesta
+      if (currentUserId !== request.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: request.user_id,
+          type: "reply",
+          actor_id: currentUserId,
+          request_id: request.id,
+        });
+      }
     }
     setPosting(false);
   }
@@ -368,12 +379,14 @@ function CommentsSheet({
   onOpenChange,
   recommendationId,
   currentUserId,
+  recOwnerId,
   onCountChange,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   recommendationId: string;
   currentUserId: string;
+  recOwnerId: string;
   onCountChange: (n: number) => void;
 }) {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -426,6 +439,16 @@ function CommentsSheet({
       onCountChange(updated.length);
       setText("");
       setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+
+      // Notifica al proprietario della raccomandazione
+      if (currentUserId !== recOwnerId) {
+        await supabase.from("notifications").insert({
+          user_id: recOwnerId,
+          type: "comment",
+          actor_id: currentUserId,
+          recommendation_id: recommendationId,
+        });
+      }
     }
     setPosting(false);
   }
@@ -911,6 +934,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         onOpenChange={setCommentsOpen}
         recommendationId={r.id}
         currentUserId={currentUserId}
+        recOwnerId={r.user_id}
         onCountChange={setCommentsCount}
       />
     </>
@@ -925,14 +949,18 @@ export function FeedClient({
   secondDegreeIds,
   currentUserId,
   followingProfiles,
+  initialUnreadCount,
 }: {
   items: FeedItem[];
   followingIds: string[];
   secondDegreeIds: string[];
   currentUserId: string;
   followingProfiles: FollowingProfile[];
+  initialUnreadCount: number;
 }) {
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
+  const [notifsOpen, setNotifsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
 
   const filtered = useMemo(() => {
     return items.filter((r) =>
@@ -953,9 +981,24 @@ export function FeedClient({
 
       {/* Header */}
       <header className="sticky top-0 z-40 bg-[#0a0a0a]">
-        <div className="mx-auto flex max-w-[430px] items-center justify-center px-4 py-5">
+        <div className="mx-auto flex max-w-[430px] items-center justify-between px-4 py-5">
+          <div className="w-10" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/filo-logo-3d.png" alt="Filo" className="h-12 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
+          <button
+            type="button"
+            onClick={() => setNotifsOpen(true)}
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+            </svg>
+            {unreadCount > 0 && (
+              <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </button>
         </div>
       </header>
 
@@ -1028,6 +1071,12 @@ export function FeedClient({
       </main>
 
       <BottomNav />
+
+      <NotificationsDrawer
+        open={notifsOpen}
+        onOpenChange={setNotifsOpen}
+        onMarkAllRead={() => setUnreadCount(0)}
+      />
     </div>
   );
 }
