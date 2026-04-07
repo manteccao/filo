@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { FeedClient, type FeedItem, type FeedRecommendation, type FeedRequest, type FollowingProfile } from "./FeedClient";
 
 export default async function FeedPage() {
@@ -42,9 +42,10 @@ export default async function FeedPage() {
 
   const recIds = recommendations.map((r) => r.id);
 
-  // Fetch profiles, second-degree follows, and likes in parallel
+  // Fetch profiles con admin client (bypassa RLS) per leggere profili altrui
+  const adminClient = createAdminClient();
   const profilesResult = allProfileIds.length
-    ? await supabase.from("profiles").select("id,full_name,city,username,avatar_url").in("id", allProfileIds)
+    ? await adminClient.from("profiles").select("id,full_name,city,username,avatar_url").in("id", allProfileIds)
     : { data: [], error: null };
   const [
     { data: secondDegreeFollows },
