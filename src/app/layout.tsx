@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -10,8 +11,15 @@ export const metadata: Metadata = {
   title: "Filo",
   description:
     "Filo è un social network dove le persone condividono raccomandazioni di professionisti di fiducia.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/filo-logo-3d.png",
+    apple: "/filo-logo-square.svg",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Filo",
+    statusBarStyle: "black-translucent",
   },
 };
 
@@ -19,6 +27,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: "#0D9488",
 };
 
 export default function RootLayout({
@@ -31,6 +40,19 @@ export default function RootLayout({
       <body className="min-h-full antialiased">
         <SplashScreen />
         {children}
+        <Script
+          id="sw-registration"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
