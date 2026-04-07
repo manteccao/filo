@@ -45,7 +45,7 @@ export default async function FeedPage() {
   // Fetch profiles con admin client (bypassa RLS) per leggere profili altrui
   const adminClient = createAdminClient();
   const profilesResult = allProfileIds.length
-    ? await adminClient.from("profiles").select("id,full_name,city,username,avatar_url").in("id", allProfileIds)
+    ? await adminClient.from("profiles").select("id,full_name,city,username").in("id", allProfileIds)
     : { data: [], error: null };
   const [
     { data: secondDegreeFollows },
@@ -76,7 +76,7 @@ export default async function FeedPage() {
         full_name: p.full_name as string | null,
         city: p.city as string | null,
         username: p.username as string | null,
-        avatar_url: p.avatar_url as string | null,
+        avatar_url: null,
       },
     ])
   );
