@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
+import { deleteAccount } from "./actions";
 
 const BASE_URL = "https://filo-kappa.vercel.app";
 
@@ -44,6 +45,10 @@ export default function SettingsPage() {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [copiedProfile, setCopiedProfile] = useState(false);
+
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [showPw, setShowPw] = useState(false);
   const [pwCurrent, setPwCurrent] = useState("");
@@ -125,6 +130,21 @@ export default function SettingsPage() {
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/login");
+  }
+
+  async function handleDeleteAccount() {
+    setDeleteLoading(true);
+    setDeleteError(null);
+    const result = await deleteAccount();
+    if ("error" in result) {
+      setDeleteError(result.error);
+      setDeleteLoading(false);
+      return;
+    }
+    // Account deleted — clear local session and go home
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
   }
 
   const gradient = avatarGradient(fullName || "U");
@@ -259,7 +279,68 @@ export default function SettingsPage() {
           Logout
         </button>
 
+        {/* Elimina account */}
+        <button
+          type="button"
+          onClick={() => setDeleteConfirm(true)}
+          className="h-12 w-full rounded-2xl bg-red-600 text-sm font-semibold text-white shadow-[0_0_20px_rgba(220,38,38,0.25)] transition hover:bg-red-700 active:scale-[0.98]"
+        >
+          Elimina account
+        </button>
+
       </main>
+
+      {/* Delete account confirmation dialog */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6">
+          <div className="w-full max-w-sm rounded-3xl border border-[#232340] bg-[#111111] p-6 shadow-2xl">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6 text-red-400">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
+            </div>
+
+            <h2 className="mt-4 text-base font-bold text-white">Elimina account</h2>
+            <p className="mt-2 text-sm leading-relaxed text-[#8b8fa8]">
+              Sei sicuro? Tutti i tuoi dati verranno eliminati permanentemente: raccomandazioni, commenti, connessioni e profilo.
+            </p>
+            <p className="mt-2 text-xs text-red-400">Questa operazione non può essere annullata.</p>
+
+            {deleteError && (
+              <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setDeleteConfirm(false); setDeleteError(null); }}
+                disabled={deleteLoading}
+                className="h-11 flex-1 rounded-2xl border border-[#232340] text-sm text-[#8b8fa8] transition hover:text-white disabled:opacity-50"
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading}
+                className="h-11 flex-1 rounded-2xl bg-red-600 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Eliminazione…
+                  </span>
+                ) : "Elimina tutto"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNav />
     </div>
