@@ -595,8 +595,29 @@ export default function RequestsPage() {
         </motion.div>
 
         {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+          <div className="flex flex-col gap-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="animate-pulse rounded-2xl border border-[#232340] bg-[#16162a] p-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-9 w-9 shrink-0 rounded-full bg-[#1a1a1a]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="h-3.5 w-24 rounded-full bg-[#1a1a1a]" />
+                      <div className="h-3 w-10 rounded-full bg-[#1a1a1a]" />
+                    </div>
+                    <div className="h-3 w-full rounded-full bg-[#1a1a1a]" />
+                    <div className="h-3 w-4/5 rounded-full bg-[#1a1a1a]" />
+                    <div className="flex gap-2 pt-0.5">
+                      <div className="h-5 w-16 rounded-full bg-[#1a1a1a]" />
+                      <div className="h-5 w-14 rounded-full bg-[#1a1a1a]" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <div className="h-7 w-24 rounded-full bg-[#1a1a1a]" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : requests.length === 0 ? (
           <div className="py-16 text-center">

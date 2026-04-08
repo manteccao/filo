@@ -94,8 +94,63 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-[#0d0d17]">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
+      <div className="min-h-svh bg-[#0d0d17] text-white">
+        {/* Header skeleton */}
+        <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+          <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between px-4">
+            <div className="h-4 w-28 animate-pulse rounded-full bg-[#1a1a1a]" />
+            <div className="h-5 w-5 animate-pulse rounded bg-[#1a1a1a]" />
+          </div>
+        </header>
+
+        <main className="mx-auto max-w-[430px] pb-28">
+          {/* Profile hero skeleton */}
+          <div className="px-5 pb-6 pt-5">
+            <div className="flex animate-pulse items-center gap-5">
+              <div className="h-[76px] w-[76px] shrink-0 rounded-full bg-[#1a1a1a]" />
+              <div className="flex flex-1 justify-around">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex flex-col items-center gap-1.5">
+                    <div className="h-5 w-8 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-3 w-12 rounded-full bg-[#1a1a1a]" />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mt-3 h-3 w-20 animate-pulse rounded-full bg-[#1a1a1a]" />
+            <div className="mt-2 animate-pulse space-y-1.5">
+              <div className="h-3 w-full rounded-full bg-[#1a1a1a]" />
+              <div className="h-3 w-3/4 rounded-full bg-[#1a1a1a]" />
+            </div>
+          </div>
+
+          <div className="h-px bg-[#232340]" />
+
+          {/* Recommendations skeleton */}
+          <div className="px-4 pt-4">
+            <div className="flex animate-pulse items-center justify-between pb-3">
+              <div className="h-3 w-24 rounded-full bg-[#1a1a1a]" />
+              <div className="h-7 w-20 rounded-full bg-[#1a1a1a]" />
+            </div>
+            <div className="flex flex-col gap-2.5">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="animate-pulse rounded-2xl border border-[#232340] bg-[#16162a] p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="h-4 w-36 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-5 w-16 rounded-full bg-[#1a1a1a]" />
+                  </div>
+                  <div className="mt-2 h-3 w-16 rounded-full bg-[#1a1a1a]" />
+                  <div className="mt-2 space-y-1.5">
+                    <div className="h-3 w-full rounded-full bg-[#1a1a1a]" />
+                    <div className="h-3 w-2/3 rounded-full bg-[#1a1a1a]" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+
+        <BottomNav />
       </div>
     );
   }
