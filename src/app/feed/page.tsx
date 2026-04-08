@@ -13,8 +13,8 @@ export default async function FeedPage() {
 
   const userId = data.user.id;
 
-  // Fetch recommendations, requests, follows in parallel
-  const [{ data: recs }, { data: reqs }, { data: follows }] =
+  // Fetch recommendations, requests, follows, and blocked users in parallel
+  const [{ data: recs }, { data: reqs }, { data: follows }, { data: blockedData }] =
     await Promise.all([
       supabase
         .from("recommendations")
@@ -27,7 +27,13 @@ export default async function FeedPage() {
         .from("follows")
         .select("following_id")
         .eq("follower_id", userId),
+      supabase
+        .from("blocks")
+        .select("blocked_user_id")
+        .eq("user_id", userId),
     ]);
+
+  const blockedUserIds = new Set((blockedData ?? []).map((b) => String(b.blocked_user_id)));
 
   const recommendations = recs ?? [];
   const requests = reqs ?? [];
@@ -96,8 +102,8 @@ export default async function FeedPage() {
     likesPerRec.set(l.recommendation_id, (likesPerRec.get(l.recommendation_id) ?? 0) + 1);
   }
 
-  // Build typed arrays
-  const recItems: FeedRecommendation[] = recommendations.filter((r) => isValidId(r.user_id)).map((r) => {
+  // Build typed arrays — exclude content from blocked users
+  const recItems: FeedRecommendation[] = recommendations.filter((r) => isValidId(r.user_id) && !blockedUserIds.has(r.user_id as string)).map((r) => {
     const uid = r.user_id as string;
     const prof = profileById.get(uid) ?? null;
     return {
@@ -118,7 +124,7 @@ export default async function FeedPage() {
     };
   });
 
-  const reqItems: FeedRequest[] = requests.map((r) => ({
+  const reqItems: FeedRequest[] = requests.filter((r) => !blockedUserIds.has(String(r.user_id))).map((r) => ({
     type: "request" as const,
     id: r.id,
     user_id: String(r.user_id),

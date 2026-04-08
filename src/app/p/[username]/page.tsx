@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { ProfileActions } from "./ProfileActions";
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -25,6 +26,12 @@ export default async function PublicProfilePage({
   const { username } = await params;
   const supabase = await createClient();
 
+  // Auth is optional here — public page
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const currentUserId = user?.id ?? null;
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("id,full_name,city,username")
@@ -32,6 +39,20 @@ export default async function PublicProfilePage({
     .single();
 
   if (!profile) notFound();
+
+  const isOwnProfile = currentUserId === profile.id;
+
+  // Check if current user has already blocked this profile
+  let initialIsBlocked = false;
+  if (currentUserId && !isOwnProfile) {
+    const { data: block } = await supabase
+      .from("blocks")
+      .select("id")
+      .eq("user_id", currentUserId)
+      .eq("blocked_user_id", profile.id)
+      .maybeSingle();
+    initialIsBlocked = !!block;
+  }
 
   const { data: recs } = await supabase
     .from("recommendations")
@@ -64,11 +85,11 @@ export default async function PublicProfilePage({
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-10">
         {/* Profile header */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-start gap-5">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-zinc-900 text-lg font-semibold text-zinc-200">
             {initials(fullName)}
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-semibold tracking-tight">
               {fullName}
             </h1>
@@ -82,6 +103,17 @@ export default async function PublicProfilePage({
                 : "raccomandazioni"}
             </p>
           </div>
+
+          {/* Block / report — only for logged-in users viewing someone else's profile */}
+          {currentUserId && !isOwnProfile && (
+            <div className="shrink-0">
+              <ProfileActions
+                profileId={profile.id}
+                profileName={fullName}
+                initialIsBlocked={initialIsBlocked}
+              />
+            </div>
+          )}
         </div>
 
         {/* Recommendations list */}

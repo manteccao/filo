@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/sheet";
 
 import { deleteRecommendation, toggleLike, updateRecommendation } from "./actions";
+import { reportContent } from "@/app/moderation/actions";
+import { ReportDialog } from "@/components/ReportDialog";
 import { createClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -648,6 +650,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
   const [commentsCount, setCommentsCount] = useState(0);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [reportMenuOpen, setReportMenuOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const [draft, setDraft] = useState({
     professional_name: r.professional_name,
@@ -658,6 +662,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     price_range: r.price_range ?? "",
   });
   const menuRef = useRef<HTMLDivElement>(null);
+  const reportMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -667,6 +672,15 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (!reportMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (reportMenuRef.current && !reportMenuRef.current.contains(e.target as Node)) setReportMenuOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [reportMenuOpen]);
 
   const recommenderName = r.profile?.full_name ?? "Utente";
   const recColor = avatarColor(r.user_id);
@@ -717,6 +731,10 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     await navigator.clipboard.writeText(`https://filo-kappa.vercel.app/feed`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function handleReport(reason: string) {
+    await reportContent(r.id, "recommendation", reason);
   }
 
   // Edit form
@@ -790,7 +808,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
           </div>
           <div className="flex items-center gap-2">
             <ConnectionBadge userId={r.user_id} followingIds={followingIds} secondDegreeIds={secondDegreeIds} />
-            {isOwner && (
+            {isOwner ? (
               <div ref={menuRef} className="relative">
                 <motion.button
                   type="button"
@@ -822,6 +840,37 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                         </svg>
                         Elimina
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div ref={reportMenuRef} className="relative">
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.85 }}
+                  onClick={() => setReportMenuOpen((v) => !v)}
+                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
+                    <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
+                  </svg>
+                </motion.button>
+                <AnimatePresence>
+                  {reportMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.92, y: -4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.92, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-8 z-10 min-w-[160px] overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] shadow-2xl"
+                    >
+                      <button type="button" onClick={() => { setReportMenuOpen(false); setReportOpen(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-[#111111]">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4 shrink-0">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 011.743-1.342 48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664L19.5 19.5" />
+                        </svg>
+                        Segnala contenuto
                       </button>
                     </motion.div>
                   )}
@@ -944,6 +993,12 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         currentUserId={currentUserId}
         recOwnerId={r.user_id}
         onCountChange={setCommentsCount}
+      />
+      <ReportDialog
+        open={reportOpen}
+        title="Segnala contenuto"
+        onClose={() => setReportOpen(false)}
+        onSubmit={handleReport}
       />
     </>
   );
