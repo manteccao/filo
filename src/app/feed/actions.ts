@@ -5,6 +5,19 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
+const VALID_CATEGORIES = new Set([
+  "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
+  "fisioterapista", "psicologo", "ginecologo", "ortopedico", "nutrizionista",
+  "avvocato", "commercialista", "notaio", "consulente finanziario", "mediatore immobiliare",
+  "idraulico", "elettricista", "muratore", "imbianchino", "falegname",
+  "giardiniere", "fabbro", "caldaista", "geometra", "architetto",
+  "meccanico", "carrozziere", "gommista", "informatico", "web designer",
+  "fotografo", "videomaker", "babysitter", "doposcuola", "dog sitter",
+  "veterinario", "parrucchiere", "estetista", "personal trainer", "tatuatore",
+  "ristorante", "catering", "chef privato", "traslochi", "sartoria",
+  "orologiaio", "ottico", "altro",
+]);
+
 export async function deleteRecommendation(id: string) {
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -100,6 +113,10 @@ export async function updateRecommendation(
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/login");
+
+  if (!fields.professional_name?.trim() || !fields.city?.trim()) return;
+  if (!VALID_CATEGORIES.has(fields.category)) return;
+  if (fields.note?.length > 300) return;
 
   await supabase
     .from("recommendations")

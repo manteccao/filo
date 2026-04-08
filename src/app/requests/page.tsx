@@ -121,12 +121,16 @@ function NewRequestSheet({
       setError("Compila tutti i campi.");
       return;
     }
+    if (!CATEGORIES.includes(category as (typeof CATEGORIES)[number])) {
+      setError("Categoria non valida.");
+      return;
+    }
     setSaving(true);
     setError("");
     const supabase = createClient();
     const { data, error: err } = await supabase
       .from("requests")
-      .insert({ user_id: currentUserId, content: content.trim(), category, city: city.trim() })
+      .insert({ user_id: currentUserId, content: content.trim().slice(0, 500), category, city: city.trim() })
       .select("id, user_id, content, category, city, created_at")
       .single();
     if (err || !data) {

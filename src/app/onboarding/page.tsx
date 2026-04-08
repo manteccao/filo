@@ -70,7 +70,9 @@ export default function OnboardingPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      await supabase.from("recommendations").insert({ user_id: user.id, professional_name: profName, category, city, note });
+      if (!CATEGORIES.includes(category as (typeof CATEGORIES)[number])) return;
+      if (!profName.trim() || !city.trim()) return;
+      await supabase.from("recommendations").insert({ user_id: user.id, professional_name: profName.trim(), category, city: city.trim(), note: note.slice(0, 300) });
     } catch (_) {
       // proceed even on error
     } finally {
