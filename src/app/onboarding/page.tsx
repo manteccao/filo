@@ -9,8 +9,16 @@ import { createClient } from "@/lib/supabase/browser";
 const BASE_URL = "https://filo-kappa.vercel.app";
 
 const CATEGORIES = [
-  "dentista", "medico", "avvocato", "commercialista",
-  "idraulico", "elettricista", "altro",
+  "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
+  "fisioterapista", "psicologo", "ginecologo", "ortopedico", "nutrizionista",
+  "avvocato", "commercialista", "notaio", "consulente finanziario", "mediatore immobiliare",
+  "idraulico", "elettricista", "muratore", "imbianchino", "falegname",
+  "giardiniere", "fabbro", "caldaista", "geometra", "architetto",
+  "meccanico", "carrozziere", "gommista", "informatico", "web designer",
+  "fotografo", "videomaker", "babysitter", "doposcuola", "dog sitter",
+  "veterinario", "parrucchiere", "estetista", "personal trainer", "tatuatore",
+  "ristorante", "catering", "chef privato", "traslochi", "sartoria",
+  "orologiaio", "ottico", "altro",
 ] as const;
 
 type Step = 1 | 2 | 3;

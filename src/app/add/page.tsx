@@ -4,8 +4,16 @@ import { createClient } from "@/lib/supabase/server";
 import { BottomNav } from "@/components/BottomNav";
 
 const CATEGORIES = [
-  "dentista", "medico", "avvocato", "commercialista",
-  "idraulico", "elettricista", "altro",
+  "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
+  "fisioterapista", "psicologo", "ginecologo", "ortopedico", "nutrizionista",
+  "avvocato", "commercialista", "notaio", "consulente finanziario", "mediatore immobiliare",
+  "idraulico", "elettricista", "muratore", "imbianchino", "falegname",
+  "giardiniere", "fabbro", "caldaista", "geometra", "architetto",
+  "meccanico", "carrozziere", "gommista", "informatico", "web designer",
+  "fotografo", "videomaker", "babysitter", "doposcuola", "dog sitter",
+  "veterinario", "parrucchiere", "estetista", "personal trainer", "tatuatore",
+  "ristorante", "catering", "chef privato", "traslochi", "sartoria",
+  "orologiaio", "ottico", "altro",
 ] as const;
 
 function errorRedirect(message: string) {
@@ -23,6 +31,7 @@ async function addRecommendation(formData: FormData) {
   const note = String(formData.get("note") ?? "").trim();
   const address = String(formData.get("address") ?? "").trim();
   const priceRange = String(formData.get("priceRange") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
 
   if (!professionalName || !categoryRaw || !city) {
     errorRedirect("Compila tutti i campi obbligatori.");
@@ -46,6 +55,7 @@ async function addRecommendation(formData: FormData) {
     note,
     address: address || null,
     price_range: priceRange || null,
+    phone: phone || null,
   });
 
   if (error) errorRedirect(error.message);
@@ -116,6 +126,13 @@ export default async function AddRecommendationPage({
               Indirizzo <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
             </label>
             <input id="address" name="address" type="text" placeholder="Es. Via Roma 15, centro" className={inputCls} />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className={labelCls} htmlFor="phone">
+              Numero di telefono <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+            </label>
+            <input id="phone" name="phone" type="tel" placeholder="+39 02 1234567" className={inputCls} />
           </div>
 
           <div className="space-y-1.5">
