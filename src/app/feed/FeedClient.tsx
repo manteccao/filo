@@ -772,7 +772,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
   }
 
   const username = r.profile?.username;
-  const metaLine = [username ? `@${username}` : null, timeAgo(r.created_at)].filter(Boolean).join(" · ");
+  const metaLine = timeAgo(r.created_at);
 
   return (
     <>
