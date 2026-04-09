@@ -1,10 +1,67 @@
 import { redirect } from "next/navigation";
 
 import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { CercaClient, type UserCard } from "./CercaClient";
+import { CercaClient, type UserCard, type ProCard, type ProRecommender } from "./CercaClient";
 
 function normalizeCity(city: string | null | undefined): string {
   return city?.toLowerCase().trim() ?? "";
+}
+
+type ProfileRow = {
+  id: string;
+  full_name: string | null;
+  city: string | null;
+  username: string | null;
+  avatar_url: string | null;
+};
+
+type RecRow = {
+  user_id: string;
+  professional_name: string;
+  category: string;
+  city: string | null;
+  price_range: string | null;
+};
+
+function buildProCards(
+  proMap: Map<string, RecRow[]>,
+  profileById: Map<string, ProfileRow>,
+  getMutualFriend: (uid: string) => string | undefined,
+  max: number,
+): ProCard[] {
+  const cards: ProCard[] = [];
+  for (const [, recs] of proMap) {
+    const first = recs[0];
+    if (!first?.professional_name) continue;
+    const recommenders: ProRecommender[] = [];
+    const seen = new Set<string>();
+    for (const r of recs) {
+      const uid = r.user_id;
+      if (seen.has(uid)) continue;
+      seen.add(uid);
+      const p = profileById.get(uid);
+      if (!p?.full_name) continue;
+      recommenders.push({
+        id: uid,
+        full_name: p.full_name,
+        username: p.username ?? null,
+        avatar_url: p.avatar_url ?? null,
+        mutual_friend: getMutualFriend(uid),
+      });
+      if (recommenders.length >= 3) break;
+    }
+    if (recommenders.length === 0) continue;
+    cards.push({
+      slug: first.professional_name.trim().replace(/\s+/g, "-"),
+      professional_name: first.professional_name,
+      category: first.category ?? "",
+      city: first.city ?? null,
+      rec_count: recs.length,
+      price_range: first.price_range ?? null,
+      recommenders,
+    });
+  }
+  return cards.sort((a, b) => b.rec_count - a.rec_count).slice(0, max);
 }
 
 export default async function CercaPage() {
@@ -44,7 +101,7 @@ export default async function CercaPage() {
 
   // ── Parallel: all profiles + second-degree follows ───────────────────────
   const [allProfilesResult, secondDegreeResult] = await Promise.all([
-    adminClient.from("profiles").select("id,full_name,city"),
+    adminClient.from("profiles").select("id,full_name,city,username,avatar_url"),
     followingIds.length > 0
       ? supabase
           .from("follows")
@@ -56,7 +113,6 @@ export default async function CercaPage() {
   ]);
 
   // Build profile lookup map
-  type ProfileRow = { id: string; full_name: string | null; city: string | null };
   const profileById = new Map<string, ProfileRow>(
     (allProfilesResult.data ?? []).map((p) => [p.id as string, p as ProfileRow]),
   );
@@ -81,8 +137,9 @@ export default async function CercaPage() {
     fofMap.get(target)!.add(via);
   }
   const fofIds = Array.from(fofMap.keys());
+  const fofSet = new Set(fofIds);
 
-  // ── Rec counts ─────────────────────────────────────────────────────────────
+  // ── Rec counts for user cards ───────────────────────────────────────────
   const relevantIds = Array.from(
     new Set([
       ...(allProfilesResult.data ?? [])
@@ -94,20 +151,44 @@ export default async function CercaPage() {
     ]),
   );
 
-  const { data: recRows } = relevantIds.length > 0
-    ? await supabase
-        .from("recommendations")
-        .select("user_id")
-        .in("user_id", relevantIds)
-    : { data: [] as { user_id: string }[] };
+  // ── Same-city all users (including following) for pro cards ──────────────
+  const sameCityAllIds = myCityNorm
+    ? (allProfilesResult.data ?? [])
+        .filter(
+          (p) =>
+            p.id !== userId &&
+            !blockedIds.has(p.id as string) &&
+            normalizeCity(p.city as string | null) === myCityNorm,
+        )
+        .map((p) => p.id as string)
+    : [];
+  const sameCityAllSet = new Set(sameCityAllIds);
+
+  const proQueryIds = Array.from(new Set([...sameCityAllIds, ...fofIds]));
+
+  // ── Parallel: user rec counts + pro recs ─────────────────────────────────
+  const [recRowsResult, proRecRowsResult] = await Promise.all([
+    relevantIds.length > 0
+      ? supabase
+          .from("recommendations")
+          .select("user_id")
+          .in("user_id", relevantIds)
+      : Promise.resolve({ data: [] as { user_id: string }[] }),
+    proQueryIds.length > 0
+      ? supabase
+          .from("recommendations")
+          .select("user_id,professional_name,category,city,price_range")
+          .in("user_id", proQueryIds)
+      : Promise.resolve({ data: [] as RecRow[] }),
+  ]);
 
   const recCountMap = new Map<string, number>();
-  for (const r of recRows ?? []) {
+  for (const r of recRowsResult.data ?? []) {
     const uid = r.user_id as string;
     recCountMap.set(uid, (recCountMap.get(uid) ?? 0) + 1);
   }
 
-  // ── Section 1: same city — JS comparison with normalize() ────────────────
+  // ── Section 1: same city users ────────────────────────────────────────────
   const sameCityUsers: UserCard[] = myCityNorm
     ? (allProfilesResult.data ?? [])
         .filter((p) => {
@@ -147,6 +228,43 @@ export default async function CercaPage() {
     .sort((a, b) => b.mutual_friends.length - a.mutual_friends.length)
     .slice(0, 30);
 
+  // ── Pro cards: group recs by professional_name ────────────────────────────
+  const sameCityProMap = new Map<string, RecRow[]>();
+  const fofProMap = new Map<string, RecRow[]>();
+
+  for (const rec of proRecRowsResult.data ?? []) {
+    const uid = rec.user_id as string;
+    if (!rec.professional_name) continue;
+    const key = (rec.professional_name as string).toLowerCase().trim();
+
+    if (sameCityAllSet.has(uid)) {
+      if (!sameCityProMap.has(key)) sameCityProMap.set(key, []);
+      sameCityProMap.get(key)!.push(rec as RecRow);
+    }
+    if (fofSet.has(uid)) {
+      if (!fofProMap.has(key)) fofProMap.set(key, []);
+      fofProMap.get(key)!.push(rec as RecRow);
+    }
+  }
+
+  const sameCityPros = buildProCards(
+    sameCityProMap,
+    profileById,
+    () => undefined,
+    30,
+  );
+
+  const fofPros = buildProCards(
+    fofProMap,
+    profileById,
+    (uid) => {
+      const viaIds = Array.from(fofMap.get(uid) ?? []);
+      const viaName = viaIds.map((id) => followingNameById.get(id)).find(Boolean);
+      return viaName ?? undefined;
+    },
+    30,
+  );
+
   return (
     <CercaClient
       currentUserId={userId}
@@ -154,6 +272,8 @@ export default async function CercaPage() {
       sameCityUsers={sameCityUsers}
       friendsOfFriends={friendsOfFriends}
       followingIds={followingIds}
+      sameCityPros={sameCityPros}
+      fofPros={fofPros}
     />
   );
 }
