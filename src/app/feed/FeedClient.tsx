@@ -21,12 +21,6 @@ import { createClient } from "@/lib/supabase/browser";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type FollowingProfile = {
-  id: string;
-  full_name: string | null;
-  username: string | null;
-  avatar_url: string | null;
-};
 
 export type FeedRecommendation = {
   type: "recommendation";
@@ -154,49 +148,6 @@ function ConnectionBadge({ userId, followingIds, secondDegreeIds }: {
   );
 }
 
-// ─── Stories Row ──────────────────────────────────────────────────────────────
-
-function StoriesRow({ profiles, recentlyPostedIds }: {
-  profiles: FollowingProfile[];
-  recentlyPostedIds: Set<string>;
-}) {
-  if (profiles.length === 0) return null;
-
-  return (
-    <div
-      className="flex gap-4 overflow-x-auto px-4 py-3"
-      style={{ scrollbarWidth: "none" }}
-    >
-      {profiles.map((p) => {
-        const name = p.full_name ?? "Utente";
-        const hasPosted = recentlyPostedIds.has(p.id);
-        const href = p.username ? `/p/${p.username}` : `/users`;
-
-        return (
-          <Link key={p.id} href={href} className="flex shrink-0 flex-col items-center gap-1.5">
-            <div
-              className={`flex h-[52px] w-[52px] items-center justify-center rounded-full p-[2px] ${
-                hasPosted ? "bg-[#0D9488]" : "bg-[#2a2a2a]"
-              }`}
-            >
-              <div className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(name)} overflow-hidden`}>
-                {p.avatar_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.avatar_url} alt={name} className="h-full w-full object-cover" />
-                ) : (
-                  <span className="text-[13px] font-bold text-white">{initials(name)}</span>
-                )}
-              </div>
-            </div>
-            <span className="max-w-[52px] truncate text-center text-[10px] text-[#6b7280]">
-              {name.split(" ")[0]}
-            </span>
-          </Link>
-        );
-      })}
-    </div>
-  );
-}
 
 // ─── Request Replies Sheet ────────────────────────────────────────────────────
 
@@ -1011,14 +962,12 @@ export function FeedClient({
   followingIds,
   secondDegreeIds,
   currentUserId,
-  followingProfiles,
   initialUnreadCount,
 }: {
   items: FeedItem[];
   followingIds: string[];
   secondDegreeIds: string[];
   currentUserId: string;
-  followingProfiles: FollowingProfile[];
   initialUnreadCount: number;
 }) {
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
@@ -1031,13 +980,6 @@ export function FeedClient({
     );
   }, [items, mode, followingIds]);
 
-  const recentlyPostedIds = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach((item) => {
-      if (followingIds.includes(item.user_id)) set.add(item.user_id);
-    });
-    return set;
-  }, [items, followingIds]);
 
   return (
     <div className="min-h-dvh bg-[#0a0a0a] text-white">
@@ -1064,9 +1006,6 @@ export function FeedClient({
           </button>
         </div>
       </header>
-
-      {/* Stories row */}
-      <StoriesRow profiles={followingProfiles} recentlyPostedIds={recentlyPostedIds} />
 
       {/* Filter pills */}
       <div className="mx-auto max-w-[430px] px-4 pb-3 pt-4">

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { FeedClient, type FeedItem, type FeedRecommendation, type FeedRequest, type FollowingProfile } from "./FeedClient";
+import { FeedClient, type FeedItem, type FeedRecommendation, type FeedRequest } from "./FeedClient";
 
 export default async function FeedPage() {
   const supabase = await createClient();
@@ -139,18 +139,6 @@ export default async function FeedPage() {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  const followingProfiles: FollowingProfile[] = followingIds
-    .map((id) => {
-      const p = profileById.get(id);
-      return {
-        id,
-        full_name: p?.full_name ?? null,
-        username: p?.username ?? null,
-        avatar_url: p?.avatar_url ?? null,
-      };
-    })
-    .filter((p) => p.full_name !== null);
-
   const { count: unreadCount } = await supabase
     .from("notifications")
     .select("id", { count: "exact", head: true })
@@ -163,7 +151,6 @@ export default async function FeedPage() {
       followingIds={followingIds}
       secondDegreeIds={secondDegreeIds}
       currentUserId={userId}
-      followingProfiles={followingProfiles}
       initialUnreadCount={unreadCount ?? 0}
     />
   );
