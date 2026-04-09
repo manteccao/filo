@@ -3,6 +3,10 @@ import { redirect } from "next/navigation";
 import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { CercaClient, type UserCard } from "./CercaClient";
 
+function normalizeCity(city: string | null | undefined): string {
+  return city?.toLowerCase().trim() ?? "";
+}
+
 export default async function CercaPage() {
   const supabase = await createClient();
   const {
@@ -25,7 +29,9 @@ export default async function CercaPage() {
   ]);
 
   const myCity =
-    (myProfileData as { city?: string | null } | null)?.city ?? null;
+    (myProfileData as { city?: string | null } | null)?.city?.trim() ?? null;
+  const myCityNorm = normalizeCity(myCity);
+
   const followingIds = (follows ?? [])
     .map((f) => f.following_id as string)
     .filter(Boolean);
@@ -36,34 +42,33 @@ export default async function CercaPage() {
 
   const adminClient = createAdminClient();
 
-  // ── Parallel: same-city profiles, second-degree follows, following names ──
-  const [sameCityResult, secondDegreeResult, followingNamesResult] =
-    await Promise.all([
-      myCity
-        ? adminClient
-            .from("profiles")
-            .select("id,full_name,city")
-            .ilike("city", myCity)
-        : Promise.resolve({ data: [] as { id: string; full_name: string | null; city: string | null }[] }),
-      followingIds.length > 0
-        ? supabase
-            .from("follows")
-            .select("follower_id,following_id")
-            .in("follower_id", followingIds)
-        : Promise.resolve({ data: [] as { follower_id: string; following_id: string }[] }),
-      followingIds.length > 0
-        ? adminClient
-            .from("profiles")
-            .select("id,full_name")
-            .in("id", followingIds)
-        : Promise.resolve({ data: [] as { id: string; full_name: string | null }[] }),
-    ]);
+  // ── Parallel: all profiles + second-degree follows ───────────────────────
+  const [allProfilesResult, secondDegreeResult] = await Promise.all([
+    adminClient.from("profiles").select("id,full_name,city"),
+    followingIds.length > 0
+      ? supabase
+          .from("follows")
+          .select("follower_id,following_id")
+          .in("follower_id", followingIds)
+      : Promise.resolve({
+          data: [] as { follower_id: string; following_id: string }[],
+        }),
+  ]);
 
-  const followingNameById = new Map(
-    (followingNamesResult.data ?? []).map((p) => [
-      p.id as string,
-      (p.full_name as string | null) ?? "",
-    ]),
+  // Build profile lookup map
+  type ProfileRow = { id: string; full_name: string | null; city: string | null };
+  const profileById = new Map<string, ProfileRow>(
+    (allProfilesResult.data ?? []).map((p) => [p.id as string, p as ProfileRow]),
+  );
+
+  // Following names for "amico di X" labels
+  const followingNameById = new Map<string, string>(
+    followingIds
+      .map((id) => {
+        const name = profileById.get(id)?.full_name ?? null;
+        return name ? ([id, name] as [string, string]) : null;
+      })
+      .filter((e): e is [string, string] => e !== null),
   );
 
   // ── Build FOF map: targetId → Set<viaFriendId> ───────────────────────────
@@ -75,62 +80,55 @@ export default async function CercaPage() {
     if (!fofMap.has(target)) fofMap.set(target, new Set());
     fofMap.get(target)!.add(via);
   }
-
   const fofIds = Array.from(fofMap.keys());
 
-  // ── Fetch FOF profiles + rec counts ─────────────────────────────────────
-  const [fofProfilesResult, recCountResult] = await Promise.all([
-    fofIds.length > 0
-      ? adminClient
-          .from("profiles")
-          .select("id,full_name,city")
-          .in("id", fofIds)
-      : Promise.resolve({ data: [] as { id: string; full_name: string | null; city: string | null }[] }),
-    (() => {
-      const relevantIds = Array.from(
-        new Set([
-          ...(sameCityResult.data ?? [])
-            .map((p) => p.id as string)
-            .filter((id) => !excludedIds.has(id)),
-          ...fofIds,
-        ]),
-      );
-      return relevantIds.length > 0
-        ? supabase
-            .from("recommendations")
-            .select("user_id")
-            .in("user_id", relevantIds)
-        : Promise.resolve({ data: [] as { user_id: string }[] });
-    })(),
-  ]);
+  // ── Rec counts ─────────────────────────────────────────────────────────────
+  const relevantIds = Array.from(
+    new Set([
+      ...(allProfilesResult.data ?? [])
+        .map((p) => p.id as string)
+        .filter((id) => !excludedIds.has(id) && myCityNorm
+          ? normalizeCity(profileById.get(id)?.city) === myCityNorm
+          : false),
+      ...fofIds,
+    ]),
+  );
 
-  // ── Rec count map ─────────────────────────────────────────────────────────
+  const { data: recRows } = relevantIds.length > 0
+    ? await supabase
+        .from("recommendations")
+        .select("user_id")
+        .in("user_id", relevantIds)
+    : { data: [] as { user_id: string }[] };
+
   const recCountMap = new Map<string, number>();
-  for (const r of recCountResult.data ?? []) {
+  for (const r of recRows ?? []) {
     const uid = r.user_id as string;
     recCountMap.set(uid, (recCountMap.get(uid) ?? 0) + 1);
   }
 
-  // ── Section 1: same city ─────────────────────────────────────────────────
-  const sameCityUsers: UserCard[] = (sameCityResult.data ?? [])
-    .filter((p) => !excludedIds.has(p.id as string) && p.full_name)
-    .map((p) => ({
-      id: p.id as string,
-      full_name: p.full_name as string,
-      city: p.city as string | null,
-      rec_count: recCountMap.get(p.id as string) ?? 0,
-      mutual_friends: [],
-    }))
-    .slice(0, 20);
+  // ── Section 1: same city — JS comparison with normalize() ────────────────
+  const sameCityUsers: UserCard[] = myCityNorm
+    ? (allProfilesResult.data ?? [])
+        .filter((p) => {
+          if (excludedIds.has(p.id as string)) return false;
+          if (!p.full_name) return false;
+          return normalizeCity(p.city as string | null) === myCityNorm;
+        })
+        .map((p) => ({
+          id: p.id as string,
+          full_name: p.full_name as string,
+          city: p.city as string | null,
+          rec_count: recCountMap.get(p.id as string) ?? 0,
+          mutual_friends: [],
+        }))
+        .slice(0, 20)
+    : [];
 
-  // ── Section 2: friends of friends ────────────────────────────────────────
-  const fofProfileById = new Map(
-    (fofProfilesResult.data ?? []).map((p) => [p.id as string, p]),
-  );
-
+  // ── Section 2: friends of friends ─────────────────────────────────────────
   const friendsOfFriends: UserCard[] = fofIds
     .map((targetId) => {
-      const p = fofProfileById.get(targetId);
+      const p = profileById.get(targetId);
       if (!p?.full_name) return null;
       const viaIds = Array.from(fofMap.get(targetId)!);
       const mutualFriends = viaIds
