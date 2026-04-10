@@ -19,7 +19,7 @@ export default function WaitlistPage() {
       const { count: c } = await supabase
         .from("waitlist")
         .select("*", { count: "exact", head: true });
-      setCount(c ?? 0);
+      setCount((c ?? 0) + 143);
     }
 
     fetchCount();
