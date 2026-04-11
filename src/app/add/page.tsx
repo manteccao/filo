@@ -47,6 +47,27 @@ async function addRecommendation(formData: FormData) {
   const { data, error: userError } = await supabase.auth.getUser();
   if (userError || !data.user) redirect("/login?redirectTo=/add");
 
+  // ── Email verification check ─────────────────────────────────────────────
+  if (!data.user.email_confirmed_at) {
+    errorRedirect("Verifica la tua email prima di pubblicare raccomandazioni.");
+  }
+
+  // ── Self-recommendation check ─────────────────────────────────────────────
+  const { data: myProfile } = await supabase
+    .from("profiles")
+    .select("account_type, full_name")
+    .eq("id", data.user.id)
+    .single();
+
+  if (
+    (myProfile as { account_type?: string } | null)?.account_type === "professional"
+  ) {
+    const myName = ((myProfile as { full_name?: string | null } | null)?.full_name ?? "").toLowerCase().trim();
+    if (myName && professionalName.toLowerCase().trim() === myName) {
+      errorRedirect("Non puoi raccomandare te stesso.");
+    }
+  }
+
   const { error } = await supabase.from("recommendations").insert({
     user_id: data.user.id,
     professional_name: professionalName,
@@ -58,7 +79,12 @@ async function addRecommendation(formData: FormData) {
     phone: phone || null,
   });
 
-  if (error) errorRedirect(error.message);
+  if (error) {
+    if (error.code === "23505") {
+      errorRedirect("Hai già raccomandato questo professionista in questa città.");
+    }
+    errorRedirect(error.message);
+  }
   redirect("/feed");
 }
 

@@ -257,6 +257,7 @@ export default function ProfilePage() {
   const [bio, setBio] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [recs, setRecs] = useState<Rec[]>([]);
+  const [accountType, setAccountType] = useState<string>("user");
   const [followingIds, setFollowingIds] = useState<string[]>([]);
   const [followerIds, setFollowerIds] = useState<string[]>([]);
 
@@ -286,7 +287,7 @@ export default function ProfilePage() {
         ] = await Promise.all([
           supabase
             .from("profiles")
-            .select("full_name, city, avatar_url, bio")
+            .select("full_name, city, avatar_url, bio, account_type")
             .eq("id", user.id)
             .single(),
           supabase
@@ -315,6 +316,7 @@ export default function ProfilePage() {
           (profile as { avatar_url?: string | null } | null)?.avatar_url ?? "",
         );
         setBio((profile as { bio?: string | null } | null)?.bio ?? "");
+        setAccountType((profile as { account_type?: string | null } | null)?.account_type ?? "user");
         setRecs((myRecs ?? []) as Rec[]);
         setFollowingIds(
           (following ?? []).map((f) => f.following_id as string).filter(Boolean),
@@ -447,7 +449,14 @@ export default function ProfilePage() {
       <div className="min-h-svh bg-[#0d0d17] text-white">
         <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
           <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between px-4">
-            <span className="text-[15px] font-bold">{fullName}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[15px] font-bold">{fullName}</span>
+              {accountType === "professional" && (
+                <span className="rounded-full bg-[#0D9488]/15 px-2 py-[2px] text-[10px] font-semibold text-[#0D9488]">
+                  Professionista
+                </span>
+              )}
+            </div>
             <Link href="/settings" aria-label="Impostazioni">
               <svg
                 viewBox="0 0 24 24"

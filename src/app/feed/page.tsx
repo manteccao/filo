@@ -51,7 +51,7 @@ export default async function FeedPage() {
   // Fetch profiles con admin client (bypassa RLS) per leggere profili altrui
   const adminClient = createAdminClient();
   const profilesResult = allProfileIds.length
-    ? await adminClient.from("profiles").select("id,full_name,city,username").in("id", allProfileIds)
+    ? await adminClient.from("profiles").select("id,full_name,city,username,account_type").in("id", allProfileIds)
     : { data: [], error: null };
   const [
     { data: secondDegreeFollows },
@@ -83,6 +83,7 @@ export default async function FeedPage() {
         city: p.city as string | null,
         username: p.username as string | null,
         avatar_url: null,
+        account_type: (p as { account_type?: string | null }).account_type ?? "user",
       },
     ])
   );
@@ -120,7 +121,7 @@ export default async function FeedPage() {
       likes_count: likesPerRec.get(r.id) ?? 0,
       liked_by_me: likedByMe.has(r.id),
       saved_by_me: savedByMe.has(r.id),
-      profile: prof ? { full_name: prof.full_name, city: prof.city, username: prof.username, avatar_url: prof.avatar_url } : null,
+      profile: prof ? { full_name: prof.full_name, city: prof.city, username: prof.username, avatar_url: prof.avatar_url, account_type: prof.account_type } : null,
     };
   });
 

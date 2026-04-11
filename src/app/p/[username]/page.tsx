@@ -34,7 +34,7 @@ export default async function PublicProfilePage({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id,full_name,city,username")
+    .select("id,full_name,city,username,account_type")
     .eq("username", username)
     .single();
 
@@ -90,9 +90,16 @@ export default async function PublicProfilePage({
             {initials(fullName)}
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {fullName}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {fullName}
+              </h1>
+              {(profile as { account_type?: string | null }).account_type === "professional" && (
+                <span className="rounded-full bg-teal-500/15 px-2.5 py-0.5 text-xs font-semibold text-teal-400">
+                  Professionista
+                </span>
+              )}
+            </div>
             {profile.city ? (
               <p className="mt-0.5 text-sm text-zinc-400">{profile.city}</p>
             ) : null}

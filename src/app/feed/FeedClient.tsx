@@ -35,7 +35,7 @@ export type FeedRecommendation = {
   created_at: string;
   likes_count: number;
   liked_by_me: boolean;
-  profile: { full_name: string | null; city: string | null; username: string | null; avatar_url: string | null } | null;
+  profile: { full_name: string | null; city: string | null; username: string | null; avatar_url: string | null; account_type: string | null } | null;
   saved_by_me: boolean;
 };
 
@@ -750,11 +750,18 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             </div>
           )}
           <div className="min-w-0 flex-1">
-            {username ? (
-              <Link href={`/p/${username}`} className="block truncate text-[15px] font-bold text-white transition hover:text-[#0D9488]">{recommenderName}</Link>
-            ) : (
-              <p className="text-[15px] font-bold text-white truncate">{recommenderName}</p>
-            )}
+            <div className="flex min-w-0 items-center gap-1.5">
+              {username ? (
+                <Link href={`/p/${username}`} className="truncate text-[15px] font-bold text-white transition hover:text-[#0D9488]">{recommenderName}</Link>
+              ) : (
+                <p className="truncate text-[15px] font-bold text-white">{recommenderName}</p>
+              )}
+              {r.profile?.account_type === "professional" && (
+                <span className="shrink-0 rounded-full bg-[#0D9488]/15 px-1.5 py-[2px] text-[10px] font-semibold text-[#0D9488]">
+                  Pro
+                </span>
+              )}
+            </div>
             {metaLine && <p className="text-[12px] text-[#6b7280] truncate">{metaLine}</p>}
           </div>
           <div className="flex items-center gap-2">
