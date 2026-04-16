@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const NAV = [
   {
@@ -45,6 +46,15 @@ const NAV = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    router.prefetch("/feed");
+    router.prefetch("/cerca");
+    router.prefetch("/requests");
+    router.prefetch("/profile");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#1a1a1a] bg-[#0d0d0d]">
@@ -69,6 +79,7 @@ export function BottomNav() {
             <Link
               key={i}
               href={item.href}
+              scroll={false}
               className={`flex flex-col items-center gap-[3px] px-2 transition-colors ${
                 active ? "text-[#0D9488]" : "text-[#6b7280] hover:text-[#9ca3af]"
               }`}

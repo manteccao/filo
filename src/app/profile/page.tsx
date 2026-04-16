@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
+import { cacheGet, cacheSet } from "@/lib/page-cache";
 
 const AVATAR_COLORS = [
   "from-teal-600 to-cyan-500",
@@ -52,6 +53,18 @@ type DrawerUser = {
   username: string | null;
   city: string | null;
   avatar_url: string | null;
+};
+
+type ProfileCache = {
+  userId: string;
+  fullName: string;
+  city: string;
+  bio: string;
+  avatarUrl: string;
+  recs: Rec[];
+  accountType: string;
+  followingIds: string[];
+  followerIds: string[];
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -267,6 +280,20 @@ export default function ProfilePage() {
   const [drawerLoading, setDrawerLoading] = useState(false);
 
   useEffect(() => {
+    const cached = cacheGet<ProfileCache>("profile");
+    if (cached) {
+      setUserId(cached.userId);
+      setFullName(cached.fullName);
+      setCity(cached.city);
+      setBio(cached.bio);
+      setAvatarUrl(cached.avatarUrl);
+      setRecs(cached.recs);
+      setAccountType(cached.accountType);
+      setFollowingIds(cached.followingIds);
+      setFollowerIds(cached.followerIds);
+      setLoading(false);
+    }
+
     async function load() {
       try {
         const supabase = createClient();
@@ -309,21 +336,35 @@ export default function ProfilePage() {
           (profile as { full_name?: string | null } | null)?.full_name ??
           user.user_metadata?.full_name ??
           "Utente";
+        const city = (profile as { city?: string | null } | null)?.city ?? "";
+        const bio = (profile as { bio?: string | null } | null)?.bio ?? "";
+        const avatarUrl = (profile as { avatar_url?: string | null } | null)?.avatar_url ?? "";
+        const accountType = (profile as { account_type?: string | null } | null)?.account_type ?? "user";
+        const recs = (myRecs ?? []) as Rec[];
+        const followingIds = (following ?? []).map((f) => f.following_id as string).filter(Boolean);
+        const followerIds = (followers ?? []).map((f) => f.follower_id as string).filter(Boolean);
+
+        cacheSet<ProfileCache>("profile", {
+          userId: user.id,
+          fullName: name,
+          city,
+          bio,
+          avatarUrl,
+          recs,
+          accountType,
+          followingIds,
+          followerIds,
+        });
+
         setUserId(user.id);
         setFullName(name);
-        setCity((profile as { city?: string | null } | null)?.city ?? "");
-        setAvatarUrl(
-          (profile as { avatar_url?: string | null } | null)?.avatar_url ?? "",
-        );
-        setBio((profile as { bio?: string | null } | null)?.bio ?? "");
-        setAccountType((profile as { account_type?: string | null } | null)?.account_type ?? "user");
-        setRecs((myRecs ?? []) as Rec[]);
-        setFollowingIds(
-          (following ?? []).map((f) => f.following_id as string).filter(Boolean),
-        );
-        setFollowerIds(
-          (followers ?? []).map((f) => f.follower_id as string).filter(Boolean),
-        );
+        setCity(city);
+        setAvatarUrl(avatarUrl);
+        setBio(bio);
+        setAccountType(accountType);
+        setRecs(recs);
+        setFollowingIds(followingIds);
+        setFollowerIds(followerIds);
       } finally {
         setLoading(false);
       }

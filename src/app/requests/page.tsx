@@ -16,6 +16,13 @@ import {
 } from "@/components/ui/sheet";
 
 import { createClient } from "@/lib/supabase/browser";
+import { cacheGet, cacheSet } from "@/lib/page-cache";
+
+type RequestsCache = {
+  userId: string;
+  requests: Request[];
+  replyCounts: Record<string, number>;
+};
 
 const CATEGORIES = [
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
@@ -544,11 +551,18 @@ export default function RequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<Request | null>(null);
 
   useEffect(() => {
+    const cached = cacheGet<RequestsCache>("requests");
+    if (cached) {
+      setCurrentUserId(cached.userId);
+      setRequests(cached.requests);
+      setReplyCounts(cached.replyCounts);
+      setLoading(false);
+    }
+
     async function load() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
-      setCurrentUserId(user.id);
 
       const [{ data: reqs }, { data: counts }] = await Promise.all([
         supabase
@@ -558,13 +572,16 @@ export default function RequestsPage() {
         supabase.from("request_replies").select("request_id"),
       ]);
 
-      setRequests((reqs as Request[]) ?? []);
-
+      const requests = (reqs as Request[]) ?? [];
       const countMap: Record<string, number> = {};
       for (const c of (counts ?? [])) {
         const rid = (c as { request_id: string }).request_id;
         countMap[rid] = (countMap[rid] ?? 0) + 1;
       }
+
+      cacheSet<RequestsCache>("requests", { userId: user.id, requests, replyCounts: countMap });
+      setCurrentUserId(user.id);
+      setRequests(requests);
       setReplyCounts(countMap);
       setLoading(false);
     }
