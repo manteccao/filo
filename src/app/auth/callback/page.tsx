@@ -24,8 +24,8 @@ function AuthCallback() {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        setError(error.message);
-        router.push("/login?error=auth_failed");
+        console.error("Auth error:", JSON.stringify(error));
+        setError(JSON.stringify({ message: error.message, status: (error as unknown as { status?: number }).status, name: error.name }));
         return;
       }
 
@@ -56,8 +56,10 @@ function AuthCallback() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Errore di autenticazione. Reindirizzamento...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 bg-black text-white">
+        <p className="text-red-400 font-bold text-lg">Errore di autenticazione</p>
+        <pre className="text-xs bg-zinc-900 p-4 rounded-xl max-w-lg w-full overflow-auto text-red-300 whitespace-pre-wrap">{error}</pre>
+        <a href="/login" className="text-sm underline text-zinc-400">Torna al login</a>
       </div>
     );
   }
