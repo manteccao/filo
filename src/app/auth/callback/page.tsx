@@ -1,40 +1,53 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export const dynamic = "force-static";
-
-function AuthCallback() {
-  const searchParams = useSearchParams();
+function CallbackHandler() {
   const router = useRouter();
   const supabase = createClient();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
-      const code = searchParams.get("code");
+      // Per il flusso implicit, Supabase gestisce automaticamente i token dall'URL hash
+      // Basta controllare se c'è una sessione
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
 
-      if (!code) {
-        router.push("/login?error=no_code");
-        return;
+      if (sessionError || !session) {
+        // Prova anche con exchangeCodeForSession per il caso PKCE
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+
+        if (code) {
+          const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (codeError) {
+            setError(JSON.stringify(codeError));
+            return;
+          }
+        } else {
+          // Aspetta un attimo che Supabase processi l'hash
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          const {
+            data: { session: retrySession },
+          } = await supabase.auth.getSession();
+          if (!retrySession) {
+            setError("Nessuna sessione trovata");
+            return;
+          }
+        }
       }
 
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-      if (error) {
-        console.error("Auth error:", JSON.stringify(error));
-        setError(JSON.stringify({ message: error.message, status: (error as unknown as { status?: number }).status, name: error.name }));
-        return;
-      }
-
-      // Controlla se l'utente ha già un profilo
+      // A questo punto abbiamo una sessione
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        router.push("/login?error=no_user");
+        setError("Utente non trovato");
         return;
       }
 
@@ -52,20 +65,20 @@ function AuthCallback() {
     };
 
     handleCallback();
-  }, [searchParams, router, supabase]);
+  }, [router, supabase]);
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 bg-black text-white">
-        <p className="text-red-400 font-bold text-lg">Errore di autenticazione</p>
-        <pre className="text-xs bg-zinc-900 p-4 rounded-xl max-w-lg w-full overflow-auto text-red-300 whitespace-pre-wrap">{error}</pre>
-        <a href="/login" className="text-sm underline text-zinc-400">Torna al login</a>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 bg-black text-white">
+        <h1 className="text-xl font-bold text-red-400">Errore di autenticazione</h1>
+        <pre className="bg-gray-800 p-4 rounded max-w-lg overflow-auto text-sm whitespace-pre-wrap">{error}</pre>
+        <a href="/login" className="underline text-zinc-400">Torna al login</a>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-black text-white">
       <p>Accesso in corso...</p>
     </div>
   );
@@ -75,12 +88,12 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <p>Accesso in corso...</p>
+        <div className="flex items-center justify-center min-h-screen bg-black text-white">
+          <p>Caricamento...</p>
         </div>
       }
     >
-      <AuthCallback />
+      <CallbackHandler />
     </Suspense>
   );
 }

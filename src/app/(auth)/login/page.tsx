@@ -15,6 +15,10 @@ export default function LoginPage() {
       provider: "google",
       options: {
         redirectTo: "https://filo.network/auth/callback",
+        skipBrowserRedirect: false,
+        queryParams: {
+          prompt: "select_account",
+        },
       },
     });
     if (error) {
