@@ -76,13 +76,15 @@ export function AddFormClient({ userId }: { userId: string }) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       const supabase = createClient();
-      const { data } = await supabase
+      const { data, error: searchError } = await supabase
         .from("profiles")
         .select("id, full_name, city, professional_category, avatar_url")
         .eq("account_type", "professional")
         .neq("id", userId)
         .ilike("full_name", `%${query}%`)
         .limit(6);
+      if (searchError) console.error("Profiles search error:", searchError);
+      console.log("Search results:", data);
       setResults(data ?? []);
       setSearched(true);
       setShowDropdown(true);
