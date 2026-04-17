@@ -50,14 +50,6 @@ export default function SettingsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const [showPw, setShowPw] = useState(false);
-  const [pwCurrent, setPwCurrent] = useState("");
-  const [pwNew, setPwNew] = useState("");
-  const [pwConfirm, setPwConfirm] = useState("");
-  const [pwLoading, setPwLoading] = useState(false);
-  const [pwError, setPwError] = useState<string | null>(null);
-  const [pwSuccess, setPwSuccess] = useState(false);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -107,23 +99,6 @@ export default function SettingsPage() {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
-  }
-
-  async function handlePasswordChange(e: React.FormEvent) {
-    e.preventDefault();
-    setPwError(null);
-    if (pwNew.length < 6) { setPwError("La password deve essere di almeno 6 caratteri."); return; }
-    if (pwNew !== pwConfirm) { setPwError("Le password non coincidono."); return; }
-    setPwLoading(true);
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password: pwCurrent });
-    if (signInError) { setPwError("Password attuale non corretta."); setPwLoading(false); return; }
-    const { error } = await supabase.auth.updateUser({ password: pwNew });
-    setPwLoading(false);
-    if (error) { setPwError(error.message); return; }
-    setPwSuccess(true);
-    setPwCurrent(""); setPwNew(""); setPwConfirm("");
-    setTimeout(() => { setPwSuccess(false); setShowPw(false); }, 2000);
   }
 
   async function handleLogout() {
@@ -217,31 +192,6 @@ export default function SettingsPage() {
             <span className="text-sm text-[#8b8fa8]">Email</span>
             <span className="truncate text-sm text-white">{email}</span>
           </div>
-        </div>
-
-        {/* Sicurezza */}
-        <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Sicurezza</p>
-            {!showPw && (
-              <button type="button" onClick={() => { setShowPw(true); setPwError(null); setPwSuccess(false); }} className="text-xs text-[#8b8fa8] transition hover:text-white">
-                Cambia password
-              </button>
-            )}
-          </div>
-          {showPw && (
-            <form onSubmit={handlePasswordChange} className="mt-4 space-y-3">
-              {pwError && <div className="rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">{pwError}</div>}
-              {pwSuccess && <div className="rounded-xl border border-teal-500/20 bg-teal-500/10 px-3 py-2 text-xs text-teal-300">Password aggiornata!</div>}
-              <input type="password" placeholder="Password attuale" required value={pwCurrent} onChange={(e) => setPwCurrent(e.target.value)} className={inputCls} />
-              <input type="password" placeholder="Nuova password" required value={pwNew} onChange={(e) => setPwNew(e.target.value)} className={inputCls} />
-              <input type="password" placeholder="Conferma nuova password" required value={pwConfirm} onChange={(e) => setPwConfirm(e.target.value)} className={inputCls} />
-              <div className="flex gap-2">
-                <button type="button" onClick={() => { setShowPw(false); setPwError(null); }} className="h-10 flex-1 rounded-2xl border border-[#232340] text-xs text-[#8b8fa8] transition hover:text-white">Annulla</button>
-                <button type="submit" disabled={pwLoading} className="h-10 flex-1 rounded-2xl bg-[#0D9488] text-xs font-semibold text-white transition hover:bg-[#0b7c76] disabled:opacity-50">{pwLoading ? "Salvataggio…" : "Salva"}</button>
-              </div>
-            </form>
-          )}
         </div>
 
         {/* Condividi profilo */}
