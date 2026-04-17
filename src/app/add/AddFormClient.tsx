@@ -24,7 +24,6 @@ type ProfessionalResult = {
   id: string;
   full_name: string | null;
   city: string | null;
-  professional_category: string | null;
   avatar_url: string | null;
 };
 
@@ -76,15 +75,13 @@ export function AddFormClient({ userId }: { userId: string }) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       const supabase = createClient();
-      const { data, error: searchError } = await supabase
+      const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, city, professional_category, avatar_url")
+        .select("id, full_name, city, avatar_url")
         .eq("account_type", "professional")
         .neq("id", userId)
         .ilike("full_name", `%${query}%`)
         .limit(6);
-      if (searchError) console.error("Profiles search error:", searchError);
-      console.log("Search results:", data);
       setResults(data ?? []);
       setSearched(true);
       setShowDropdown(true);
@@ -111,13 +108,6 @@ export function AddFormClient({ userId }: { userId: string }) {
     setQuery(prof.full_name ?? "");
     // Auto-fill city if available
     if (prof.city) setCity(prof.city);
-    // Try to match professional_category to CATEGORIES list
-    if (prof.professional_category) {
-      const match = CATEGORIES.find(
-        (c) => c.toLowerCase() === prof.professional_category!.toLowerCase()
-      );
-      if (match) setCategory(match);
-    }
     setShowDropdown(false);
     setResults([]);
   }
@@ -207,7 +197,7 @@ export function AddFormClient({ userId }: { userId: string }) {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-white">{prof.full_name}</p>
                         <p className="truncate text-[11px] text-[#6b7280]">
-                          {[prof.professional_category, prof.city].filter(Boolean).join(" · ")}
+                          {prof.city ?? ""}
                         </p>
                       </div>
                       {/* Badge */}
