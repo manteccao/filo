@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import { addRecommendation } from "./actions";
 import { createClient } from "@/lib/supabase/client";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 
 const CATEGORIES = [
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
@@ -262,14 +263,12 @@ export function AddFormClient({ userId }: { userId: string }) {
         </div>
         <div className="space-y-1.5">
           <label className={labelCls} htmlFor="city">Città</label>
-          <input
-            id="city"
+          <CityAutocomplete
             name="city"
-            type="text"
+            value={city}
+            onChange={setCity}
             required
             placeholder="Es. Milano"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
             className={inputCls}
           />
         </div>

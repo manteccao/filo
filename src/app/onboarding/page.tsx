@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/browser";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 
 const BASE_URL = "https://filo-kappa.vercel.app";
 
@@ -229,12 +230,11 @@ export default function OnboardingPage() {
                   </option>
                 ))}
               </select>
-              <input
+              <CityAutocomplete
                 value={city}
-                onChange={(e) => setCity(e.target.value)}
+                onChange={setCity}
                 required
                 placeholder="Città"
-                className={inputCls}
               />
               <textarea
                 value={note}
@@ -293,12 +293,11 @@ export default function OnboardingPage() {
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
                   Città in cui lavori
                 </label>
-                <input
+                <CityAutocomplete
                   value={proCity}
-                  onChange={(e) => setProCity(e.target.value)}
+                  onChange={setProCity}
                   required
                   placeholder="Es. Milano"
-                  className={inputCls}
                 />
               </div>
 
