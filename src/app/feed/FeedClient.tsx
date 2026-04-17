@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { BottomNav } from "@/components/BottomNav";
-import { NotificationsDrawer } from "@/components/NotificationsDrawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,8 +16,17 @@ import {
 
 import { deleteRecommendation, toggleLike, updateRecommendation } from "./actions";
 import { reportContent } from "@/app/moderation/actions";
-import { ReportDialog } from "@/components/ReportDialog";
 import { createClient } from "@/lib/supabase/browser";
+
+// Lazy-load heavy drawers — only downloaded when first opened
+const NotificationsDrawer = dynamic(
+  () => import("@/components/NotificationsDrawer").then((m) => ({ default: m.NotificationsDrawer })),
+  { ssr: false }
+);
+const ReportDialog = dynamic(
+  () => import("@/components/ReportDialog").then((m) => ({ default: m.ReportDialog })),
+  { ssr: false }
+);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -179,6 +188,7 @@ function RequestRepliesSheet({
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [myRecs, setMyRecs] = useState<MyRec[]>([]);
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [selectedRec, setSelectedRec] = useState("");
   const [posting, setPosting] = useState(false);
@@ -189,7 +199,7 @@ function RequestRepliesSheet({
     setLoading(true);
     async function load() {
       const supabase = createClient();
-      const [{ data: repliesData }, { data: recsData }] = await Promise.all([
+      const [{ data: repliesData }, { data: recsData }, { data: meData }] = await Promise.all([
         supabase
           .from("request_replies_with_profile")
           .select("id, user_id, content, created_at, full_name, professional_name, rec_category, rec_city")
@@ -199,9 +209,11 @@ function RequestRepliesSheet({
           .from("recommendations")
           .select("id, professional_name, category, city")
           .eq("user_id", currentUserId),
+        supabase.from("profiles").select("full_name").eq("id", currentUserId).single(),
       ]);
       setReplies((repliesData as RequestReply[]) ?? []);
       setMyRecs((recsData as MyRec[]) ?? []);
+      setCurrentUserName((meData as { full_name: string | null } | null)?.full_name ?? null);
       setLoading(false);
       setLoaded(true);
     }
@@ -211,37 +223,51 @@ function RequestRepliesSheet({
 
   async function handlePost(e: React.FormEvent) {
     e.preventDefault();
-    if (!text.trim() || posting) return;
+    const content = text.trim();
+    if (!content || posting) return;
+
+    // Optimistic: mostra la risposta immediatamente
+    const rec = myRecs.find((r) => r.id === selectedRec) ?? null;
+    const tempId = `temp-${Date.now()}`;
+    const tempReply: RequestReply = {
+      id: tempId,
+      user_id: currentUserId,
+      content,
+      created_at: new Date().toISOString(),
+      full_name: currentUserName,
+      professional_name: rec?.professional_name ?? null,
+      rec_category: rec?.category ?? null,
+      rec_city: rec?.city ?? null,
+    };
+    setReplies((prev) => [...prev, tempReply]);
+    setText("");
+    setSelectedRec("");
+    setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+
     setPosting(true);
     const supabase = createClient();
     const { data, error } = await supabase
       .from("request_replies")
-      .insert({ request_id: request.id, user_id: currentUserId, content: text.trim(), recommendation_id: selectedRec || null })
+      .insert({ request_id: request.id, user_id: currentUserId, content, recommendation_id: selectedRec || null })
       .select("id, user_id, content, created_at")
       .single();
     if (!error && data) {
-      const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", currentUserId).single();
-      const rec = myRecs.find((r) => r.id === selectedRec) ?? null;
-      setReplies([...replies, {
-        ...(data as Pick<RequestReply, "id" | "user_id" | "content" | "created_at">),
-        full_name: (profile as { full_name: string | null } | null)?.full_name ?? null,
-        professional_name: rec?.professional_name ?? null,
-        rec_category: rec?.category ?? null,
-        rec_city: rec?.city ?? null,
-      }]);
-      setText("");
-      setSelectedRec("");
-      setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
-
-      // Notifica al proprietario della richiesta
+      // Sostituisce il temp con l'ID reale del server
+      setReplies((prev) => prev.map((r) => r.id === tempId
+        ? { ...(data as Pick<RequestReply, "id" | "user_id" | "content" | "created_at">), full_name: currentUserName, professional_name: rec?.professional_name ?? null, rec_category: rec?.category ?? null, rec_city: rec?.city ?? null }
+        : r));
+      // Notifica fire-and-forget
       if (currentUserId !== request.user_id) {
-        await supabase.from("notifications").insert({
+        supabase.from("notifications").insert({
           user_id: request.user_id,
           type: "reply",
           actor_id: currentUserId,
           request_id: request.id,
         });
       }
+    } else {
+      // Revert optimistic update on error
+      setReplies((prev) => prev.filter((r) => r.id !== tempId));
     }
     setPosting(false);
   }
@@ -353,6 +379,7 @@ function CommentsSheet({
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
@@ -362,14 +389,18 @@ function CommentsSheet({
     setLoading(true);
     async function load() {
       const supabase = createClient();
-      const { data } = await supabase
-        .from("comments_with_profile")
-        .select("id, user_id, content, created_at, full_name")
-        .eq("recommendation_id", recommendationId)
-        .order("created_at", { ascending: true });
+      const [{ data }, { data: meData }] = await Promise.all([
+        supabase
+          .from("comments_with_profile")
+          .select("id, user_id, content, created_at, full_name")
+          .eq("recommendation_id", recommendationId)
+          .order("created_at", { ascending: true }),
+        supabase.from("profiles").select("full_name").eq("id", currentUserId).single(),
+      ]);
       const list = (data as Comment[]) ?? [];
       setComments(list);
       onCountChange(list.length);
+      setCurrentUserName((meData as { full_name: string | null } | null)?.full_name ?? null);
       setLoading(false);
       setLoaded(true);
     }
@@ -381,6 +412,22 @@ function CommentsSheet({
     e.preventDefault();
     const content = text.trim();
     if (!content || posting) return;
+
+    // Optimistic: mostra il commento immediatamente
+    const tempId = `temp-${Date.now()}`;
+    const tempComment: Comment = {
+      id: tempId,
+      user_id: currentUserId,
+      content,
+      created_at: new Date().toISOString(),
+      full_name: currentUserName,
+    };
+    const optimistic = [...comments, tempComment];
+    setComments(optimistic);
+    onCountChange(optimistic.length);
+    setText("");
+    setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+
     setPosting(true);
     const supabase = createClient();
     const { data, error } = await supabase
@@ -389,27 +436,23 @@ function CommentsSheet({
       .select("id, user_id, content, created_at")
       .single();
     if (!error && data) {
-      const { data: profile } = await supabase
-        .from("profiles").select("full_name").eq("id", currentUserId).single();
-      const newComment: Comment = {
-        ...(data as Omit<Comment, "full_name">),
-        full_name: (profile as { full_name: string | null } | null)?.full_name ?? null,
-      };
-      const updated = [...comments, newComment];
-      setComments(updated);
-      onCountChange(updated.length);
-      setText("");
-      setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
-
-      // Notifica al proprietario della raccomandazione
+      // Sostituisce il temp con l'ID reale
+      setComments((prev) => prev.map((c) => c.id === tempId
+        ? { ...(data as Omit<Comment, "full_name">), full_name: currentUserName }
+        : c));
+      // Notifica fire-and-forget
       if (currentUserId !== recOwnerId) {
-        await supabase.from("notifications").insert({
+        supabase.from("notifications").insert({
           user_id: recOwnerId,
           type: "comment",
           actor_id: currentUserId,
           recommendation_id: recommendationId,
         });
       }
+    } else {
+      // Revert on error
+      setComments((prev) => prev.filter((c) => c.id !== tempId));
+      onCountChange(comments.length);
     }
     setPosting(false);
   }
@@ -670,11 +713,10 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     setSaved(!prev);
     setSaveLoading(true);
     const supabase = createClient();
-    if (prev) {
-      await supabase.from("saves").delete().eq("recommendation_id", r.id).eq("user_id", currentUserId);
-    } else {
-      await supabase.from("saves").insert({ recommendation_id: r.id, user_id: currentUserId });
-    }
+    const { error } = prev
+      ? await supabase.from("saves").delete().eq("recommendation_id", r.id).eq("user_id", currentUserId)
+      : await supabase.from("saves").insert({ recommendation_id: r.id, user_id: currentUserId });
+    if (error) setSaved(prev); // revert on error
     setSaveLoading(false);
   }
 

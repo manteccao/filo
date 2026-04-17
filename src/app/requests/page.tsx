@@ -240,6 +240,7 @@ function RepliesSheet({
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [myRecs, setMyRecs] = useState<MyRec[]>([]);
+  const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [selectedRec, setSelectedRec] = useState("");
   const [posting, setPosting] = useState(false);
@@ -250,7 +251,7 @@ function RepliesSheet({
     setLoading(true);
     async function load() {
       const supabase = createClient();
-      const [{ data: repliesData }, { data: recsData }] = await Promise.all([
+      const [{ data: repliesData }, { data: recsData }, { data: meData }] = await Promise.all([
         supabase
           .from("request_replies_with_profile")
           .select("id, request_id, user_id, content, recommendation_id, created_at, full_name, professional_name, rec_category, rec_city")
@@ -260,9 +261,11 @@ function RepliesSheet({
           .from("recommendations")
           .select("id, professional_name, category, city")
           .eq("user_id", currentUserId),
+        supabase.from("profiles").select("full_name").eq("id", currentUserId).single(),
       ]);
       setReplies((repliesData as Reply[]) ?? []);
       setMyRecs((recsData as MyRec[]) ?? []);
+      setCurrentUserName((meData as { full_name: string | null } | null)?.full_name ?? null);
       setLoading(false);
       setLoaded(true);
     }
@@ -272,39 +275,53 @@ function RepliesSheet({
 
   async function handlePost(e: React.FormEvent) {
     e.preventDefault();
-    if (!text.trim() || posting) return;
+    const content = text.trim();
+    if (!content || posting) return;
+
+    // Optimistic: mostra la risposta immediatamente
+    const rec = myRecs.find((r) => r.id === selectedRec) ?? null;
+    const tempId = `temp-${Date.now()}`;
+    const tempReply: Reply = {
+      id: tempId,
+      request_id: request.id,
+      user_id: currentUserId,
+      content,
+      recommendation_id: selectedRec || null,
+      created_at: new Date().toISOString(),
+      full_name: currentUserName,
+      professional_name: rec?.professional_name ?? null,
+      rec_category: rec?.category ?? null,
+      rec_city: rec?.city ?? null,
+    };
+    setReplies((prev) => [...prev, tempReply]);
+    setText("");
+    setSelectedRec("");
+    setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
+
     setPosting(true);
     const supabase = createClient();
     const { data, error } = await supabase
       .from("request_replies")
-      .insert({ request_id: request.id, user_id: currentUserId, content: text.trim(), recommendation_id: selectedRec || null })
+      .insert({ request_id: request.id, user_id: currentUserId, content, recommendation_id: selectedRec || null })
       .select("id, request_id, user_id, content, recommendation_id, created_at")
       .single();
     if (!error && data) {
-      const { data: profile } = await supabase
-        .from("profiles").select("full_name").eq("id", currentUserId).single();
-      const rec = myRecs.find((r) => r.id === selectedRec) ?? null;
-      const newReply: Reply = {
-        ...(data as Omit<Reply, "full_name" | "professional_name" | "rec_category" | "rec_city">),
-        full_name: (profile as { full_name: string | null } | null)?.full_name ?? null,
-        professional_name: rec?.professional_name ?? null,
-        rec_category: rec?.category ?? null,
-        rec_city: rec?.city ?? null,
-      };
-      setReplies([...replies, newReply]);
-      setText("");
-      setSelectedRec("");
-      setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" }), 50);
-
-      // Notifica al proprietario della richiesta
+      // Sostituisce il temp con l'ID reale
+      setReplies((prev) => prev.map((r) => r.id === tempId
+        ? { ...(data as Omit<Reply, "full_name" | "professional_name" | "rec_category" | "rec_city">), full_name: currentUserName, professional_name: rec?.professional_name ?? null, rec_category: rec?.category ?? null, rec_city: rec?.city ?? null }
+        : r));
+      // Notifica fire-and-forget
       if (currentUserId !== request.user_id) {
-        await supabase.from("notifications").insert({
+        supabase.from("notifications").insert({
           user_id: request.user_id,
           type: "reply",
           actor_id: currentUserId,
           request_id: request.id,
         });
       }
+    } else {
+      // Revert on error
+      setReplies((prev) => prev.filter((r) => r.id !== tempId));
     }
     setPosting(false);
   }

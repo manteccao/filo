@@ -19,10 +19,13 @@ export default async function FeedPage() {
       supabase
         .from("recommendations")
         .select("id,user_id,professional_name,category,city,note,address,price_range,created_at")
-        .order("created_at", { ascending: false }),
+        .order("created_at", { ascending: false })
+        .limit(20),
       supabase
         .from("requests_with_profile")
-        .select("id,user_id,content,category,city,created_at,full_name"),
+        .select("id,user_id,content,category,city,created_at,full_name")
+        .order("created_at", { ascending: false })
+        .limit(20),
       supabase
         .from("follows")
         .select("following_id")

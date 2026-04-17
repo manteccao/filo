@@ -80,6 +80,7 @@ export function BottomNav() {
               key={i}
               href={item.href}
               scroll={false}
+              prefetch={true}
               className={`flex flex-col items-center gap-[3px] px-2 transition-colors ${
                 active ? "text-[#0D9488]" : "text-[#6b7280] hover:text-[#9ca3af]"
               }`}
