@@ -1,13 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 function CallbackHandler() {
   const router = useRouter();
   const supabase = createClient();
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -26,7 +25,7 @@ function CallbackHandler() {
         if (code) {
           const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
           if (codeError) {
-            setError(JSON.stringify(codeError));
+            router.push("/login?error=auth_failed");
             return;
           }
         } else {
@@ -36,7 +35,7 @@ function CallbackHandler() {
             data: { session: retrySession },
           } = await supabase.auth.getSession();
           if (!retrySession) {
-            setError("Nessuna sessione trovata");
+            router.push("/login?error=auth_failed");
             return;
           }
         }
@@ -47,7 +46,7 @@ function CallbackHandler() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        setError("Utente non trovato");
+        router.push("/login?error=auth_failed");
         return;
       }
 
@@ -66,16 +65,6 @@ function CallbackHandler() {
 
     handleCallback();
   }, [router, supabase]);
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-4 bg-black text-white">
-        <h1 className="text-xl font-bold text-red-400">Errore di autenticazione</h1>
-        <pre className="bg-gray-800 p-4 rounded max-w-lg overflow-auto text-sm whitespace-pre-wrap">{error}</pre>
-        <a href="/login" className="underline text-zinc-400">Torna al login</a>
-      </div>
-    );
-  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-black text-white">
