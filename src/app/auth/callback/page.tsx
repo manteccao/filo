@@ -1,69 +1,84 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 
-function Callback() {
-  const router = useRouter();
+export const dynamic = "force-static";
+
+function AuthCallback() {
   const searchParams = useSearchParams();
-  const handled = useRef(false);
+  const router = useRouter();
+  const supabase = createClient();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (handled.current) return;
-    handled.current = true;
+    const handleCallback = async () => {
+      const code = searchParams.get("code");
 
-    const code = searchParams.get("code");
-
-    if (!code) {
-      router.replace("/login?error=Autenticazione+fallita.+Riprova.");
-      return;
-    }
-
-    const supabase = createClient();
-
-    supabase.auth.exchangeCodeForSession(code).then(async ({ error }) => {
-      if (error) {
-        router.replace("/login?error=Autenticazione+fallita.+Riprova.");
+      if (!code) {
+        router.push("/login?error=no_code");
         return;
       }
 
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+      if (error) {
+        setError(error.message);
+        router.push("/login?error=auth_failed");
+        return;
+      }
+
+      // Controlla se l'utente ha già un profilo
       const {
         data: { user },
       } = await supabase.auth.getUser();
-
       if (!user) {
-        router.replace("/login?error=Autenticazione+fallita.+Riprova.");
+        router.push("/login?error=no_user");
         return;
       }
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id")
+        .select("id, full_name")
         .eq("id", user.id)
-        .maybeSingle();
+        .single();
 
-      if (profile) {
-        router.replace("/feed");
+      if (profile?.full_name) {
+        router.push("/feed");
       } else {
-        router.replace("/onboarding");
+        router.push("/onboarding");
       }
-    });
-  }, [router, searchParams]);
+    };
 
-  return null;
+    handleCallback();
+  }, [searchParams, router, supabase]);
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Errore di autenticazione. Reindirizzamento...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <p>Accesso in corso...</p>
+    </div>
+  );
 }
-
-const Spinner = (
-  <div className="flex min-h-svh items-center justify-center bg-[#0a0a0a]">
-    <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-  </div>
-);
 
 export default function AuthCallbackPage() {
   return (
-    <Suspense fallback={Spinner}>
-      <Callback />
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <p>Accesso in corso...</p>
+        </div>
+      }
+    >
+      <AuthCallback />
     </Suspense>
   );
 }
