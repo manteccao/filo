@@ -113,7 +113,11 @@ export default function SettingsPage() {
     setCityError(null);
     try {
       const supabase = createClient();
-      console.log("[settings] saving city:", city.trim(), "for userId:", userId);
+      console.log("[settings] userId usato:", userId);
+      console.log("[settings] città da salvare:", city.trim());
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      console.log("[settings] auth.uid():", authUser?.id);
+      console.log("[settings] match:", authUser?.id === userId);
       const { data, error } = await supabase
         .from("profiles")
         .update({ city: city.trim() })
