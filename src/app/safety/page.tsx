@@ -21,10 +21,10 @@ export default function SafetyPage() {
           </Link>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/filo-logo-3d.png"
+            src="/filo-logo-new.png"
             alt="Filo"
             className="h-8 w-auto object-contain"
-            style={{ mixBlendMode: "screen" }}
+           
           />
         </div>
       </header>

@@ -33,10 +33,10 @@ export default function LoginPage() {
       <div className="mb-10 flex flex-col items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/filo-logo-3d.png"
+          src="/filo-logo-new.png"
           alt="Filo"
           className="h-20 w-auto object-contain"
-          style={{ mixBlendMode: "screen" }}
+         
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight text-white">Filo</h1>

@@ -1038,7 +1038,7 @@ export function FeedClient({
         <div className="mx-auto flex max-w-[430px] items-center justify-between px-4 py-5">
           <div className="w-10" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-3d.png" alt="Filo" className="h-12 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
+          <img src="/filo-logo-new.png" alt="Filo" className="h-12 w-auto object-contain" />
           <button
             type="button"
             onClick={() => setNotifsOpen(true)}

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "Filo è un social network dove le persone condividono raccomandazioni di professionisti di fiducia.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/filo-logo-3d.png",
+    icon: "/filo-logo-new.png",
     apple: "/filo-logo-square.svg",
   },
   appleWebApp: {

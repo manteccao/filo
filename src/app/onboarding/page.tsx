@@ -148,10 +148,10 @@ export default function OnboardingPage() {
           <div className="mt-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/filo-logo-3d.png"
+              src="/filo-logo-new.png"
               alt="Filo"
               className="mx-auto mb-6 h-9 w-auto object-contain"
-              style={{ mixBlendMode: "screen" }}
+             
             />
             <h1 className="text-center text-2xl font-bold leading-tight">
               Benvenuto su Filo,{" "}

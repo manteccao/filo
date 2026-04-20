@@ -17,7 +17,7 @@ export function AuthShell({
       <div className="w-full max-w-sm">
         <Link href="/" className="flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-3d.png" alt="Filo" className="h-8 w-auto object-contain opacity-90 transition-opacity hover:opacity-100" style={{ mixBlendMode: "screen" }} />
+          <img src="/filo-logo-new.png" alt="Filo" className="h-8 w-auto object-contain opacity-90 transition-opacity hover:opacity-100" />
         </Link>
         <div className="mt-8 rounded-3xl border border-[#232340] bg-[#16162a] p-6 shadow-[0_0_60px_rgba(0,0,0,0.5)]">
           <h1 className="text-xl font-bold tracking-tight">{title}</h1>

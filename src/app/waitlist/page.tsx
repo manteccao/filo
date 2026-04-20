@@ -72,11 +72,11 @@ export default function WaitlistPage() {
         <div className="mb-8 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/filo-logo-3d.png"
+            src="/filo-logo-new.png"
             alt="Filo"
             width={200}
             className="object-contain"
-            style={{ mixBlendMode: "screen" }}
+           
           />
         </div>
 

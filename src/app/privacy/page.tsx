@@ -23,7 +23,7 @@ export default function PrivacyPage() {
             Torna a Filo
           </Link>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-3d.png" alt="Filo" className="h-8 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
+          <img src="/filo-logo-new.png" alt="Filo" className="h-8 w-auto object-contain" />
         </div>
       </header>
 

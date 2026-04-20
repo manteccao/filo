@@ -44,7 +44,7 @@ export default async function UsersPage() {
       <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-[430px] items-center justify-center px-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-3d.png" alt="Filo" className="h-9 w-auto object-contain" style={{ mixBlendMode: "screen" }} />
+          <img src="/filo-logo-new.png" alt="Filo" className="h-9 w-auto object-contain" />
         </div>
       </header>
 
