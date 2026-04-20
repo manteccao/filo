@@ -26,6 +26,10 @@ export type ProProfile = {
   professional_category: string | null;
 };
 
+export type FofProfile = UserProfile & {
+  followed_by: string; // primo nome dell'amico che li segue
+};
+
 // Keep for backwards-compat if anything else imports these
 export type UserCard = UserProfile & { rec_count: number; mutual_friends: string[] };
 export type ProRecommender = { id: string; full_name: string; username: string | null; avatar_url: string | null; mutual_friend?: string };
@@ -121,11 +125,13 @@ function PersonCard({
   isFollowing,
   onToggle,
   index,
+  badge,
 }: {
   user: UserProfile;
   isFollowing: boolean;
   onToggle: (id: string, follow: boolean) => void;
   index: number;
+  badge?: string;
 }) {
   const [busy, setBusy] = useState(false);
 
@@ -184,6 +190,11 @@ function PersonCard({
             {user.city && (
               <p className="truncate text-[12px] text-[#6b7280]">{user.city}</p>
             )}
+            {badge && (
+              <p className="mt-0.5 truncate text-[11px] font-medium text-[#0D9488]">
+                {badge}
+              </p>
+            )}
           </div>
         </Link>
       ) : (
@@ -195,6 +206,11 @@ function PersonCard({
             </p>
             {user.city && (
               <p className="truncate text-[12px] text-[#6b7280]">{user.city}</p>
+            )}
+            {badge && (
+              <p className="mt-0.5 truncate text-[11px] font-medium text-[#0D9488]">
+                {badge}
+              </p>
             )}
           </div>
         </div>
@@ -356,11 +372,13 @@ export function CercaClient({
   myCity,
   sameCityUsers,
   sameCityPros,
+  friendsOfFriends,
   followingIds,
 }: {
   myCity: string | null;
   sameCityUsers: UserProfile[];
   sameCityPros: ProProfile[];
+  friendsOfFriends: FofProfile[];
   followingIds: string[];
 }) {
   const [tab, setTab] = useState<"persone" | "professionisti">("persone");
@@ -378,13 +396,36 @@ export function CercaClient({
     });
   }
 
-  // Filtered users
-  const filteredUsers = useMemo(() => {
+  // All unique users across both sections (for search)
+  const allUsers = useMemo(() => {
+    const seen = new Set<string>();
+    const arr: UserProfile[] = [];
+    for (const u of [...sameCityUsers, ...friendsOfFriends]) {
+      if (seen.has(u.id)) continue;
+      seen.add(u.id);
+      arr.push(u);
+    }
+    return arr;
+  }, [sameCityUsers, friendsOfFriends]);
+
+  // Filtered users (when search is active, search across all; otherwise show by section)
+  const filteredAllUsers = useMemo(() => {
+    const q = userQuery.toLowerCase().trim();
+    if (!q) return [];
+    return allUsers.filter((u) => u.full_name.toLowerCase().includes(q));
+  }, [allUsers, userQuery]);
+
+  // Filtered FOF (no search — shown as-is in section)
+  const filteredFof = useMemo(() => {
+    const q = userQuery.toLowerCase().trim();
+    if (!q) return friendsOfFriends;
+    return friendsOfFriends.filter((u) => u.full_name.toLowerCase().includes(q));
+  }, [friendsOfFriends, userQuery]);
+
+  const filteredCityUsers = useMemo(() => {
     const q = userQuery.toLowerCase().trim();
     if (!q) return sameCityUsers;
-    return sameCityUsers.filter((u) =>
-      u.full_name.toLowerCase().includes(q),
-    );
+    return sameCityUsers.filter((u) => u.full_name.toLowerCase().includes(q));
   }, [sameCityUsers, userQuery]);
 
   // Filtered pros (by name + category)
@@ -462,41 +503,96 @@ export function CercaClient({
         {/* ── Persone tab ── */}
         {tab === "persone" && (
           <>
-            <SectionHeader
-              title={
-                myCity ? `Nella tua città · ${myCity}` : "Nella tua città"
-              }
-              count={filteredUsers.length}
-            />
-            {filteredUsers.length === 0 ? (
-              <div className="py-10 text-center">
-                {userQuery ? (
+            {/* Quando c'è una ricerca attiva, mostra risultati globali */}
+            {userQuery ? (
+              filteredAllUsers.length === 0 ? (
+                <div className="py-10 text-center">
                   <p className="text-sm text-[#6b7280]">
                     Nessun risultato per &ldquo;{userQuery}&rdquo;
                   </p>
-                ) : (
-                  <>
-                    <p className="text-sm text-[#6b7280]">
-                      Nessun utente trovato nella tua città.
-                    </p>
-                    <p className="mt-1 text-sm font-medium text-[#0D9488]">
-                      Invita i tuoi amici!
-                    </p>
-                  </>
-                )}
-              </div>
+                </div>
+              ) : (
+                <>
+                  <SectionHeader title="Risultati" count={filteredAllUsers.length} />
+                  <div className="flex flex-col gap-2">
+                    {filteredAllUsers.map((u, i) => (
+                      <PersonCard
+                        key={u.id}
+                        user={u}
+                        isFollowing={followedSet.has(u.id)}
+                        onToggle={onToggle}
+                        index={i}
+                      />
+                    ))}
+                  </div>
+                </>
+              )
             ) : (
-              <div className="flex flex-col gap-2">
-                {filteredUsers.map((u, i) => (
-                  <PersonCard
-                    key={u.id}
-                    user={u}
-                    isFollowing={followedSet.has(u.id)}
-                    onToggle={onToggle}
-                    index={i}
-                  />
-                ))}
-              </div>
+              <>
+                {/* Sezione 1: Nella tua città */}
+                <SectionHeader
+                  title={myCity ? `Nella tua città · ${myCity}` : "Nella tua città"}
+                  count={filteredCityUsers.length}
+                />
+                {filteredCityUsers.length === 0 ? (
+                  <div className="pb-2 text-center">
+                    {!myCity ? (
+                      <p className="text-sm text-[#6b7280]">
+                        Imposta la tua città nelle{" "}
+                        <a href="/settings" className="text-[#0D9488] underline">
+                          impostazioni
+                        </a>{" "}
+                        per vedere chi è vicino a te.
+                      </p>
+                    ) : (
+                      <>
+                        <p className="text-sm text-[#6b7280]">
+                          Nessun utente trovato nella tua città.
+                        </p>
+                        <p className="mt-1 text-sm font-medium text-[#0D9488]">
+                          Invita i tuoi amici!
+                        </p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filteredCityUsers.map((u, i) => (
+                      <PersonCard
+                        key={u.id}
+                        user={u}
+                        isFollowing={followedSet.has(u.id)}
+                        onToggle={onToggle}
+                        index={i}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {/* Sezione 2: Amici di amici */}
+                <SectionHeader
+                  title="Persone che potresti conoscere"
+                  count={filteredFof.length}
+                />
+                {filteredFof.length === 0 ? (
+                  <p className="pb-4 text-sm text-[#6b7280]">
+                    Segui più persone per scoprire nuove connessioni.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filteredFof.map((u, i) => (
+                      <PersonCard
+                        key={u.id}
+                        user={u}
+                        isFollowing={followedSet.has(u.id)}
+                        onToggle={onToggle}
+                        index={filteredCityUsers.length + i}
+                        badge={`Seguito da ${u.followed_by}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
