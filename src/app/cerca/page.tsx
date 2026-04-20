@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
 import { CercaClient, type UserProfile, type ProProfile, type FofProfile } from "./CercaClient";
 
 function normalizeCity(city: string | null | undefined): string {
@@ -17,11 +17,14 @@ export default async function CercaPage() {
 
   const userId = user.id;
 
-  const [{ data: myProfileData }, { data: follows }, { data: profilesData }] =
+  // Admin client bypassa RLS per leggere tutti i profili
+  const adminClient = createAdminClient();
+
+  const [{ data: myProfileData }, { data: follows }, { data: profilesData, error: profilesError }] =
     await Promise.all([
       supabase.from("profiles").select("city, full_name").eq("id", userId).single(),
       supabase.from("follows").select("following_id").eq("follower_id", userId),
-      supabase
+      adminClient
         .from("profiles")
         .select(
           "id,full_name,city,username,avatar_url,account_type,professional_category",
@@ -34,8 +37,10 @@ export default async function CercaPage() {
 
   // Debug log — visible in Vercel logs
   console.log("[cerca] userId:", userId);
-  console.log("[cerca] myCity:", myCity, "| myCityNorm:", myCityNorm);
+  console.log("[cerca] myCity:", myCity);
+  console.log("[cerca] myCityNorm:", myCityNorm);
   console.log("[cerca] total profiles fetched:", profilesData?.length ?? 0);
+  console.log("[cerca] profiles query error:", profilesError);
 
   const followingIds = (follows ?? [])
     .map((f) => f.following_id as string)
@@ -77,8 +82,6 @@ export default async function CercaPage() {
         .slice(0, 50)
     : [];
 
-  console.log("[cerca] sameCityUsers:", sameCityUsers.length);
-
   // ── Same-city professionals (account_type = 'professional') ──────────────
   const sameCityPros: ProProfile[] = myCityNorm
     ? allProfiles
@@ -102,6 +105,9 @@ export default async function CercaPage() {
         }))
         .slice(0, 50)
     : [];
+
+  console.log("[cerca] sameCityUsers count:", sameCityUsers.length);
+  console.log("[cerca] sameCityPros count:", sameCityPros.length);
 
   // ── Friends of friends (2° grado) ─────────────────────────────────────────
   const secondDegreeResult =
