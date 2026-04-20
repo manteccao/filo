@@ -118,11 +118,14 @@ export default function SettingsPage() {
         .from("profiles")
         .update({ city: city.trim() })
         .eq("id", userId)
-        .select("city")
-        .single();
+        .select("city");
       console.log("[settings] city update result — data:", data, "error:", error);
       if (error) {
         setCityError(`Errore: ${error.message}`);
+        return;
+      }
+      if (!data || data.length === 0) {
+        setCityError("Impossibile salvare la città. Riprova.");
         return;
       }
       setCitySaved(true);
