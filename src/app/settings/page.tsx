@@ -47,6 +47,7 @@ export default function SettingsPage() {
   const [city, setCity] = useState("");
   const [savingCity, setSavingCity] = useState(false);
   const [citySaved, setCitySaved] = useState(false);
+  const [cityError, setCityError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [copiedProfile, setCopiedProfile] = useState(false);
 
@@ -109,11 +110,26 @@ export default function SettingsPage() {
   async function handleSaveCity() {
     if (!city.trim() || !userId) return;
     setSavingCity(true);
+    setCityError(null);
     try {
       const supabase = createClient();
-      await supabase.from("profiles").update({ city: city.trim() }).eq("id", userId);
+      console.log("[settings] saving city:", city.trim(), "for userId:", userId);
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ city: city.trim() })
+        .eq("id", userId)
+        .select("city")
+        .single();
+      console.log("[settings] city update result — data:", data, "error:", error);
+      if (error) {
+        setCityError(`Errore: ${error.message}`);
+        return;
+      }
       setCitySaved(true);
       setTimeout(() => setCitySaved(false), 2000);
+    } catch (err) {
+      console.error("[settings] city save exception:", err);
+      setCityError("Errore imprevisto, riprova.");
     } finally {
       setSavingCity(false);
     }
@@ -219,7 +235,7 @@ export default function SettingsPage() {
             <div className="flex-1">
               <CityAutocomplete
                 value={city}
-                onChange={setCity}
+                onChange={(v) => { setCity(v); setCityError(null); }}
                 placeholder="Es. Milano"
                 className={inputCls}
               />
@@ -233,6 +249,9 @@ export default function SettingsPage() {
               {savingCity ? "…" : citySaved ? "Salvata ✓" : "Salva"}
             </button>
           </div>
+          {cityError && (
+            <p className="mt-2 text-xs text-red-400">{cityError}</p>
+          )}
         </div>
 
         {/* Condividi profilo */}

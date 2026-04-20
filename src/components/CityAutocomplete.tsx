@@ -70,8 +70,8 @@ export function CityAutocomplete({
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const v = e.target.value;
     setQuery(v);
-    // Clear selection if user modifies after picking
-    if (v !== value) onChange("");
+    // Clear the confirmed value only when the field is fully cleared
+    if (v === "") onChange("");
   }
 
   const inputCls =
