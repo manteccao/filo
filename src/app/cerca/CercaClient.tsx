@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
 import { createClient } from "@/lib/supabase/browser";
@@ -368,17 +368,17 @@ function SearchInput({
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
+function normalizeCity(city: string | null | undefined): string {
+  return city?.toLowerCase().trim() ?? "";
+}
+
 export function CercaClient({
+  userId,
   myCity,
-  sameCityUsers,
-  sameCityPros,
-  friendsOfFriends,
   followingIds,
 }: {
+  userId: string;
   myCity: string | null;
-  sameCityUsers: UserProfile[];
-  sameCityPros: ProProfile[];
-  friendsOfFriends: FofProfile[];
   followingIds: string[];
 }) {
   const [tab, setTab] = useState<"persone" | "professionisti">("persone");
@@ -386,6 +386,129 @@ export function CercaClient({
   const [proQuery, setProQuery] = useState("");
   const [followedSet, setFollowedSet] = useState(() => new Set(followingIds));
   const [categoryFilter, setCategoryFilter] = useState("Tutti");
+
+  // Profiles fetched client-side (browser JWT → RLS works correctly)
+  const [sameCityUsers, setSameCityUsers] = useState<UserProfile[]>([]);
+  const [sameCityPros, setSameCityPros] = useState<ProProfile[]>([]);
+  const [friendsOfFriends, setFriendsOfFriends] = useState<FofProfile[]>([]);
+  const [profilesLoading, setProfilesLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProfiles() {
+      const supabase = createClient();
+      const myCityNorm = normalizeCity(myCity);
+      const followingSet = new Set(followingIds);
+
+      console.log("[cerca client] myCity:", myCity, "myCityNorm:", myCityNorm);
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id,full_name,city,username,avatar_url,account_type,professional_category");
+
+      console.log("[cerca client] profiles fetched:", data?.length ?? 0, "error:", error);
+
+      if (!data) { setProfilesLoading(false); return; }
+
+      const profileById = new Map(data.map((p) => [p.id as string, p]));
+
+      // Same-city users
+      const users: UserProfile[] = myCityNorm
+        ? data
+            .filter(
+              (p) =>
+                p.id !== userId &&
+                (p as { account_type?: string | null }).account_type === "user" &&
+                p.full_name &&
+                normalizeCity(p.city as string | null) === myCityNorm,
+            )
+            .map((p) => ({
+              id: p.id as string,
+              full_name: p.full_name as string,
+              city: p.city as string | null,
+              username: p.username as string | null,
+              avatar_url: p.avatar_url as string | null,
+            }))
+            .slice(0, 50)
+        : [];
+
+      // Same-city pros
+      const pros: ProProfile[] = myCityNorm
+        ? data
+            .filter(
+              (p) =>
+                p.id !== userId &&
+                (p as { account_type?: string | null }).account_type === "professional" &&
+                p.full_name &&
+                normalizeCity(p.city as string | null) === myCityNorm,
+            )
+            .map((p) => ({
+              id: p.id as string,
+              full_name: p.full_name as string,
+              city: p.city as string | null,
+              username: p.username as string | null,
+              avatar_url: p.avatar_url as string | null,
+              professional_category: (p as { professional_category?: string | null }).professional_category ?? null,
+            }))
+            .slice(0, 50)
+        : [];
+
+      console.log("[cerca client] sameCityUsers:", users.length, "sameCityPros:", pros.length);
+
+      // Friends of friends
+      let fof: FofProfile[] = [];
+      if (followingIds.length > 0) {
+        const { data: fofData } = await supabase
+          .from("follows")
+          .select("follower_id,following_id")
+          .in("follower_id", followingIds);
+
+        const followingNameById = new Map<string, string>(
+          followingIds
+            .map((id) => {
+              const p = profileById.get(id);
+              return p?.full_name ? ([id, p.full_name as string] as [string, string]) : null;
+            })
+            .filter((e): e is [string, string] => e !== null),
+        );
+
+        const fofMap = new Map<string, Set<string>>();
+        for (const f of fofData ?? []) {
+          const target = f.following_id as string;
+          const via = f.follower_id as string;
+          if (target === userId) continue;
+          if (followingSet.has(target)) continue;
+          if (!fofMap.has(target)) fofMap.set(target, new Set());
+          fofMap.get(target)!.add(via);
+        }
+
+        fof = Array.from(fofMap.entries())
+          .map(([targetId, viaIds]) => {
+            const p = profileById.get(targetId);
+            if (!p?.full_name) return null;
+            const viaId = Array.from(viaIds)[0];
+            const viaName = viaId ? (followingNameById.get(viaId) ?? "un amico") : "un amico";
+            return {
+              id: targetId,
+              full_name: p.full_name as string,
+              city: p.city as string | null,
+              username: p.username as string | null,
+              avatar_url: p.avatar_url as string | null,
+              followed_by: viaName.split(" ")[0],
+            } satisfies FofProfile;
+          })
+          .filter((u): u is FofProfile => u !== null)
+          .slice(0, 30);
+      }
+
+      setSameCityUsers(users);
+      setSameCityPros(pros);
+      setFriendsOfFriends(fof);
+      setProfilesLoading(false);
+    }
+
+    fetchProfiles();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, myCity]);
 
   function onToggle(id: string, follow: boolean) {
     setFollowedSet((prev) => {
@@ -500,8 +623,11 @@ export function CercaClient({
       </header>
 
       <main className="mx-auto max-w-[430px] px-4 pb-28">
-        {/* ── Persone tab ── */}
-        {tab === "persone" && (
+        {profilesLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+          </div>
+        ) : tab === "persone" ? (
           <>
             {/* Quando c'è una ricerca attiva, mostra risultati globali */}
             {userQuery ? (
@@ -595,10 +721,8 @@ export function CercaClient({
               </>
             )}
           </>
-        )}
-
-        {/* ── Professionisti tab ── */}
-        {tab === "professionisti" && (
+        ) : (
+          /* ── Professionisti tab ── */
           <>
             <SectionHeader
               title={
