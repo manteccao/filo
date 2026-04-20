@@ -50,9 +50,10 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
 
   // User path
+  const [myCity, setMyCity] = useState(""); // città dell'utente, salvata nel profilo
   const [profName, setProfName] = useState("");
   const [category, setCategory] = useState("dentista");
-  const [city, setCity] = useState("");
+  const [recCity, setRecCity] = useState(""); // città del professionista raccomandato
   const [note, setNote] = useState("");
 
   // Professional path
@@ -73,7 +74,9 @@ export default function OnboardingPage() {
         .eq("id", user.id)
         .single();
       setUsername((profile as { username?: string | null } | null)?.username ?? "");
-      setProCity((profile as { city?: string | null } | null)?.city ?? "");
+      const existingCity = (profile as { city?: string | null } | null)?.city ?? "";
+      setMyCity(existingCity);
+      setProCity(existingCity);
     }
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,22 +94,40 @@ export default function OnboardingPage() {
 
   async function handleAddRec(e: React.FormEvent) {
     e.preventDefault();
+    if (!myCity.trim()) return; // città utente obbligatoria
     setSaving(true);
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      if (!CATEGORIES.includes(category as (typeof CATEGORIES)[number])) return;
-      if (!profName.trim() || !city.trim()) return;
-      await supabase.from("recommendations").insert({
-        user_id: user.id,
-        professional_name: profName.trim(),
-        category,
-        city: city.trim(),
-        note: note.slice(0, 300),
-      });
+      // Salva la città dell'utente nel profilo
+      await supabase.from("profiles").update({ city: myCity.trim() }).eq("id", user.id);
+      // Salva la raccomandazione (solo se il nome del professionista è compilato)
+      if (profName.trim() && recCity.trim() && CATEGORIES.includes(category as (typeof CATEGORIES)[number])) {
+        await supabase.from("recommendations").insert({
+          user_id: user.id,
+          professional_name: profName.trim(),
+          category,
+          city: recCity.trim(),
+          note: note.slice(0, 300),
+        });
+      }
     } catch (_) {
       // proceed even on error
+    } finally {
+      setSaving(false);
+      setStep(3);
+    }
+  }
+
+  async function handleSkipRec() {
+    if (!myCity.trim()) return; // città utente obbligatoria anche se si salta
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      await supabase.from("profiles").update({ city: myCity.trim() }).eq("id", userId);
+    } catch (_) {
+      // proceed
     } finally {
       setSaving(false);
       setStep(3);
@@ -212,52 +233,73 @@ export default function OnboardingPage() {
             </p>
 
             <form onSubmit={handleAddRec} className="mt-6 space-y-3">
-              <input
-                value={profName}
-                onChange={(e) => setProfName(e.target.value)}
-                required
-                placeholder="Nome del professionista"
-                className={inputCls}
-              />
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className={inputCls}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c} className="bg-[#16162a]">
-                    {c.charAt(0).toUpperCase() + c.slice(1)}
-                  </option>
-                ))}
-              </select>
-              <CityAutocomplete
-                value={city}
-                onChange={setCity}
-                required
-                placeholder="Città"
-              />
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value.slice(0, 300))}
-                rows={3}
-                placeholder="Perché lo consigli? (opzionale)"
-                className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]"
-              />
+              {/* Città dell'utente — obbligatoria */}
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                  La tua città <span className="text-[#0D9488]">*</span>
+                </label>
+                <CityAutocomplete
+                  value={myCity}
+                  onChange={setMyCity}
+                  required
+                  placeholder="Es. Milano"
+                />
+              </div>
+
+              <div className="pt-2">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                  Prima raccomandazione{" "}
+                  <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+                </p>
+                <div className="space-y-3">
+                  <input
+                    value={profName}
+                    onChange={(e) => setProfName(e.target.value)}
+                    placeholder="Nome del professionista"
+                    className={inputCls}
+                  />
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className={inputCls}
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c} className="bg-[#16162a]">
+                        {c.charAt(0).toUpperCase() + c.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                  <CityAutocomplete
+                    value={recCity}
+                    onChange={setRecCity}
+                    placeholder="Città del professionista"
+                  />
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value.slice(0, 300))}
+                    rows={3}
+                    placeholder="Perché lo consigli? (opzionale)"
+                    className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]"
+                  />
+                </div>
+              </div>
+
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || !myCity.trim()}
                 className="h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.3)] transition hover:bg-[#0b7c76] disabled:opacity-50 active:scale-[0.98]"
               >
-                {saving ? "Salvataggio…" : "Aggiungi"}
+                {saving ? "Salvataggio…" : "Continua"}
               </button>
             </form>
 
             <button
               type="button"
-              onClick={() => setStep(3)}
-              className="mt-3 w-full text-center text-sm text-[#5c5f7a] transition hover:text-[#8b8fa8]"
+              onClick={handleSkipRec}
+              disabled={saving || !myCity.trim()}
+              className="mt-3 w-full text-center text-sm text-[#5c5f7a] transition hover:text-[#8b8fa8] disabled:opacity-40"
             >
-              Salta per ora
+              Salta la raccomandazione
             </button>
           </div>
         )}

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 import { deleteAccount } from "./actions";
 
 const BASE_URL = "https://filo-kappa.vercel.app";
@@ -43,6 +44,9 @@ export default function SettingsPage() {
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [city, setCity] = useState("");
+  const [savingCity, setSavingCity] = useState(false);
+  const [citySaved, setCitySaved] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [copiedProfile, setCopiedProfile] = useState(false);
 
@@ -60,7 +64,7 @@ export default function SettingsPage() {
         if (error || !user) { router.push("/login"); return; }
 
         const { data: profile } = await supabase
-          .from("profiles").select("full_name, username, avatar_url").eq("id", user.id).single();
+          .from("profiles").select("full_name, username, avatar_url, city").eq("id", user.id).single();
 
         const name = (profile as { full_name?: string | null } | null)?.full_name ?? user.user_metadata?.full_name ?? "Utente";
         const uname = (profile as { username?: string | null } | null)?.username ?? toSlug(name);
@@ -70,6 +74,7 @@ export default function SettingsPage() {
         setFullName(name);
         setUsername(uname);
         setAvatarUrl((profile as { avatar_url?: string | null } | null)?.avatar_url ?? user.user_metadata?.avatar_url ?? "");
+        setCity((profile as { city?: string | null } | null)?.city ?? "");
       } finally {
         setLoading(false);
       }
@@ -98,6 +103,19 @@ export default function SettingsPage() {
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
+  async function handleSaveCity() {
+    if (!city.trim() || !userId) return;
+    setSavingCity(true);
+    try {
+      const supabase = createClient();
+      await supabase.from("profiles").update({ city: city.trim() }).eq("id", userId);
+      setCitySaved(true);
+      setTimeout(() => setCitySaved(false), 2000);
+    } finally {
+      setSavingCity(false);
     }
   }
 
@@ -191,6 +209,29 @@ export default function SettingsPage() {
           <div className="mt-3 flex items-center justify-between gap-4">
             <span className="text-sm text-[#8b8fa8]">Email</span>
             <span className="truncate text-sm text-white">{email}</span>
+          </div>
+        </div>
+
+        {/* Città */}
+        <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">La tua città</p>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex-1">
+              <CityAutocomplete
+                value={city}
+                onChange={setCity}
+                placeholder="Es. Milano"
+                className={inputCls}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleSaveCity}
+              disabled={savingCity || !city.trim()}
+              className="h-11 shrink-0 rounded-xl bg-[#0D9488] px-4 text-sm font-semibold text-white transition hover:bg-[#0b7c76] disabled:opacity-50"
+            >
+              {savingCity ? "…" : citySaved ? "Salvata ✓" : "Salva"}
+            </button>
           </div>
         </div>
 
