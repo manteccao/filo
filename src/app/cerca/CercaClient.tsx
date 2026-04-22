@@ -390,6 +390,7 @@ export function CercaClient({
   // Profiles fetched client-side (browser JWT → RLS works correctly)
   const [sameCityUsers, setSameCityUsers] = useState<UserProfile[]>([]);
   const [sameCityPros, setSameCityPros] = useState<ProProfile[]>([]);
+  const [allOtherUsers, setAllOtherUsers] = useState<UserProfile[]>([]);
   const [friendsOfFriends, setFriendsOfFriends] = useState<FofProfile[]>([]);
   const [profilesLoading, setProfilesLoading] = useState(true);
 
@@ -406,63 +407,41 @@ export function CercaClient({
         .select("id,full_name,city,username,avatar_url,account_type,profession");
 
       console.log("[cerca client] profiles fetched:", data?.length ?? 0, "error:", error);
-      // DEBUG: log first 3 profiles to see what data looks like
-      console.log("[cerca client] sample profiles:", data?.slice(0, 3).map(p => ({
-        id: (p as {id:string}).id?.slice(0,8),
-        full_name: p.full_name,
-        city: p.city,
-        account_type: (p as {account_type?: string | null}).account_type,
-      })));
 
       if (!data) { setProfilesLoading(false); return; }
 
       const profileById = new Map(data.map((p) => [p.id as string, p]));
 
-      // DEBUG: mostra TUTTI i profili (no filtro città) per diagnosticare
-      const allOtherUsers: UserProfile[] = data
-        .filter((p) => p.id !== userId && p.full_name)
-        .map((p) => ({
-          id: p.id as string,
-          full_name: p.full_name as string,
-          city: p.city as string | null,
-          username: p.username as string | null,
-          avatar_url: p.avatar_url as string | null,
-        }))
-        .slice(0, 50);
-
-      console.log("[cerca client] all other users (no city filter):", allOtherUsers.length);
-      console.log("[cerca client] cities in data:", [...new Set(data.map(p => p.city))].slice(0, 10));
-
-      // Same-city users (manteniamo il filtro per il conteggio log)
+      // Same-city users
+      const sameCitySet = new Set<string>();
       const users: UserProfile[] = myCityNorm
         ? data
-            .filter(
-              (p) =>
-                p.id !== userId &&
-                (p as { account_type?: string | null }).account_type === "user" &&
-                p.full_name &&
-                normalizeCity(p.city as string | null) === myCityNorm,
-            )
-            .map((p) => ({
-              id: p.id as string,
-              full_name: p.full_name as string,
-              city: p.city as string | null,
-              username: p.username as string | null,
-              avatar_url: p.avatar_url as string | null,
-            }))
+            .filter((p) => {
+              if (p.id === userId || !p.full_name) return false;
+              if ((p as { account_type?: string | null }).account_type !== "user") return false;
+              return normalizeCity(p.city as string | null) === myCityNorm;
+            })
+            .map((p) => {
+              sameCitySet.add(p.id as string);
+              return {
+                id: p.id as string,
+                full_name: p.full_name as string,
+                city: p.city as string | null,
+                username: p.username as string | null,
+                avatar_url: p.avatar_url as string | null,
+              };
+            })
             .slice(0, 50)
         : [];
 
       // Same-city pros
       const pros: ProProfile[] = myCityNorm
         ? data
-            .filter(
-              (p) =>
-                p.id !== userId &&
-                (p as { account_type?: string | null }).account_type === "professional" &&
-                p.full_name &&
-                normalizeCity(p.city as string | null) === myCityNorm,
-            )
+            .filter((p) => {
+              if (p.id === userId || !p.full_name) return false;
+              if ((p as { account_type?: string | null }).account_type !== "professional") return false;
+              return normalizeCity(p.city as string | null) === myCityNorm;
+            })
             .map((p) => ({
               id: p.id as string,
               full_name: p.full_name as string,
@@ -474,10 +453,19 @@ export function CercaClient({
             .slice(0, 50)
         : [];
 
-      console.log("[cerca client] sameCityUsers (with filter):", users.length, "| sameCityPros:", pros.length);
+      // Tutti gli altri utenti (escluso stesso utente e già mostrati in same-city)
+      const others: UserProfile[] = data
+        .filter((p) => p.id !== userId && p.full_name && !sameCitySet.has(p.id as string))
+        .map((p) => ({
+          id: p.id as string,
+          full_name: p.full_name as string,
+          city: p.city as string | null,
+          username: p.username as string | null,
+          avatar_url: p.avatar_url as string | null,
+        }))
+        .slice(0, 50);
 
-      // USA allOtherUsers invece di users per mostrare tutti (DEBUG temporaneo)
-      const displayUsers = allOtherUsers;
+      console.log("[cerca client] sameCityUsers:", users.length, "sameCityPros:", pros.length, "allOthers:", others.length);
 
       // Friends of friends
       let fof: FofProfile[] = [];
@@ -525,8 +513,9 @@ export function CercaClient({
           .slice(0, 30);
       }
 
-      setSameCityUsers(displayUsers); // DEBUG: tutti gli utenti, no filtro città
+      setSameCityUsers(users);
       setSameCityPros(pros);
+      setAllOtherUsers(others);
       setFriendsOfFriends(fof);
       setProfilesLoading(false);
     }
@@ -548,13 +537,13 @@ export function CercaClient({
   const allUsers = useMemo(() => {
     const seen = new Set<string>();
     const arr: UserProfile[] = [];
-    for (const u of [...sameCityUsers, ...friendsOfFriends]) {
+    for (const u of [...sameCityUsers, ...friendsOfFriends, ...allOtherUsers]) {
       if (seen.has(u.id)) continue;
       seen.add(u.id);
       arr.push(u);
     }
     return arr;
-  }, [sameCityUsers, friendsOfFriends]);
+  }, [sameCityUsers, friendsOfFriends, allOtherUsers]);
 
   // Filtered users (when search is active, search across all; otherwise show by section)
   const filteredAllUsers = useMemo(() => {
@@ -575,6 +564,12 @@ export function CercaClient({
     if (!q) return sameCityUsers;
     return sameCityUsers.filter((u) => u.full_name.toLowerCase().includes(q));
   }, [sameCityUsers, userQuery]);
+
+  const filteredOtherUsers = useMemo(() => {
+    const q = userQuery.toLowerCase().trim();
+    if (!q) return allOtherUsers;
+    return allOtherUsers.filter((u) => u.full_name.toLowerCase().includes(q));
+  }, [allOtherUsers, userQuery]);
 
   // Filtered pros (by name + category)
   const filteredPros = useMemo(() => {
@@ -742,6 +737,27 @@ export function CercaClient({
                       />
                     ))}
                   </div>
+                )}
+
+                {/* Sezione 3: Tutti gli utenti */}
+                {filteredOtherUsers.length > 0 && (
+                  <>
+                    <SectionHeader
+                      title="Tutti gli utenti"
+                      count={filteredOtherUsers.length}
+                    />
+                    <div className="flex flex-col gap-2">
+                      {filteredOtherUsers.map((u, i) => (
+                        <PersonCard
+                          key={u.id}
+                          user={u}
+                          isFollowing={followedSet.has(u.id)}
+                          onToggle={onToggle}
+                          index={filteredCityUsers.length + filteredFof.length + i}
+                        />
+                      ))}
+                    </div>
+                  </>
                 )}
               </>
             )}
