@@ -84,6 +84,8 @@ export default function ProfilePageClient() {
 
       const prof = profData;
 
+      console.log("[profile] profile id:", prof?.id, "account_type:", prof?.account_type);
+
       setCurrentUserId(user?.id ?? null);
       setProfile(prof ?? null);
 
@@ -91,7 +93,7 @@ export default function ProfilePageClient() {
 
       const isPro = (prof as Profile).account_type === "professional";
 
-      const [{ data: recs }, blockResult, receivedResult] = await Promise.all([
+      const [{ data: recs }, blockResult, { data: receivedRaw, error: receivedError }] = await Promise.all([
         supabase
           .from("recommendations")
           .select("id,professional_name,category,city,note,created_at")
@@ -108,29 +110,45 @@ export default function ProfilePageClient() {
         isPro
           ? supabase
               .from("recommendations")
-              .select("id,note,category,created_at,profiles!recommendations_user_id_fkey(full_name,username)")
+              .select("id,note,category,created_at,user_id")
               .eq("professional_id", prof.id)
               .order("created_at", { ascending: false })
-          : Promise.resolve({ data: [] }),
+          : Promise.resolve({ data: [], error: null }),
       ]);
+
+      console.log("[profile] isPro:", isPro, "receivedRaw:", receivedRaw, "error:", receivedError);
 
       setRecommendations(recs ?? []);
       setInitialIsBlocked(!!(blockResult as { data: unknown }).data);
 
-      if (isPro && receivedResult.data) {
-        const mapped = (receivedResult.data as Array<{
+      if (isPro && receivedRaw && receivedRaw.length > 0) {
+        // Fetch authors separately to avoid FK hint issues
+        const authorIds = [...new Set((receivedRaw as Array<{ user_id: string }>).map((r) => r.user_id))];
+        const { data: authorProfiles } = await supabase
+          .from("profiles")
+          .select("id,full_name,username")
+          .in("id", authorIds);
+
+        const authorMap = new Map(
+          (authorProfiles ?? []).map((p) => [p.id as string, p])
+        );
+
+        const mapped = (receivedRaw as Array<{
           id: string;
           note: string | null;
           category: string | null;
           created_at: string;
-          profiles: { full_name: string | null; username: string | null } | null;
-        }>).map((r) => ({
-          id: r.id,
-          note: r.note,
-          category: r.category,
-          created_at: r.created_at,
-          author: r.profiles ?? null,
-        }));
+          user_id: string;
+        }>).map((r) => {
+          const author = authorMap.get(r.user_id) ?? null;
+          return {
+            id: r.id,
+            note: r.note,
+            category: r.category,
+            created_at: r.created_at,
+            author: author ? { full_name: author.full_name as string | null, username: author.username as string | null } : null,
+          };
+        });
         setReceivedRecs(mapped);
       }
     }
