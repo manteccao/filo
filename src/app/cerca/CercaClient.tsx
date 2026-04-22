@@ -23,7 +23,7 @@ export type ProProfile = {
   city: string | null;
   username: string | null;
   avatar_url: string | null;
-  professional_category: string | null;
+  profession: string | null;
 };
 
 export type FofProfile = UserProfile & {
@@ -252,9 +252,9 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
           {pro.full_name}
         </p>
         <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-          {pro.professional_category && (
+          {pro.profession && (
             <span className="rounded-full bg-[#0D9488]/15 px-2 py-[2px] text-[11px] font-medium text-[#0D9488]">
-              {capitalize(pro.professional_category)}
+              {capitalize(pro.profession)}
             </span>
           )}
           {pro.city && (
@@ -403,7 +403,7 @@ export function CercaClient({
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id,full_name,city,username,avatar_url,account_type,professional_category");
+        .select("id,full_name,city,username,avatar_url,account_type,profession");
 
       console.log("[cerca client] profiles fetched:", data?.length ?? 0, "error:", error);
       // DEBUG: log first 3 profiles to see what data looks like
@@ -469,7 +469,7 @@ export function CercaClient({
               city: p.city as string | null,
               username: p.username as string | null,
               avatar_url: p.avatar_url as string | null,
-              professional_category: (p as { professional_category?: string | null }).professional_category ?? null,
+              profession: (p as { profession?: string | null }).profession ?? null,
             }))
             .slice(0, 50)
         : [];
@@ -583,10 +583,10 @@ export function CercaClient({
       const matchesQuery =
         !q ||
         p.full_name.toLowerCase().includes(q) ||
-        (p.professional_category?.toLowerCase().includes(q) ?? false);
+        (p.profession?.toLowerCase().includes(q) ?? false);
       const matchesCategory =
         categoryFilter === "Tutti" ||
-        (p.professional_category?.toLowerCase() ===
+        (p.profession?.toLowerCase() ===
           categoryFilter.toLowerCase());
       return matchesQuery && matchesCategory;
     });

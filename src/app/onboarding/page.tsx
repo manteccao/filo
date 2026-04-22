@@ -141,7 +141,7 @@ export default function OnboardingPage() {
       const supabase = createClient();
       await supabase.from("profiles").update({
         account_type: "professional",
-        professional_category: proCategory,
+        profession: proCategory,
         professional_phone: proPhone.trim() || null,
         ...(proCity.trim() ? { city: proCity.trim() } : {}),
       }).eq("id", userId);

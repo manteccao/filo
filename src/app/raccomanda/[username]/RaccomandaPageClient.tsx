@@ -37,7 +37,7 @@ type Profile = {
   city: string | null;
   username: string | null;
   account_type: string | null;
-  professional_category: string | null;
+  profession: string | null;
 };
 
 export default function RaccomandaPageClient() {
@@ -51,7 +51,7 @@ export default function RaccomandaPageClient() {
     async function load() {
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id,full_name,city,username,account_type,professional_category")
+        .select("id,full_name,city,username,account_type,profession")
         .eq("username", username)
         .single();
 
@@ -89,7 +89,7 @@ export default function RaccomandaPageClient() {
 
   const fullName = profile.full_name ?? "Utente";
   const city = profile.city ?? null;
-  const category = profile.professional_category ?? null;
+  const category = profile.profession ?? null;
   const color = avatarColor(profile.id);
 
   return (
