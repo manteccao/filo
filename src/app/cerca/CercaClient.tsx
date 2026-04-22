@@ -406,12 +406,34 @@ export function CercaClient({
         .select("id,full_name,city,username,avatar_url,account_type,professional_category");
 
       console.log("[cerca client] profiles fetched:", data?.length ?? 0, "error:", error);
+      // DEBUG: log first 3 profiles to see what data looks like
+      console.log("[cerca client] sample profiles:", data?.slice(0, 3).map(p => ({
+        id: (p as {id:string}).id?.slice(0,8),
+        full_name: p.full_name,
+        city: p.city,
+        account_type: (p as {account_type?: string | null}).account_type,
+      })));
 
       if (!data) { setProfilesLoading(false); return; }
 
       const profileById = new Map(data.map((p) => [p.id as string, p]));
 
-      // Same-city users
+      // DEBUG: mostra TUTTI i profili (no filtro città) per diagnosticare
+      const allOtherUsers: UserProfile[] = data
+        .filter((p) => p.id !== userId && p.full_name)
+        .map((p) => ({
+          id: p.id as string,
+          full_name: p.full_name as string,
+          city: p.city as string | null,
+          username: p.username as string | null,
+          avatar_url: p.avatar_url as string | null,
+        }))
+        .slice(0, 50);
+
+      console.log("[cerca client] all other users (no city filter):", allOtherUsers.length);
+      console.log("[cerca client] cities in data:", [...new Set(data.map(p => p.city))].slice(0, 10));
+
+      // Same-city users (manteniamo il filtro per il conteggio log)
       const users: UserProfile[] = myCityNorm
         ? data
             .filter(
@@ -452,7 +474,10 @@ export function CercaClient({
             .slice(0, 50)
         : [];
 
-      console.log("[cerca client] sameCityUsers:", users.length, "sameCityPros:", pros.length);
+      console.log("[cerca client] sameCityUsers (with filter):", users.length, "| sameCityPros:", pros.length);
+
+      // USA allOtherUsers invece di users per mostrare tutti (DEBUG temporaneo)
+      const displayUsers = allOtherUsers;
 
       // Friends of friends
       let fof: FofProfile[] = [];
@@ -500,7 +525,7 @@ export function CercaClient({
           .slice(0, 30);
       }
 
-      setSameCityUsers(users);
+      setSameCityUsers(displayUsers); // DEBUG: tutti gli utenti, no filtro città
       setSameCityPros(pros);
       setFriendsOfFriends(fof);
       setProfilesLoading(false);
