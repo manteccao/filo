@@ -62,14 +62,27 @@ export default function ProfilePageClient() {
     const supabase = createClient();
 
     async function load() {
-      const [{ data: { user } }, { data: prof }] = await Promise.all([
+      const [{ data: { user } }, usernameResult] = await Promise.all([
         supabase.auth.getUser(),
         supabase
           .from("profiles")
           .select("id,full_name,city,username,account_type,profession")
           .eq("username", username)
-          .single(),
+          .maybeSingle(),
       ]);
+
+      let profData = usernameResult.data;
+      if (!profData) {
+        // fallback: try lookup by id (for profiles without username)
+        const { data: byId } = await supabase
+          .from("profiles")
+          .select("id,full_name,city,username,account_type,profession")
+          .eq("id", username)
+          .maybeSingle();
+        profData = byId ?? null;
+      }
+
+      const prof = profData;
 
       setCurrentUserId(user?.id ?? null);
       setProfile(prof ?? null);
