@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/browser";
 import { ProfileActions } from "./ProfileActions";
 
@@ -26,6 +27,7 @@ type Profile = {
   city: string | null;
   username: string | null;
   account_type: string | null;
+  profession: string | null;
 };
 
 type Recommendation = {
@@ -37,10 +39,22 @@ type Recommendation = {
   created_at: string;
 };
 
+type ReceivedRecommendation = {
+  id: string;
+  note: string | null;
+  category: string | null;
+  created_at: string;
+  author: {
+    full_name: string | null;
+    username: string | null;
+  } | null;
+};
+
 export default function ProfilePageClient() {
   const { username } = useParams<{ username: string }>();
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [receivedRecs, setReceivedRecs] = useState<ReceivedRecommendation[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [initialIsBlocked, setInitialIsBlocked] = useState(false);
 
@@ -52,7 +66,7 @@ export default function ProfilePageClient() {
         supabase.auth.getUser(),
         supabase
           .from("profiles")
-          .select("id,full_name,city,username,account_type")
+          .select("id,full_name,city,username,account_type,profession")
           .eq("username", username)
           .single(),
       ]);
@@ -62,7 +76,9 @@ export default function ProfilePageClient() {
 
       if (!prof) return;
 
-      const [{ data: recs }, blockResult] = await Promise.all([
+      const isPro = (prof as Profile).account_type === "professional";
+
+      const [{ data: recs }, blockResult, receivedResult] = await Promise.all([
         supabase
           .from("recommendations")
           .select("id,professional_name,category,city,note,created_at")
@@ -76,10 +92,34 @@ export default function ProfilePageClient() {
               .eq("blocked_user_id", prof.id)
               .maybeSingle()
           : Promise.resolve({ data: null }),
+        isPro
+          ? supabase
+              .from("recommendations")
+              .select("id,note,category,created_at,profiles!recommendations_user_id_fkey(full_name,username)")
+              .eq("professional_id", prof.id)
+              .order("created_at", { ascending: false })
+          : Promise.resolve({ data: [] }),
       ]);
 
       setRecommendations(recs ?? []);
       setInitialIsBlocked(!!(blockResult as { data: unknown }).data);
+
+      if (isPro && receivedResult.data) {
+        const mapped = (receivedResult.data as Array<{
+          id: string;
+          note: string | null;
+          category: string | null;
+          created_at: string;
+          profiles: { full_name: string | null; username: string | null } | null;
+        }>).map((r) => ({
+          id: r.id,
+          note: r.note,
+          category: r.category,
+          created_at: r.created_at,
+          author: r.profiles ?? null,
+        }));
+        setReceivedRecs(mapped);
+      }
     }
 
     load();
@@ -103,6 +143,7 @@ export default function ProfilePageClient() {
 
   const fullName = profile.full_name ?? "Utente";
   const isOwnProfile = currentUserId === profile.id;
+  const isPro = profile.account_type === "professional";
 
   return (
     <div className="flex min-h-screen flex-col bg-black text-zinc-50">
@@ -135,71 +176,158 @@ export default function ProfilePageClient() {
               <h1 className="text-2xl font-semibold tracking-tight">
                 {fullName}
               </h1>
-              {profile.account_type === "professional" && (
+              {isPro && (
                 <span className="rounded-full bg-teal-500/15 px-2.5 py-0.5 text-xs font-semibold text-teal-400">
                   Professionista
                 </span>
               )}
+              {isPro && receivedRecs.length > 0 && (
+                <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-semibold text-zinc-300">
+                  {receivedRecs.length}{" "}
+                  {receivedRecs.length === 1 ? "raccomandazione" : "raccomandazioni"}
+                </span>
+              )}
             </div>
-            {profile.city ? (
+            {isPro && profile.profession ? (
+              <p className="mt-0.5 text-sm text-zinc-300">
+                {profile.profession}
+                {profile.city ? ` · ${profile.city}` : ""}
+              </p>
+            ) : profile.city ? (
               <p className="mt-0.5 text-sm text-zinc-400">{profile.city}</p>
             ) : null}
-            <p className="mt-1 text-xs text-zinc-500">
-              {recommendations.length}{" "}
-              {recommendations.length === 1
-                ? "raccomandazione"
-                : "raccomandazioni"}
-            </p>
+            {!isPro && (
+              <p className="mt-1 text-xs text-zinc-500">
+                {recommendations.length}{" "}
+                {recommendations.length === 1
+                  ? "raccomandazione"
+                  : "raccomandazioni"}
+              </p>
+            )}
           </div>
 
-          {currentUserId && !isOwnProfile && (
-            <div className="shrink-0">
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            {isPro && !isOwnProfile && currentUserId && (
+              <Link
+                href={`/add?professionalId=${profile.id}&name=${encodeURIComponent(fullName)}`}
+                className="inline-flex h-9 items-center justify-center rounded-xl bg-teal-600 px-4 text-sm font-semibold text-white transition hover:bg-teal-500"
+              >
+                Raccomanda
+              </Link>
+            )}
+            {currentUserId && !isOwnProfile && (
               <ProfileActions
                 profileId={profile.id}
                 profileName={fullName}
                 initialIsBlocked={initialIsBlocked}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Recommendations list */}
-        <div className="mt-8 flex flex-col gap-4">
-          {recommendations.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 text-sm text-zinc-400">
-              Nessuna raccomandazione ancora.
-            </div>
-          ) : (
-            recommendations.map((r) => (
-              <article
-                key={r.id}
-                className="rounded-2xl border border-white/10 bg-zinc-950/60 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2 className="text-base font-semibold tracking-tight">
-                      {r.professional_name}
-                    </h2>
-                    <p className="mt-1 text-sm text-zinc-400">
-                      {r.category} · {r.city}
-                    </p>
-                  </div>
-                  <time
-                    className="shrink-0 text-xs text-zinc-500"
-                    dateTime={r.created_at}
+        {/* Received recommendations — professionals only */}
+        {isPro && (
+          <section className="mt-10">
+            <h2 className="mb-4 text-base font-semibold text-zinc-200">
+              Raccomandazioni ricevute
+            </h2>
+            {receivedRecs.length === 0 ? (
+              <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 text-sm text-zinc-400">
+                Nessuna raccomandazione ancora. Sii il primo a raccomandare questo professionista.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {receivedRecs.map((r) => (
+                  <article
+                    key={r.id}
+                    className="rounded-2xl border border-white/10 bg-zinc-950/60 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]"
                   >
-                    {formatDate(r.created_at)}
-                  </time>
-                </div>
-                {r.note ? (
-                  <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-zinc-200">
-                    {r.note}
-                  </p>
-                ) : null}
-              </article>
-            ))
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-zinc-300">
+                          {initials(r.author?.full_name ?? "?")}
+                        </div>
+                        <div>
+                          {r.author?.username ? (
+                            <Link
+                              href={`/p/${r.author.username}`}
+                              className="text-sm font-medium text-zinc-200 hover:text-white"
+                            >
+                              {r.author.full_name ?? r.author.username}
+                            </Link>
+                          ) : (
+                            <span className="text-sm font-medium text-zinc-200">
+                              {r.author?.full_name ?? "Utente"}
+                            </span>
+                          )}
+                          {r.category && (
+                            <p className="text-xs text-zinc-500">{r.category}</p>
+                          )}
+                        </div>
+                      </div>
+                      <time
+                        className="shrink-0 text-xs text-zinc-500"
+                        dateTime={r.created_at}
+                      >
+                        {formatDate(r.created_at)}
+                      </time>
+                    </div>
+                    {r.note ? (
+                      <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-zinc-200">
+                        {r.note}
+                      </p>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Outgoing recommendations list */}
+        <section className="mt-10">
+          {isPro && (
+            <h2 className="mb-4 text-base font-semibold text-zinc-200">
+              Raccomandazioni date
+            </h2>
           )}
-        </div>
+          <div className="flex flex-col gap-4">
+            {recommendations.length === 0 ? (
+              <div className="rounded-2xl border border-white/10 bg-zinc-950/60 p-6 text-sm text-zinc-400">
+                Nessuna raccomandazione ancora.
+              </div>
+            ) : (
+              recommendations.map((r) => (
+                <article
+                  key={r.id}
+                  className="rounded-2xl border border-white/10 bg-zinc-950/60 p-5 shadow-[0_0_0_1px_rgba(255,255,255,0.03)]"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-base font-semibold tracking-tight">
+                        {r.professional_name}
+                      </h2>
+                      <p className="mt-1 text-sm text-zinc-400">
+                        {r.category} · {r.city}
+                      </p>
+                    </div>
+                    <time
+                      className="shrink-0 text-xs text-zinc-500"
+                      dateTime={r.created_at}
+                    >
+                      {formatDate(r.created_at)}
+                    </time>
+                  </div>
+                  {r.note ? (
+                    <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-zinc-200">
+                      {r.note}
+                    </p>
+                  ) : null}
+                </article>
+              ))
+            )}
+          </div>
+        </section>
       </main>
     </div>
   );
