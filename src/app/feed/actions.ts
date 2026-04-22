@@ -53,6 +53,17 @@ export async function toggleLike(recommendationId: string): Promise<{ liked: boo
     if (error) return { error: error.message };
     return { liked: false };
   } else {
+    // Rate limit: max 100 like al giorno
+    const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count: likesToday } = await supabase
+      .from("recommendation_likes")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", since24h);
+    if ((likesToday ?? 0) >= 100) {
+      return { error: "Hai raggiunto il limite di 100 like al giorno." };
+    }
+
     const { error } = await supabase
       .from("recommendation_likes")
       .insert({ recommendation_id: recommendationId, user_id: user.id });

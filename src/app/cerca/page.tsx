@@ -9,7 +9,7 @@ export default async function CercaPage() {
     data: { user },
     error,
   } = await supabase.auth.getUser();
-  if (error || !user) redirect("/login?redirectTo=/cerca");
+  if (error || !user) redirect("/login");
 
   const userId = user.id;
 

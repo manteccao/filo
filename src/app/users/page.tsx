@@ -29,7 +29,7 @@ function initials(name: string) {
 export default async function UsersPage() {
   const supabase = await createClient();
   const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) redirect("/login?redirectTo=/users");
+  if (error || !user) redirect("/login");
 
   const [{ data: profiles }, { data: follows }] = await Promise.all([
     supabase.from("profiles").select("id,full_name,city").order("full_name", { ascending: true }),

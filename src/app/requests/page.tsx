@@ -128,6 +128,10 @@ function NewRequestSheet({
       setError("Compila tutti i campi.");
       return;
     }
+    if (content.trim().length > 2000) {
+      setError("Il testo della richiesta è troppo lungo (max 2000 caratteri).");
+      return;
+    }
     if (!CATEGORIES.includes(category as (typeof CATEGORIES)[number])) {
       setError("Categoria non valida.");
       return;
@@ -277,6 +281,7 @@ function RepliesSheet({
     e.preventDefault();
     const content = text.trim();
     if (!content || posting) return;
+    if (content.length > 2000) return;
 
     // Optimistic: mostra la risposta immediatamente
     const rec = myRecs.find((r) => r.id === selectedRec) ?? null;

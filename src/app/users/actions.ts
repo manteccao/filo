@@ -17,7 +17,7 @@ export async function followUser(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect("/login?redirectTo=/users");
+    redirect("/login");
   }
 
   if (user.id === targetUserId) {
@@ -51,7 +51,7 @@ export async function unfollowUser(formData: FormData) {
   } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect("/login?redirectTo=/users");
+    redirect("/login");
   }
 
   await supabase

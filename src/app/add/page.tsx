@@ -7,7 +7,7 @@ import { AddFormClient } from "./AddFormClient";
 export default async function AddRecommendationPage() {
   const supabase = await createClient();
   const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) redirect("/login?redirectTo=/add");
+  if (userError || !userData.user) redirect("/login");
 
   return (
     <div className="min-h-svh bg-[#0d0d17] text-white">

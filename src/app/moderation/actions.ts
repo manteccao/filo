@@ -58,6 +58,17 @@ export async function reportContent(
   if (authError || !user) return { error: "Non autenticato" };
   if (!VALID_REASONS.has(reason)) return { error: "Motivo non valido" };
 
+  // Rate limit: max 20 segnalazioni al giorno
+  const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count: reportsToday } = await supabase
+    .from("reports")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", since24h);
+  if ((reportsToday ?? 0) >= 20) {
+    return { error: "Hai raggiunto il limite di 20 segnalazioni al giorno." };
+  }
+
   if (type === "recommendation") {
     const { error } = await supabase
       .from("reports")

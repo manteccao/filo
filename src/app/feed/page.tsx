@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { createClient, createAdminClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { FeedClient, type FeedItem, type FeedRecommendation, type FeedRequest } from "./FeedClient";
 
 export default async function FeedPage() {
@@ -8,7 +8,7 @@ export default async function FeedPage() {
   const { data, error } = await supabase.auth.getUser();
 
   if (error || !data.user) {
-    redirect("/login?redirectTo=/feed");
+    redirect("/login");
   }
 
   const userId = data.user.id;
@@ -51,10 +51,9 @@ export default async function FeedPage() {
 
   const recIds = recommendations.map((r) => r.id);
 
-  // Fetch profiles con admin client (bypassa RLS) per leggere profili altrui
-  const adminClient = createAdminClient();
+  // Fetch profiles con client autenticato (RLS permette la lettura a utenti autenticati)
   const profilesResult = allProfileIds.length
-    ? await adminClient.from("profiles").select("id,full_name,city,username,account_type").in("id", allProfileIds)
+    ? await supabase.from("profiles").select("id,full_name,city,username,account_type").in("id", allProfileIds)
     : { data: [], error: null };
   const [
     { data: secondDegreeFollows },

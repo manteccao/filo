@@ -412,6 +412,7 @@ function CommentsSheet({
     e.preventDefault();
     const content = text.trim();
     if (!content || posting) return;
+    if (content.length > 1000) return;
 
     // Optimistic: mostra il commento immediatamente
     const tempId = `temp-${Date.now()}`;

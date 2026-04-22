@@ -32,8 +32,20 @@ export async function addRecommendation(
   if (!professionalName || !categoryRaw || !city) {
     return { error: "Compila tutti i campi obbligatori." };
   }
-  if (note.length > 300) {
-    return { error: "La nota personale può essere lunga al massimo 300 caratteri." };
+  if (professionalName.length > 100) {
+    return { error: "Il nome del professionista è troppo lungo (max 100 caratteri)." };
+  }
+  if (city.length > 100) {
+    return { error: "Il campo città è troppo lungo (max 100 caratteri)." };
+  }
+  if (note.length > 2000) {
+    return { error: "La nota personale può essere lunga al massimo 2000 caratteri." };
+  }
+  if (address.length > 200) {
+    return { error: "L'indirizzo è troppo lungo (max 200 caratteri)." };
+  }
+  if (phone.length > 20) {
+    return { error: "Il numero di telefono è troppo lungo (max 20 caratteri)." };
   }
   if (!CATEGORIES.includes(categoryRaw as (typeof CATEGORIES)[number])) {
     return { error: "Categoria non valida." };
@@ -41,10 +53,21 @@ export async function addRecommendation(
 
   const supabase = await createClient();
   const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) redirect("/login?redirectTo=/add");
+  if (userError || !data.user) redirect("/login");
 
   if (!data.user.email_confirmed_at && !data.user.app_metadata?.provider) {
     return { error: "Verifica la tua email prima di pubblicare raccomandazioni." };
+  }
+
+  // Rate limit: max 10 raccomandazioni per giorno
+  const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { count: todayCount } = await supabase
+    .from("recommendations")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", data.user.id)
+    .gte("created_at", since24h);
+  if ((todayCount ?? 0) >= 10) {
+    return { error: "Hai raggiunto il limite di 10 raccomandazioni al giorno." };
   }
 
   const { data: myProfile } = await supabase
