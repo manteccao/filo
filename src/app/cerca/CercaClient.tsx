@@ -237,32 +237,32 @@ function PersonCard({
 // ─── Pro Profile Card ─────────────────────────────────────────────────────────
 
 function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
-  const href = pro.username ? `/p/${pro.username}` : undefined;
+  const href = `/p/${pro.username ?? pro.id}`;
 
-  const inner = (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.28, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="flex items-center gap-3.5 rounded-2xl bg-[#111111] px-4 py-3.5 transition active:opacity-80"
-    >
-      <Avatar profile={pro} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[15px] font-semibold text-white">
-          {pro.full_name}
-        </p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-          {pro.profession && (
-            <span className="rounded-full bg-[#0D9488]/15 px-2 py-[2px] text-[11px] font-medium text-[#0D9488]">
-              {capitalize(pro.profession)}
-            </span>
-          )}
-          {pro.city && (
-            <span className="text-[12px] text-[#6b7280]">{pro.city}</span>
-          )}
+  return (
+    <Link href={href}>
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="flex items-center gap-3.5 rounded-2xl bg-[#111111] px-4 py-3.5 transition active:opacity-80"
+      >
+        <Avatar profile={pro} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[15px] font-semibold text-white">
+            {pro.full_name}
+          </p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+            {pro.profession && (
+              <span className="rounded-full bg-[#0D9488]/15 px-2 py-[2px] text-[11px] font-medium text-[#0D9488]">
+                {capitalize(pro.profession)}
+              </span>
+            )}
+            {pro.city && (
+              <span className="text-[12px] text-[#6b7280]">{pro.city}</span>
+            )}
+          </div>
         </div>
-      </div>
-      {href && (
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -272,14 +272,9 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
         </svg>
-      )}
-    </motion.div>
+      </motion.div>
+    </Link>
   );
-
-  if (href) {
-    return <Link href={href}>{inner}</Link>;
-  }
-  return inner;
 }
 
 // ─── Section Header ───────────────────────────────────────────────────────────
