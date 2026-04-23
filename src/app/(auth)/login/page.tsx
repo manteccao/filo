@@ -6,8 +6,10 @@ import { createClient } from "@/lib/supabase/client";
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [consented, setConsented] = useState(false);
 
   async function handleGoogleLogin() {
+    if (!consented) return;
     setLoading(true);
     setError(null);
     const supabase = createClient();
@@ -36,7 +38,6 @@ export default function LoginPage() {
           src="/filo-logo-new.png"
           alt="Filo"
           className="h-20 w-auto object-contain"
-         
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight text-white">Filo</h1>
@@ -56,11 +57,64 @@ export default function LoginPage() {
           </div>
         )}
 
+        {/* GDPR consent */}
+        <label className="mb-5 flex cursor-pointer items-start gap-3">
+          <div className="relative mt-0.5 shrink-0">
+            <input
+              type="checkbox"
+              checked={consented}
+              onChange={(e) => setConsented(e.target.checked)}
+              className="sr-only"
+            />
+            <div
+              className={`flex h-5 w-5 items-center justify-center rounded border-2 transition ${
+                consented
+                  ? "border-[#0D9488] bg-[#0D9488]"
+                  : "border-[#374151] bg-transparent"
+              }`}
+            >
+              {consented && (
+                <svg viewBox="0 0 12 12" fill="none" className="h-3 w-3">
+                  <path
+                    d="M2 6l3 3 5-5"
+                    stroke="white"
+                    strokeWidth={1.8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </div>
+          </div>
+          <span className="text-[13px] leading-relaxed text-[#9ca3af]">
+            Ho letto e accetto la{" "}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0D9488] underline hover:text-[#0b7c76]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Privacy Policy
+            </a>{" "}
+            e i{" "}
+            <a
+              href="/terms"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#0D9488] underline hover:text-[#0b7c76]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              Termini e Condizioni
+            </a>
+          </span>
+        </label>
+
         <button
           type="button"
           onClick={handleGoogleLogin}
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-white text-sm font-semibold text-[#111] shadow-[0_2px_16px_rgba(255,255,255,0.08)] transition hover:bg-zinc-100 active:scale-[0.98] disabled:opacity-60"
+          disabled={loading || !consented}
+          className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-white text-sm font-semibold text-[#111] shadow-[0_2px_16px_rgba(255,255,255,0.08)] transition hover:bg-zinc-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#111] border-t-transparent" />
@@ -76,13 +130,6 @@ export default function LoginPage() {
             </>
           )}
         </button>
-
-        <p className="mt-6 text-center text-xs text-[#4b5563]">
-          Accedendo accetti i nostri{" "}
-          <a href="/privacy" className="underline hover:text-[#9ca3af]">
-            termini e condizioni
-          </a>
-        </p>
       </div>
     </div>
   );
