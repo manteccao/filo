@@ -23,32 +23,23 @@ export function SplashScreen() {
     didRun.current = true;
 
     async function run() {
-      // 1. Logo: scale 0.3→1 + opacity 0→1, spring with bounce
+      // 1. Logo: scale 0.3→1 + opacity 0→1 (~0.25s)
       await animate(
         "#splash-logo",
         { scale: [0.3, 1], opacity: [0, 1] },
-        { type: "spring", stiffness: 120, damping: 14 }
+        { type: "spring", stiffness: 280, damping: 22 }
       );
 
-      // 2. After 0.2s: shake
-      await new Promise<void>((r) => setTimeout(r, 200));
-      await animate(
-        "#splash-logo",
-        { x: [-4, 4, -3, 3, -1, 1, 0] },
-        { duration: 0.5, ease: "easeInOut" }
-      );
-
-      // 3. After 0.5s: text letters appear one by one
-      await new Promise<void>((r) => setTimeout(r, 500));
+      // 2. Text letters appear one by one (~0.75s)
       await animate(
         ".splash-letter",
         { opacity: 1 },
-        { delay: stagger(0.06), duration: 0.3, ease: "easeOut" }
+        { delay: stagger(0.03), duration: 0.1, ease: "easeOut" }
       );
 
-      // 4. After 1s: fade out everything
-      await new Promise<void>((r) => setTimeout(r, 1000));
-      await animate(scope.current, { opacity: 0 }, { duration: 0.6, ease: "easeInOut" });
+      // 3. After 0.15s: fade out everything (0.25s)
+      await new Promise<void>((r) => setTimeout(r, 150));
+      await animate(scope.current, { opacity: 0 }, { duration: 0.25, ease: "easeIn" });
 
       setVisible(false);
     }
