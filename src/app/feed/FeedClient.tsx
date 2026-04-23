@@ -67,6 +67,7 @@ type Comment = {
   content: string;
   created_at: string;
   full_name: string | null;
+  deleted_at: string | null;
 };
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -382,6 +383,7 @@ function CommentsSheet({
   const [currentUserName, setCurrentUserName] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [posting, setPosting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -392,7 +394,7 @@ function CommentsSheet({
       const [{ data }, { data: meData }] = await Promise.all([
         supabase
           .from("comments_with_profile")
-          .select("id, user_id, content, created_at, full_name")
+          .select("id, user_id, content, created_at, full_name, deleted_at")
           .eq("recommendation_id", recommendationId)
           .order("created_at", { ascending: true }),
         supabase.from("profiles").select("full_name").eq("id", currentUserId).single(),
@@ -422,6 +424,7 @@ function CommentsSheet({
       content,
       created_at: new Date().toISOString(),
       full_name: currentUserName,
+      deleted_at: null,
     };
     const optimistic = [...comments, tempComment];
     setComments(optimistic);
@@ -439,7 +442,7 @@ function CommentsSheet({
     if (!error && data) {
       // Sostituisce il temp con l'ID reale
       setComments((prev) => prev.map((c) => c.id === tempId
-        ? { ...(data as Omit<Comment, "full_name">), full_name: currentUserName }
+        ? { ...(data as Omit<Comment, "full_name" | "deleted_at">), full_name: currentUserName, deleted_at: null }
         : c));
       // Notifica fire-and-forget
       if (currentUserId !== recOwnerId) {
@@ -456,6 +459,20 @@ function CommentsSheet({
       onCountChange(comments.length);
     }
     setPosting(false);
+  }
+
+  async function handleDeleteComment(commentId: string) {
+    const supabase = createClient();
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from("comments")
+      .update({ deleted_at: now })
+      .eq("id", commentId)
+      .eq("user_id", currentUserId);
+    if (!error) {
+      setComments((prev) => prev.map((c) => c.id === commentId ? { ...c, deleted_at: now } : c));
+    }
+    setConfirmDeleteId(null);
   }
 
   return (
@@ -497,17 +514,58 @@ function CommentsSheet({
             <div className="space-y-5">
               {comments.map((c) => {
                 const name = c.full_name ?? "Utente";
+                const isDeleted = !!c.deleted_at;
+                const isOwn = c.user_id === currentUserId;
                 return (
                   <div key={c.id} className="flex gap-3">
-                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(name)}`}>
-                      <span className="text-[10px] font-bold text-white">{initials(name)}</span>
+                    <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${isDeleted ? "from-zinc-700 to-zinc-600" : avatarColor(name)}`}>
+                      <span className="text-[10px] font-bold text-white">{isDeleted ? "·" : initials(name)}</span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-semibold text-white">{name}</span>
-                        <span className="text-[10px] text-[#6b7280]">{timeAgo(c.created_at)}</span>
-                      </div>
-                      <p className="mt-1 text-sm leading-relaxed text-[#9CA3AF]">{c.content}</p>
+                      {isDeleted ? (
+                        <p className="text-sm italic text-[#4b5563]">Commento eliminato</p>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline justify-between gap-2">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-xs font-semibold text-white">{name}</span>
+                              <span className="text-[10px] text-[#6b7280]">{timeAgo(c.created_at)}</span>
+                            </div>
+                            {isOwn && (
+                              confirmDeleteId === c.id ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-[#6b7280]">Eliminare?</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteComment(c.id)}
+                                    className="text-[10px] font-semibold text-red-400 hover:text-red-300"
+                                  >
+                                    Sì
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmDeleteId(null)}
+                                    className="text-[10px] text-[#6b7280] hover:text-white"
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeleteId(c.id)}
+                                  className="shrink-0 text-[#3a3a3a] transition hover:text-red-400"
+                                >
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                  </svg>
+                                </button>
+                              )
+                            )}
+                          </div>
+                          <p className="mt-1 text-sm leading-relaxed text-[#9CA3AF]">{c.content}</p>
+                        </>
+                      )}
                     </div>
                   </div>
                 );

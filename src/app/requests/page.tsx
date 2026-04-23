@@ -58,6 +58,7 @@ type Reply = {
   professional_name: string | null;
   rec_category: string | null;
   rec_city: string | null;
+  deleted_at: string | null;
 };
 
 type MyRec = {
@@ -248,6 +249,7 @@ function RepliesSheet({
   const [text, setText] = useState("");
   const [selectedRec, setSelectedRec] = useState("");
   const [posting, setPosting] = useState(false);
+  const [confirmDeleteReplyId, setConfirmDeleteReplyId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -258,7 +260,7 @@ function RepliesSheet({
       const [{ data: repliesData }, { data: recsData }, { data: meData }] = await Promise.all([
         supabase
           .from("request_replies_with_profile")
-          .select("id, request_id, user_id, content, recommendation_id, created_at, full_name, professional_name, rec_category, rec_city")
+          .select("id, request_id, user_id, content, recommendation_id, created_at, full_name, professional_name, rec_category, rec_city, deleted_at")
           .eq("request_id", request.id)
           .order("created_at", { ascending: true }),
         supabase
@@ -297,6 +299,7 @@ function RepliesSheet({
       professional_name: rec?.professional_name ?? null,
       rec_category: rec?.category ?? null,
       rec_city: rec?.city ?? null,
+      deleted_at: null,
     };
     setReplies((prev) => [...prev, tempReply]);
     setText("");
@@ -313,7 +316,7 @@ function RepliesSheet({
     if (!error && data) {
       // Sostituisce il temp con l'ID reale
       setReplies((prev) => prev.map((r) => r.id === tempId
-        ? { ...(data as Omit<Reply, "full_name" | "professional_name" | "rec_category" | "rec_city">), full_name: currentUserName, professional_name: rec?.professional_name ?? null, rec_category: rec?.category ?? null, rec_city: rec?.city ?? null }
+        ? { ...(data as Omit<Reply, "full_name" | "professional_name" | "rec_category" | "rec_city" | "deleted_at">), full_name: currentUserName, professional_name: rec?.professional_name ?? null, rec_category: rec?.category ?? null, rec_city: rec?.city ?? null, deleted_at: null }
         : r));
       // Notifica fire-and-forget
       if (currentUserId !== request.user_id) {
@@ -329,6 +332,20 @@ function RepliesSheet({
       setReplies((prev) => prev.filter((r) => r.id !== tempId));
     }
     setPosting(false);
+  }
+
+  async function handleDeleteReply(replyId: string) {
+    const supabase = createClient();
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from("request_replies")
+      .update({ deleted_at: now })
+      .eq("id", replyId)
+      .eq("user_id", currentUserId);
+    if (!error) {
+      setReplies((prev) => prev.map((r) => r.id === replyId ? { ...r, deleted_at: now } : r));
+    }
+    setConfirmDeleteReplyId(null);
   }
 
   const authorName = request.full_name ?? "Utente";
@@ -388,22 +405,63 @@ function RepliesSheet({
             <div className="space-y-5">
               {replies.map((rep) => {
                 const name = rep.full_name ?? "Utente";
+                const isDeleted = !!rep.deleted_at;
+                const isOwn = rep.user_id === currentUserId;
                 return (
                   <div key={rep.id} className="flex gap-3">
-                    <Avatar className={`bg-gradient-to-br ${avatarColor(name)} after:hidden`}>
-                      <AvatarFallback className="bg-transparent text-white text-xs font-bold">{initials(name)}</AvatarFallback>
+                    <Avatar className={`bg-gradient-to-br ${isDeleted ? "from-zinc-700 to-zinc-600" : avatarColor(name)} after:hidden`}>
+                      <AvatarFallback className="bg-transparent text-white text-xs font-bold">{isDeleted ? "·" : initials(name)}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xs font-semibold text-white">{name}</span>
-                        <span className="text-[10px] text-[#6B7280]">{timeAgo(rep.created_at)}</span>
-                      </div>
-                      <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{rep.content}</p>
-                      {rep.professional_name && (
-                        <div className="mt-2 rounded-xl border border-teal-900/40 bg-[#0d0d17] px-3 py-2">
-                          <p className="text-xs font-semibold text-teal-400">{rep.professional_name}</p>
-                          <p className="text-[11px] text-[#6B7280]">{rep.rec_category} · {rep.rec_city}</p>
-                        </div>
+                      {isDeleted ? (
+                        <p className="text-sm italic text-[#4b5563]">Risposta eliminata</p>
+                      ) : (
+                        <>
+                          <div className="flex items-baseline justify-between gap-2">
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-xs font-semibold text-white">{name}</span>
+                              <span className="text-[10px] text-[#6B7280]">{timeAgo(rep.created_at)}</span>
+                            </div>
+                            {isOwn && (
+                              confirmDeleteReplyId === rep.id ? (
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[10px] text-[#6B7280]">Eliminare?</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteReply(rep.id)}
+                                    className="text-[10px] font-semibold text-red-400 hover:text-red-300"
+                                  >
+                                    Sì
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmDeleteReplyId(null)}
+                                    className="text-[10px] text-[#6B7280] hover:text-white"
+                                  >
+                                    No
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setConfirmDeleteReplyId(rep.id)}
+                                  className="shrink-0 text-[#3a3a3a] transition hover:text-red-400"
+                                >
+                                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                  </svg>
+                                </button>
+                              )
+                            )}
+                          </div>
+                          <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{rep.content}</p>
+                          {rep.professional_name && (
+                            <div className="mt-2 rounded-xl border border-teal-900/40 bg-[#0d0d17] px-3 py-2">
+                              <p className="text-xs font-semibold text-teal-400">{rep.professional_name}</p>
+                              <p className="text-[11px] text-[#6B7280]">{rep.rec_category} · {rep.rec_city}</p>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
