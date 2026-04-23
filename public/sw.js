@@ -1,21 +1,21 @@
-const CACHE_NAME = "filo-v1";
+const CACHE_NAME = "filo-v2";
 
-const PRECACHE_URLS = [
-  "/feed",
-  "/cerca",
-  "/requests",
-  "/profile",
-  "/filo-logo-3d.png",
-  "/filo-logo-square.svg",
+const PRECACHE_ASSETS = [
+  "/filo-logo-new.png",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/manifest.json",
 ];
 
-// ─── Install: precache le pagine principali ───────────────────────────────────
+// ─── Install: precache asset statici ─────────────────────────────────────────
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) =>
-      Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)))
-    )
+    caches
+      .open(CACHE_NAME)
+      .then((cache) =>
+        Promise.allSettled(PRECACHE_ASSETS.map((url) => cache.add(url)))
+      )
   );
   self.skipWaiting();
 });
@@ -27,7 +27,9 @@ self.addEventListener("activate", (event) => {
     caches
       .keys()
       .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+        Promise.all(
+          keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+        )
       )
   );
   self.clients.claim();
@@ -37,11 +39,54 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
+  const url = request.url;
 
-  // Ignora richieste non-GET e API Supabase
+  // Ignora richieste non-GET
   if (request.method !== "GET") return;
-  if (request.url.includes("supabase.co")) return;
-  if (request.url.includes("mapbox.com") || request.url.includes("mapbox.cn")) return;
+
+  // Ignora API Supabase (sempre network, mai cache)
+  if (url.includes("supabase.co")) return;
+  if (url.includes("mapbox.com") || url.includes("mapbox.cn")) return;
+  if (url.includes("googleapis.com") || url.includes("googletagmanager.com")) return;
+
+  // Asset statici Next.js (_next/static): cache-first (sono immutabili, hash nel nome)
+  if (url.includes("/_next/static/")) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            }
+            return response;
+          })
+      )
+    );
+    return;
+  }
+
+  // Immagini e font: cache-first con fallback network
+  if (
+    url.includes("/_next/image") ||
+    /\.(png|jpg|jpeg|svg|webp|gif|ico|woff2?|ttf|otf)(\?|$)/.test(url)
+  ) {
+    event.respondWith(
+      caches.match(request).then(
+        (cached) =>
+          cached ||
+          fetch(request).then((response) => {
+            if (response.ok) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            }
+            return response;
+          })
+      )
+    );
+    return;
+  }
 
   // Navigazione (pagine HTML): network-first, fallback cache
   if (request.mode === "navigate") {
@@ -59,8 +104,8 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Asset statici: cache-first
+  // Tutto il resto: network-first
   event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request))
+    fetch(request).catch(() => caches.match(request))
   );
 });
