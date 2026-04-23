@@ -1,21 +1,28 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useAnimate, stagger } from "framer-motion";
 
 const TAGLINE = "il passaparola digitale";
 
+// Pages where the splash should never appear (public/legal pages, auth)
+const SKIP_SPLASH_PREFIXES = ["/terms", "/privacy", "/safety", "/login", "/register", "/p/", "/invite/", "/raccomanda/"];
+
 export function SplashScreen() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [scope, animate] = useAnimate();
   const didRun = useRef(false);
 
-  // Show once per session
+  // Show once per device (localStorage persists across tabs/sessions)
   useEffect(() => {
-    if (sessionStorage.getItem("splash_shown")) return;
-    sessionStorage.setItem("splash_shown", "1");
+    const skip = SKIP_SPLASH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+    if (skip) return;
+    if (localStorage.getItem("splash_shown")) return;
+    localStorage.setItem("splash_shown", "1");
     setVisible(true);
-  }, []);
+  }, [pathname]);
 
   // Run sequential animation after mount
   useEffect(() => {
