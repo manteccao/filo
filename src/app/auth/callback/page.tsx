@@ -52,11 +52,11 @@ function CallbackHandler() {
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id, full_name")
+        .select("onboarding_completed")
         .eq("id", user.id)
         .single();
 
-      if (profile?.full_name) {
+      if (profile?.onboarding_completed) {
         router.push("/feed");
       } else {
         router.push("/onboarding");

@@ -101,8 +101,8 @@ export default function OnboardingPage() {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      // Salva la città dell'utente nel profilo
-      await supabase.from("profiles").update({ city: myCity.trim() }).eq("id", user.id);
+      // Salva la città dell'utente nel profilo e segna l'onboarding come completato
+      await supabase.from("profiles").update({ city: myCity.trim(), onboarding_completed: true }).eq("id", user.id);
       // Salva la raccomandazione (solo se il nome del professionista è compilato)
       if (profName.trim() && recCity.trim() && CATEGORIES.includes(category as (typeof CATEGORIES)[number])) {
         await supabase.from("recommendations").insert({
@@ -126,7 +126,7 @@ export default function OnboardingPage() {
     setSaving(true);
     try {
       const supabase = createClient();
-      await supabase.from("profiles").update({ city: myCity.trim() }).eq("id", userId);
+      await supabase.from("profiles").update({ city: myCity.trim(), onboarding_completed: true }).eq("id", userId);
     } catch (_) {
       // proceed
     } finally {
@@ -146,6 +146,7 @@ export default function OnboardingPage() {
         profession: proCategory,
         phone: cleanPhone,
         work_address: proWorkAddress.trim() || null,
+        onboarding_completed: true,
         ...(proCity.trim() ? { city: proCity.trim() } : {}),
       }).eq("id", userId);
     } catch (_) {
