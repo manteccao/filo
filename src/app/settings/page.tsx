@@ -182,16 +182,21 @@ export default function SettingsPage() {
   async function handleDeleteAccount() {
     setDeleteLoading(true);
     setDeleteError(null);
-    const result = await deleteAccount();
-    if ("error" in result) {
-      setDeleteError(result.error);
+    try {
+      const result = await deleteAccount();
+      if ("error" in result) {
+        setDeleteError(result.error);
+        setDeleteLoading(false);
+        return;
+      }
+      // Account deleted — sign out and go to login
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch {
+      setDeleteError("Errore imprevisto. Riprova o contatta il supporto.");
       setDeleteLoading(false);
-      return;
     }
-    // Account deleted — clear local session and go home
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/");
   }
 
   const gradient = avatarGradient(fullName || "U");
