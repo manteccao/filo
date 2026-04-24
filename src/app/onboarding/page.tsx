@@ -59,7 +59,8 @@ export default function OnboardingPage() {
   // Professional path
   const [proCategory, setProCategory] = useState("dentista");
   const [proCity, setProCity] = useState("");
-  const [proPhone, setProPhone] = useState("");
+  const [proPhone, setProPhone] = useState("+39 ");
+  const [proWorkAddress, setProWorkAddress] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -139,10 +140,12 @@ export default function OnboardingPage() {
     setSaving(true);
     try {
       const supabase = createClient();
+      const cleanPhone = proPhone.trim().replace(/^\+39\s*$/, "").trim() || null;
       await supabase.from("profiles").update({
         account_type: "professional",
         profession: proCategory,
-        professional_phone: proPhone.trim() || null,
+        phone: cleanPhone,
+        work_address: proWorkAddress.trim() || null,
         ...(proCity.trim() ? { city: proCity.trim() } : {}),
       }).eq("id", userId);
     } catch (_) {
@@ -345,21 +348,35 @@ export default function OnboardingPage() {
 
               <div>
                 <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
-                  Telefono{" "}
-                  <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+                  Telefono <span className="text-[#0D9488]">*</span>
                 </label>
                 <input
                   type="tel"
                   value={proPhone}
                   onChange={(e) => setProPhone(e.target.value)}
+                  required
                   placeholder="+39 02 1234567"
+                  className={inputCls}
+                />
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                  Indirizzo studio{" "}
+                  <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+                </label>
+                <input
+                  type="text"
+                  value={proWorkAddress}
+                  onChange={(e) => setProWorkAddress(e.target.value)}
+                  placeholder="Es. Via Roma 15, Milano"
                   className={inputCls}
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || proPhone.trim().replace(/^\+39\s*$/, "").length === 0}
                 className="h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.3)] transition hover:bg-[#0b7c76] disabled:opacity-50 active:scale-[0.98]"
               >
                 {saving ? "Salvataggio…" : "Continua"}

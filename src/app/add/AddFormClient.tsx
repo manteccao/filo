@@ -25,6 +25,8 @@ type ProfessionalResult = {
   full_name: string | null;
   city: string | null;
   avatar_url: string | null;
+  phone: string | null;
+  work_address: string | null;
 };
 
 function initials(name: string) {
@@ -55,6 +57,8 @@ export function AddFormClient({ userId }: { userId: string }) {
   // Form fields that can be auto-filled
   const [category, setCategory] = useState<string>("");
   const [city, setCity] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -77,7 +81,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
-        .select("id, full_name, city, avatar_url")
+        .select("id, full_name, city, avatar_url, phone, work_address")
         .eq("account_type", "professional")
         .neq("id", userId)
         .ilike("full_name", `%${query}%`)
@@ -106,8 +110,9 @@ export function AddFormClient({ userId }: { userId: string }) {
   function selectProfessional(prof: ProfessionalResult) {
     setSelected(prof);
     setQuery(prof.full_name ?? "");
-    // Auto-fill city if available
     if (prof.city) setCity(prof.city);
+    if (prof.phone) setPhone(prof.phone);
+    if (prof.work_address) setAddress(prof.work_address);
     setShowDropdown(false);
     setResults([]);
   }
@@ -117,6 +122,8 @@ export function AddFormClient({ userId }: { userId: string }) {
     setQuery("");
     setCity("");
     setCategory("");
+    setPhone("");
+    setAddress("");
     setSearched(false);
   }
 
@@ -271,7 +278,15 @@ export function AddFormClient({ userId }: { userId: string }) {
         <label className={labelCls} htmlFor="address">
           Indirizzo <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
         </label>
-        <input id="address" name="address" type="text" placeholder="Es. Via Roma 15, centro" className={inputCls} />
+        <input
+          id="address"
+          name="address"
+          type="text"
+          placeholder="Es. Via Roma 15, centro"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          className={inputCls}
+        />
       </div>
 
       {/* Phone */}
@@ -279,7 +294,15 @@ export function AddFormClient({ userId }: { userId: string }) {
         <label className={labelCls} htmlFor="phone">
           Numero di telefono <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
         </label>
-        <input id="phone" name="phone" type="tel" placeholder="+39 02 1234567" className={inputCls} />
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          placeholder="+39 02 1234567"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className={inputCls}
+        />
       </div>
 
       {/* Price range */}

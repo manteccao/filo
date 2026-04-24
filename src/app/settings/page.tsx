@@ -48,6 +48,12 @@ export default function SettingsPage() {
   const [savingCity, setSavingCity] = useState(false);
   const [citySaved, setCitySaved] = useState(false);
   const [cityError, setCityError] = useState<string | null>(null);
+  const [isProfessional, setIsProfessional] = useState(false);
+  const [phone, setPhone] = useState("+39 ");
+  const [workAddress, setWorkAddress] = useState("");
+  const [savingPro, setSavingPro] = useState(false);
+  const [proSaved, setProSaved] = useState(false);
+  const [proError, setProError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [copiedProfile, setCopiedProfile] = useState(false);
 
@@ -65,17 +71,21 @@ export default function SettingsPage() {
         if (error || !user) { router.push("/login"); return; }
 
         const { data: profile } = await supabase
-          .from("profiles").select("full_name, username, avatar_url, city").eq("id", user.id).single();
+          .from("profiles").select("full_name, username, avatar_url, city, account_type, phone, work_address").eq("id", user.id).single();
 
-        const name = (profile as { full_name?: string | null } | null)?.full_name ?? user.user_metadata?.full_name ?? "Utente";
-        const uname = (profile as { username?: string | null } | null)?.username ?? toSlug(name);
+        const p = profile as { full_name?: string | null; username?: string | null; avatar_url?: string | null; city?: string | null; account_type?: string | null; phone?: string | null; work_address?: string | null } | null;
+        const name = p?.full_name ?? user.user_metadata?.full_name ?? "Utente";
+        const uname = p?.username ?? toSlug(name);
 
         setUserId(user.id);
         setEmail(user.email ?? "");
         setFullName(name);
         setUsername(uname);
-        setAvatarUrl((profile as { avatar_url?: string | null } | null)?.avatar_url ?? user.user_metadata?.avatar_url ?? "");
-        setCity((profile as { city?: string | null } | null)?.city ?? "");
+        setAvatarUrl(p?.avatar_url ?? user.user_metadata?.avatar_url ?? "");
+        setCity(p?.city ?? "");
+        setIsProfessional(p?.account_type === "professional");
+        setPhone(p?.phone ?? "+39 ");
+        setWorkAddress(p?.work_address ?? "");
       } finally {
         setLoading(false);
       }
@@ -139,6 +149,27 @@ export default function SettingsPage() {
       setCityError("Errore imprevisto, riprova.");
     } finally {
       setSavingCity(false);
+    }
+  }
+
+  async function handleSaveProDetails() {
+    if (!userId) return;
+    setSavingPro(true);
+    setProError(null);
+    try {
+      const supabase = createClient();
+      const cleanPhone = phone.trim().replace(/^\+39\s*$/, "").trim() || null;
+      const { error } = await supabase
+        .from("profiles")
+        .update({ phone: cleanPhone, work_address: workAddress.trim() || null })
+        .eq("id", userId);
+      if (error) { setProError(`Errore: ${error.message}`); return; }
+      setProSaved(true);
+      setTimeout(() => setProSaved(false), 2000);
+    } catch {
+      setProError("Errore imprevisto, riprova.");
+    } finally {
+      setSavingPro(false);
     }
   }
 
@@ -260,6 +291,42 @@ export default function SettingsPage() {
             <p className="mt-2 text-xs text-red-400">{cityError}</p>
           )}
         </div>
+
+        {/* Dati professionali */}
+        {isProfessional && (
+          <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Dati professionali</p>
+            <div>
+              <label className="mb-1.5 block text-[11px] text-[#5c5f7a]">Telefono</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value); setProError(null); }}
+                placeholder="+39 02 1234567"
+                className={inputCls}
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-[11px] text-[#5c5f7a]">Indirizzo studio</label>
+              <input
+                type="text"
+                value={workAddress}
+                onChange={(e) => { setWorkAddress(e.target.value); setProError(null); }}
+                placeholder="Es. Via Roma 15, Milano"
+                className={inputCls}
+              />
+            </div>
+            {proError && <p className="text-xs text-red-400">{proError}</p>}
+            <button
+              type="button"
+              onClick={handleSaveProDetails}
+              disabled={savingPro}
+              className="h-11 w-full rounded-xl bg-[#0D9488] text-sm font-semibold text-white transition hover:bg-[#0b7c76] disabled:opacity-50"
+            >
+              {savingPro ? "…" : proSaved ? "Salvato ✓" : "Salva dati professionali"}
+            </button>
+          </div>
+        )}
 
         {/* Condividi profilo */}
         <button

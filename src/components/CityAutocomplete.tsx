@@ -46,7 +46,7 @@ export function CityAutocomplete({
     }
     const hits = fuse.search(query, { limit: 5 }).map((r) => r.item);
     setResults(hits);
-    setShowDropdown(hits.length > 0);
+    setShowDropdown(true);
   }, [query]);
 
   // Close on outside click
@@ -89,7 +89,7 @@ export function CityAutocomplete({
         placeholder={placeholder}
         value={query}
         onChange={handleChange}
-        onFocus={() => results.length > 0 && setShowDropdown(true)}
+        onFocus={() => query.length >= 2 && setShowDropdown(true)}
         className={inputCls}
         aria-autocomplete="list"
         aria-expanded={showDropdown}
@@ -111,17 +111,17 @@ export function CityAutocomplete({
               {city}
             </button>
           ))}
-          <div className="border-t border-[#232340] px-4 py-2.5">
-            <p className="text-[11px] text-[#5c5f7a]">
-              Non trovi la tua città?{" "}
-              <a
-                href="mailto:supporto@filo.network"
-                className="text-[#0D9488] hover:underline"
-                onMouseDown={(e) => e.stopPropagation()}
-              >
-                Scrivi a supporto@filo.network
-              </a>
-            </p>
+          <div className={results.length > 0 ? "border-t border-[#232340]" : ""}>
+            <button
+              type="button"
+              onMouseDown={(e) => { e.preventDefault(); select(query); }}
+              className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-[#0D9488] transition hover:bg-[#16162a]"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4 shrink-0">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Usa &ldquo;{query}&rdquo;
+            </button>
           </div>
         </div>
       )}
