@@ -10,7 +10,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
 import { deleteAccount } from "./actions";
 
-const BASE_URL = "https://filo-kappa.vercel.app";
+const BASE_URL = "https://filo.network";
 
 const AVATAR_COLORS = [
   "from-teal-600 to-cyan-500", "from-blue-600 to-indigo-500",

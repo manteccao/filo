@@ -1,4 +1,4 @@
-const CACHE_NAME = "filo-v2";
+const CACHE_NAME = "filo-v3";
 
 const PRECACHE_ASSETS = [
   "/filo-logo-new.png",

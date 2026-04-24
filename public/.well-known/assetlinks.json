@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.filo_kappa.twa",
+      "sha256_cert_fingerprints": ["61:77:32:E2:B9:D0:60:2C:7A:B6:CD:B1:65:74:D4:15:02:DD:AC:9C:64:6B:03:88:65:70:69:9B:F4:F2:EF:10"]
+    }
+  }
+]

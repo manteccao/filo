@@ -89,7 +89,7 @@ export default function LoginPage() {
           <span className="text-[13px] leading-relaxed text-[#9ca3af]">
             Ho letto e accetto la{" "}
             <a
-              href="/privacy"
+              href="https://filo.network/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#0D9488] underline hover:text-[#0b7c76]"
@@ -99,7 +99,7 @@ export default function LoginPage() {
             </a>{" "}
             e i{" "}
             <a
-              href="/terms"
+              href="https://filo.network/terms"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#0D9488] underline hover:text-[#0b7c76]"

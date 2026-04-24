@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
 
-const BASE_URL = "https://filo-kappa.vercel.app";
+const BASE_URL = "https://filo.network";
 
 const CATEGORIES = [
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",

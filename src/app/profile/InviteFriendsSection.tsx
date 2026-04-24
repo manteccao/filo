@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const BASE_URL = "https://filo-kappa.vercel.app";
+const BASE_URL = "https://filo.network";
 
 export function InviteFriendsSection({
   username,

@@ -780,7 +780,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
   }
 
   async function handleShare() {
-    await navigator.clipboard.writeText(`https://filo-kappa.vercel.app/feed`);
+    await navigator.clipboard.writeText(`https://filo.network/feed`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
