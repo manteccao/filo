@@ -265,6 +265,14 @@ function RequestRepliesSheet({
           actor_id: currentUserId,
           request_id: request.id,
         });
+        fetch("/api/push", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            targetUserId: request.user_id,
+            message: `${currentUserName} ha risposto alla tua richiesta`,
+          }),
+        });
       }
     } else {
       // Revert optimistic update on error
@@ -451,6 +459,14 @@ function CommentsSheet({
           type: "comment",
           actor_id: currentUserId,
           recommendation_id: recommendationId,
+        });
+        fetch("/api/push", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            targetUserId: recOwnerId,
+            message: `${currentUserName} ha commentato la tua raccomandazione`,
+          }),
         });
       }
     } else {

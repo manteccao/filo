@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendPush } from "@/lib/onesignal";
 
 const CATEGORIES = [
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
@@ -107,6 +108,17 @@ export async function addRecommendation(
       return { error: "Hai già raccomandato questo professionista in questa città." };
     }
     return { error: error.message };
+  }
+
+  // Push notification al professionista su Filo
+  if (professionalId) {
+    const actorName = ((myProfile as { full_name?: string | null } | null)?.full_name ?? "Qualcuno");
+    await supabase.from("notifications").insert({
+      user_id: professionalId,
+      type: "recommendation",
+      actor_id: data.user.id,
+    });
+    sendPush(professionalId, `${actorName} ti ha raccomandato!`, "https://filo.network/profile");
   }
 
   redirect("/feed");

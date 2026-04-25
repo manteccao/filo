@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { SplashScreen } from "@/components/SplashScreen";
 import { TabShell } from "@/components/TabShell";
+import { OneSignalInit } from "@/components/OneSignalInit";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -40,7 +41,12 @@ export default function RootLayout({
     <html lang="it" className={cn("h-full", "font-sans", geist.variable)}>
       <body className="min-h-full antialiased">
         <SplashScreen />
+        <OneSignalInit />
         <TabShell>{children}</TabShell>
+        <Script
+          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+          strategy="afterInteractive"
+        />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-18081144394"
           strategy="afterInteractive"

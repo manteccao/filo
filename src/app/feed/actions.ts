@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendPush } from "@/lib/onesignal";
 
 const VALID_CATEGORIES = new Set([
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
@@ -76,12 +77,17 @@ export async function toggleLike(recommendationId: string): Promise<{ liked: boo
       .eq("id", recommendationId)
       .single();
     if (rec && rec.user_id !== user.id) {
+      const { data: actor } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+      const actorName = (actor as { full_name?: string | null } | null)?.full_name ?? "Qualcuno";
+
       await supabase.from("notifications").insert({
         user_id: rec.user_id,
         type: "like",
         actor_id: user.id,
         recommendation_id: recommendationId,
       });
+
+      sendPush(rec.user_id, `${actorName} ha messo like alla tua raccomandazione`);
     }
 
     return { liked: true };

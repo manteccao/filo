@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendPush } from "@/lib/onesignal";
 
 export async function followUser(formData: FormData) {
   const targetUserId = String(formData.get("targetUserId") ?? "");
@@ -34,6 +35,10 @@ export async function followUser(formData: FormData) {
     type: "follow",
     actor_id: user.id,
   });
+
+  const { data: actor } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+  const actorName = (actor as { full_name?: string | null } | null)?.full_name ?? "Qualcuno";
+  sendPush(targetUserId, `${actorName} ha iniziato a seguirti`, "https://filo.network/profile");
 
   redirect("/users");
 }
