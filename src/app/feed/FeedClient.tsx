@@ -839,7 +839,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     );
   }
 
-  const username = r.profile?.username;
+  const profileHref = `/p/${r.profile?.username ?? r.user_id}`;
   const metaLine = timeAgo(r.created_at);
 
   return (
@@ -852,27 +852,17 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
       >
         {/* Header row */}
         <div className="flex items-center gap-3">
-          {username ? (
-            <Link href={`/p/${username}`} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
-              {r.profile?.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={r.profile.avatar_url} alt={recommenderName} className="h-full w-full object-cover" />
-              ) : (
-                <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
-              )}
-            </Link>
-          ) : (
-            <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
+          <Link href={profileHref} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
+            {r.profile?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={r.profile.avatar_url} alt={recommenderName} className="h-full w-full object-cover" />
+            ) : (
               <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
-            </div>
-          )}
+            )}
+          </Link>
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-1.5">
-              {username ? (
-                <Link href={`/p/${username}`} className="truncate text-[15px] font-bold text-white transition hover:text-[#0D9488]">{recommenderName}</Link>
-              ) : (
-                <p className="truncate text-[15px] font-bold text-white">{recommenderName}</p>
-              )}
+              <Link href={profileHref} className="truncate text-[15px] font-bold text-white transition hover:text-[#0D9488]">{recommenderName}</Link>
               {r.profile?.account_type === "professional" && (
                 <span className="shrink-0 rounded-full bg-[#0D9488]/15 px-1.5 py-[2px] text-[10px] font-semibold text-[#0D9488]">
                   Pro
