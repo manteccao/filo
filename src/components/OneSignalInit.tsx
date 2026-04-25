@@ -27,15 +27,18 @@ export function OneSignalInit() {
       }
     });
 
-    // 2. Prompt for permission (separate deferred push, runs after init)
+    // 2. Prompt for permission — only if the user hasn't decided yet
     w.OneSignalDeferred.push(async function (OneSignal: any) {
       const permission = await OneSignal.Notifications.permission;
       console.log("[OneSignal] permission:", permission);
-      if (!permission) {
-        // Small delay so the prompt doesn't fire immediately on page load
-        await new Promise((r) => setTimeout(r, 3000));
+
+      // Use native Notification API to distinguish "default" from "denied"
+      const nativePermission = typeof Notification !== "undefined" ? Notification.permission : "default";
+      if (nativePermission === "default") {
+        // Not yet decided — prompt immediately
         await OneSignal.Slidedown.promptPush();
       }
+      // If "granted" or "denied" — do nothing
     });
   }, []);
 

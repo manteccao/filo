@@ -87,7 +87,7 @@ export async function toggleLike(recommendationId: string): Promise<{ liked: boo
         recommendation_id: recommendationId,
       });
 
-      sendPush(rec.user_id, `${actorName} ha messo like alla tua raccomandazione`);
+      sendPush(rec.user_id, `${actorName} ha messo mi piace alla tua raccomandazione`);
     }
 
     return { liked: true };

@@ -22,8 +22,8 @@ export async function sendPush(
       body: JSON.stringify({
         app_id: APP_ID,
         include_external_user_ids: [targetUserId],
-        headings: { en: "Filo" },
-        contents: { en: message },
+        headings: { it: "Filo", en: "Filo" },
+        contents: { it: message, en: message },
         url,
       }),
     });
