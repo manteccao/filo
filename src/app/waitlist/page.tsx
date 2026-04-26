@@ -66,8 +66,8 @@ export default function WaitlistPage() {
   const busy = status === "loading";
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-[#0a0a0a] px-5 py-12 text-white">
-      <div className="w-full max-w-[400px]">
+    <div className="flex min-h-dvh flex-col items-center bg-[#0a0a0a] px-5 py-12 text-white">
+      <div className="flex flex-1 flex-col items-center justify-center w-full max-w-[400px]">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -76,19 +76,18 @@ export default function WaitlistPage() {
             alt="Filo"
             width={200}
             className="object-contain"
-           
           />
         </div>
 
         {/* Title */}
         <h1 className="text-center text-[32px] font-bold leading-tight tracking-tight text-white">
-          Filo sta arrivando
+          Filo
         </h1>
 
-        {/* Subtitle */}
+        {/* Description */}
         <p className="mx-auto mt-4 max-w-[320px] text-center text-[15px] leading-relaxed text-[#6b7280]">
-          Il passaparola digitale italiano — trova professionisti di fiducia
-          consigliati da persone reali che conosci.
+          Filo è il social network del passaparola digitale. Trova professionisti
+          di fiducia grazie alle raccomandazioni delle persone che conosci.
         </p>
 
         {/* Live counter */}
@@ -172,11 +171,21 @@ export default function WaitlistPage() {
           </AnimatePresence>
         </div>
 
-        {/* Footer */}
+        {/* Anti-spam note */}
         <p className="mt-10 text-center text-[12px] text-[#3a3a3a]">
           Nessuno spam. Solo un&apos;email quando siamo live.
         </p>
       </div>
+
+      {/* Footer */}
+      <footer className="mt-8 flex flex-col items-center gap-2">
+        <div className="flex items-center gap-4 text-[12px] text-[#4b5563]">
+          <a href="https://filo.network/privacy" className="hover:text-[#0D9488] transition">Privacy Policy</a>
+          <span>·</span>
+          <a href="https://filo.network/terms" className="hover:text-[#0D9488] transition">Termini e Condizioni</a>
+        </div>
+        <p className="text-[11px] text-[#3a3a3a]">© 2026 Filo</p>
+      </footer>
     </div>
   );
 }
