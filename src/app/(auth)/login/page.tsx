@@ -30,7 +30,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-[#0a0a0a] px-6">
+    <div className="flex min-h-svh flex-col items-center justify-between bg-[#0a0a0a] px-6 py-10">
+      {/* Spacer top */}
+      <div />
+
       {/* Logo */}
       <div className="mb-10 flex flex-col items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -131,6 +134,17 @@ export default function LoginPage() {
           )}
         </button>
       </div>
+
+      {/* Footer */}
+      <footer className="flex flex-col items-center gap-2 pt-8">
+        <p className="text-sm font-semibold text-[#6b7280]">Filo &mdash; Il passaparola digitale</p>
+        <div className="flex items-center gap-3 text-[12px] text-[#4b5563]">
+          <a href="https://filo.network/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-[#0D9488] transition">Privacy Policy</a>
+          <span>·</span>
+          <a href="https://filo.network/terms" target="_blank" rel="noopener noreferrer" className="hover:text-[#0D9488] transition">Termini e Condizioni</a>
+        </div>
+        <p className="text-[11px] text-[#3a3a3a]">© 2026 Filo</p>
+      </footer>
     </div>
   );
 }
