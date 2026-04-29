@@ -197,7 +197,7 @@ function NewRequestSheet({
                 onChange={(e) => setContent(e.target.value.slice(0, 200))}
                 rows={3}
                 placeholder="Es. Cerco un buon commercialista a Milano per la partita IVA…"
-                className="w-full resize-none rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 py-3 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-500"
+                className="w-full resize-none rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-teal-500"
               />
               <p className="text-right text-[11px] text-[#6B7280]">{content.length}/200</p>
             </div>
@@ -210,7 +210,7 @@ function NewRequestSheet({
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">Città</label>
-              <input value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Es. Milano" className="h-12 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-500" />
+              <input value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Es. Milano" className="h-12 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-teal-500" />
             </div>
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
@@ -490,7 +490,7 @@ function RepliesSheet({
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }}
                 rows={1}
                 placeholder="Scrivi una risposta..."
-                className="flex-1 resize-none rounded-xl border border-[#232340] bg-[#0d0d17] px-4 py-2.5 text-sm text-white placeholder:text-[#6B7280] outline-none transition focus:border-teal-500"
+                className="flex-1 resize-none rounded-xl border border-[#232340] bg-[#0d0d17] px-4 py-2.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-teal-500"
               />
               <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D9488] text-white transition disabled:opacity-40">
                 {posting ? (

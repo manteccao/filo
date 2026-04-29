@@ -119,7 +119,7 @@ export default function WaitlistPage() {
             }}
             placeholder="La tua email"
             disabled={busy || status === "success"}
-            className="h-12 w-full rounded-full border border-[#1a1a1a] bg-[#111111] px-5 text-[15px] text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488] disabled:opacity-50"
+            className="h-12 w-full rounded-full border border-[#1a1a1a] bg-[#111111] px-5 text-[15px] text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488] disabled:opacity-50"
           />
 
           <motion.button

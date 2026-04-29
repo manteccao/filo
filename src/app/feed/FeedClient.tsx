@@ -356,7 +356,7 @@ function RequestRepliesSheet({
               </select>
             )}
             <div className="flex items-end gap-2">
-              <textarea autoFocus value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }} rows={1} placeholder="Scrivi una risposta..." className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#6b7280] outline-none transition focus:border-[#0D9488]" />
+              <textarea autoFocus value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }} rows={1} placeholder="Scrivi una risposta..." className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]" />
               <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D9488] text-white transition disabled:opacity-40">
                 {posting ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}
               </motion.button>
@@ -599,7 +599,7 @@ function CommentsSheet({
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }}
               rows={1}
               placeholder="Scrivi un commento..."
-              className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#6b7280] outline-none transition focus:border-[#0D9488]"
+              className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
             />
             <motion.button
               type="submit"
@@ -811,21 +811,21 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
       <div className="rounded-[20px] bg-[#111111] p-4">
         <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[#0D9488]">Modifica raccomandazione</p>
         <form onSubmit={handleSave} className="space-y-3">
-          <input value={draft.professional_name} onChange={(e) => setDraft({ ...draft, professional_name: e.target.value })} required placeholder="Nome professionista" className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6b7280] outline-none focus:border-[#0D9488]" />
+          <input value={draft.professional_name} onChange={(e) => setDraft({ ...draft, professional_name: e.target.value })} required placeholder="Nome professionista" className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
           <div className="grid grid-cols-2 gap-3">
             <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="h-11 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white outline-none focus:border-[#0D9488]">
               {EDIT_CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111111]">{capitalize(c)}</option>)}
             </select>
-            <input value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required placeholder="Città" className="h-11 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#6b7280] outline-none focus:border-[#0D9488]" />
+            <input value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required placeholder="Città" className="h-11 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
           </div>
-          <input value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} placeholder="Indirizzo o zona (opzionale)" className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#6b7280] outline-none focus:border-[#0D9488]" />
+          <input value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} placeholder="Indirizzo o zona (opzionale)" className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
           <select value={draft.price_range} onChange={(e) => setDraft({ ...draft, price_range: e.target.value })} className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white outline-none focus:border-[#0D9488]">
             <option value="" className="bg-[#111111]">Fascia di prezzo (opzionale)</option>
             <option value="€" className="bg-[#111111]">€ — Economico</option>
             <option value="€€" className="bg-[#111111]">€€ — Nella media</option>
             <option value="€€€" className="bg-[#111111]">€€€ — Premium</option>
           </select>
-          <textarea value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value.slice(0, 300) })} rows={4} placeholder="Nota personale" className="w-full resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder:text-[#6b7280] outline-none focus:border-[#0D9488]" />
+          <textarea value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value.slice(0, 300) })} rows={4} placeholder="Nota personale" className="w-full resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
           <div className="flex gap-3 pt-1">
             <Button type="button" variant="outline" onClick={() => setEditing(false)} className="h-11 flex-1 rounded-xl border-[#1a1a1a] bg-transparent text-sm text-white">Annulla</Button>
             <motion.div whileTap={{ scale: 0.97 }} className="flex-1">

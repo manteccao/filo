@@ -63,7 +63,7 @@ export function AddFormClient({ userId }: { userId: string }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const inputCls = "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]";
+  const inputCls = "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
   const labelCls = "text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]";
 
   // Debounced search
@@ -330,7 +330,7 @@ export function AddFormClient({ userId }: { userId: string }) {
           maxLength={300}
           rows={4}
           placeholder="Perché lo/la consigli? Cosa ti ha colpito?"
-          className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]"
+          className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
         />
       </div>
 

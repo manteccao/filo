@@ -34,7 +34,7 @@ function toSlug(name: string) {
     .replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
-const inputCls = "h-11 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-3.5 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]";
+const inputCls = "h-11 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-3.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
 
 export default function SettingsPage() {
   const router = useRouter();

@@ -30,23 +30,23 @@ export function SplashScreen() {
     didRun.current = true;
 
     async function run() {
-      // 1. Logo: scale 0.3→1 + opacity 0→1 (~0.25s)
+      // 1. Logo: scale 0.3→1 + opacity 0→1 (~0.15s)
       await animate(
         "#splash-logo",
         { scale: [0.3, 1], opacity: [0, 1] },
-        { type: "spring", stiffness: 280, damping: 22 }
+        { type: "spring", stiffness: 450, damping: 24 }
       );
 
-      // 2. Text letters appear one by one (~0.75s)
+      // 2. Text letters appear one by one (~0.5s)
       await animate(
         ".splash-letter",
         { opacity: 1 },
-        { delay: stagger(0.03), duration: 0.1, ease: "easeOut" }
+        { delay: stagger(0.02), duration: 0.07, ease: "easeOut" }
       );
 
-      // 3. After 0.15s: fade out everything (0.25s)
-      await new Promise<void>((r) => setTimeout(r, 150));
-      await animate(scope.current, { opacity: 0 }, { duration: 0.25, ease: "easeIn" });
+      // 3. After 0.05s: fade out everything (0.15s)
+      await new Promise<void>((r) => setTimeout(r, 50));
+      await animate(scope.current, { opacity: 0 }, { duration: 0.15, ease: "easeIn" });
 
       setVisible(false);
     }
@@ -79,7 +79,7 @@ export function SplashScreen() {
         alt="Filo"
         style={{
           width: 240,
-          height: "auto",
+          height: 240,
           objectFit: "contain",
           mixBlendMode: "screen",
           opacity: 0,

@@ -76,7 +76,7 @@ export function CityAutocomplete({
 
   const inputCls =
     className ??
-    "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]";
+    "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
 
   return (
     <div ref={containerRef} className="relative">

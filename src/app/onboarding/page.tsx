@@ -38,7 +38,7 @@ function ProgressBar({ step }: { step: Step }) {
   );
 }
 
-const inputCls = "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]";
+const inputCls = "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -283,7 +283,7 @@ export default function OnboardingPage() {
                     onChange={(e) => setNote(e.target.value.slice(0, 300))}
                     rows={3}
                     placeholder="Perché lo consigli? (opzionale)"
-                    className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]"
+                    className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
                   />
                 </div>
               </div>

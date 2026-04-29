@@ -7,7 +7,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { TabShell } from "@/components/TabShell";
 import { OneSignalInit } from "@/components/OneSignalInit";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({subsets:['latin'],variable:'--font-sans',display:'swap'});
 
 export const metadata: Metadata = {
   title: "Filo",
@@ -28,7 +28,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: "#0D9488",
 };
 

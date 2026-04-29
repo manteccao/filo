@@ -355,7 +355,7 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-xl border border-[#1a1a1a] bg-[#111111] pl-9 pr-4 text-sm text-white placeholder:text-[#5c5f7a] outline-none transition focus:border-[#0D9488]"
+        className="h-10 w-full rounded-xl border border-[#1a1a1a] bg-[#111111] pl-9 pr-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
       />
     </div>
   );
