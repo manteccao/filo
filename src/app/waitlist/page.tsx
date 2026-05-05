@@ -72,7 +72,7 @@ export default function WaitlistPage() {
         <div className="mb-8 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/filo-logo-new.png"
+            src="/filo-logo-v2.png"
             alt="Filo"
             width={200}
             className="object-contain"

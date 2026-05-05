@@ -173,7 +173,7 @@ export default function OnboardingPage() {
           <div className="mt-8">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/filo-logo-new.png"
+              src="/filo-logo-v2.png"
               alt="Filo"
               className="mx-auto mb-6 h-9 w-auto object-contain"
              

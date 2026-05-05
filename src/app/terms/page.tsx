@@ -23,7 +23,7 @@ export default function TermsPage() {
             Torna a Filo
           </Link>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-new.png" alt="Filo" className="h-8 w-auto object-contain" />
+          <img src="/filo-logo-v2.png" alt="Filo" className="h-8 w-auto object-contain" />
         </div>
       </header>
 

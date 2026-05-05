@@ -8,7 +8,7 @@ export default function Home() {
         <div className="flex flex-col items-center text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/filo-logo-new.png" alt="Filo" className="h-9 w-auto object-contain" />
+          <img src="/filo-logo-v2.png" alt="Filo" className="h-9 w-auto object-contain" />
           <p className="mt-4 text-[15px] leading-relaxed text-[#8b8fa8]">
             Il social network della fiducia — trova professionisti
             consigliati da persone reali.

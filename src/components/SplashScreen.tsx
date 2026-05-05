@@ -75,7 +75,7 @@ export function SplashScreen() {
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         id="splash-logo"
-        src="/filo-logo-new.png"
+        src="/filo-logo-v2.png"
         alt="Filo"
         style={{
           width: 240,

@@ -1,7 +1,7 @@
-const CACHE_NAME = "filo-v3";
+const CACHE_NAME = "filo-v4";
 
 const PRECACHE_ASSETS = [
-  "/filo-logo-new.png",
+  "/filo-logo-v2.png",
   "/icon-192.png",
   "/icon-512.png",
   "/manifest.json",

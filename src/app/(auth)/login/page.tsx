@@ -38,7 +38,7 @@ export default function LoginPage() {
       <div className="mb-10 flex flex-col items-center gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/filo-logo-new.png"
+          src="/filo-logo-v2.png"
           alt="Filo"
           className="h-20 w-auto object-contain"
         />
