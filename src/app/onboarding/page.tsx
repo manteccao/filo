@@ -38,7 +38,7 @@ function ProgressBar({ step }: { step: Step }) {
   );
 }
 
-const inputCls = "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
+const inputCls = "h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -163,7 +163,7 @@ export default function OnboardingPage() {
   const whatsappProText = `Ciao! Sono su Filo, la piattaforma del passaparola professionale. Se vuoi raccomandarmi ai tuoi contatti, ecco il mio link: ${proInviteUrl}`;
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-[#0d0d17] px-6 py-12 text-white">
+    <div className="flex min-h-svh flex-col items-center justify-center bg-[#0a0a0a] px-6 py-12 text-white">
       <div className="w-full max-w-sm">
         <ProgressBar step={step} />
         <p className="mt-2 text-right text-xs text-[#5c5f7a]">{step} di 3</p>
@@ -190,7 +190,7 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={() => handleAccountTypeChoice("user")}
-                className="flex items-center gap-4 rounded-2xl border border-[#232340] bg-[#16162a] p-4 text-left transition hover:border-[#0D9488]/50 active:scale-[0.98]"
+                className="flex items-center gap-4 rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4 text-left transition hover:border-[#0D9488]/50 active:scale-[0.98]"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#0D9488]/15">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth={1.8} className="h-6 w-6">
@@ -208,7 +208,7 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={() => handleAccountTypeChoice("professional")}
-                className="flex items-center gap-4 rounded-2xl border border-[#232340] bg-[#16162a] p-4 text-left transition hover:border-[#0D9488]/50 active:scale-[0.98]"
+                className="flex items-center gap-4 rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4 text-left transition hover:border-[#0D9488]/50 active:scale-[0.98]"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#0D9488]/15">
                   <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth={1.8} className="h-6 w-6">
@@ -268,7 +268,7 @@ export default function OnboardingPage() {
                     className={inputCls}
                   >
                     {CATEGORIES.map((c) => (
-                      <option key={c} value={c} className="bg-[#16162a]">
+                      <option key={c} value={c} className="bg-[#111111]">
                         {c.charAt(0).toUpperCase() + c.slice(1)}
                       </option>
                     ))}
@@ -283,7 +283,7 @@ export default function OnboardingPage() {
                     onChange={(e) => setNote(e.target.value.slice(0, 300))}
                     rows={3}
                     placeholder="Perché lo consigli? (opzionale)"
-                    className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
+                    className="w-full resize-none rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
                   />
                 </div>
               </div>
@@ -328,7 +328,7 @@ export default function OnboardingPage() {
                   className={inputCls}
                 >
                   {CATEGORIES.map((c) => (
-                    <option key={c} value={c} className="bg-[#16162a]">
+                    <option key={c} value={c} className="bg-[#111111]">
                       {c.charAt(0).toUpperCase() + c.slice(1)}
                     </option>
                   ))}
@@ -431,7 +431,7 @@ export default function OnboardingPage() {
             </p>
 
             {/* Link box */}
-            <div className="mt-6 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3">
+            <div className="mt-6 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3">
               <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
                 Il tuo link personale
               </p>

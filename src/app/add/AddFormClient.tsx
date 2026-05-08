@@ -63,7 +63,7 @@ export function AddFormClient({ userId }: { userId: string }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const inputCls = "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
+  const inputCls = "h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
   const labelCls = "text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]";
 
   // Debounced search
@@ -181,7 +181,7 @@ export function AddFormClient({ userId }: { userId: string }) {
 
           {/* Dropdown */}
           {showDropdown && !selected && (
-            <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 overflow-hidden rounded-2xl border border-[#232340] bg-[#111111] shadow-2xl">
+            <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#111111] shadow-2xl">
               {results.length > 0 ? (
                 <>
                   {results.map((prof) => (
@@ -189,7 +189,7 @@ export function AddFormClient({ userId }: { userId: string }) {
                       key={prof.id}
                       type="button"
                       onMouseDown={(e) => { e.preventDefault(); selectProfessional(prof); }}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#16162a]"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#111111]"
                     >
                       {/* Avatar */}
                       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(prof.id)} text-xs font-bold text-white overflow-hidden`}>
@@ -213,7 +213,7 @@ export function AddFormClient({ userId }: { userId: string }) {
                       </span>
                     </button>
                   ))}
-                  <div className="border-t border-[#232340] px-4 py-2.5">
+                  <div className="border-t border-[#1a1a1a] px-4 py-2.5">
                     <button
                       type="button"
                       onMouseDown={(e) => { e.preventDefault(); setShowDropdown(false); }}
@@ -252,9 +252,9 @@ export function AddFormClient({ userId }: { userId: string }) {
             onChange={(e) => setCategory(e.target.value)}
             className={inputCls}
           >
-            <option value="" disabled className="bg-[#16162a]">Seleziona…</option>
+            <option value="" disabled className="bg-[#111111]">Seleziona…</option>
             {CATEGORIES.map((c) => (
-              <option key={c} value={c} className="bg-[#16162a]">
+              <option key={c} value={c} className="bg-[#111111]">
                 {c.charAt(0).toUpperCase() + c.slice(1)}
               </option>
             ))}
@@ -311,10 +311,10 @@ export function AddFormClient({ userId }: { userId: string }) {
           Fascia di prezzo <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
         </label>
         <select id="priceRange" name="priceRange" defaultValue="" className={inputCls}>
-          <option value="" className="bg-[#16162a]">Seleziona…</option>
-          <option value="€" className="bg-[#16162a]">€ — Economico</option>
-          <option value="€€" className="bg-[#16162a]">€€ — Nella media</option>
-          <option value="€€€" className="bg-[#16162a]">€€€ — Premium</option>
+          <option value="" className="bg-[#111111]">Seleziona…</option>
+          <option value="€" className="bg-[#111111]">€ — Economico</option>
+          <option value="€€" className="bg-[#111111]">€€ — Nella media</option>
+          <option value="€€€" className="bg-[#111111]">€€€ — Premium</option>
         </select>
       </div>
 
@@ -330,7 +330,7 @@ export function AddFormClient({ userId }: { userId: string }) {
           maxLength={300}
           rows={4}
           placeholder="Perché lo/la consigli? Cosa ti ha colpito?"
-          className="w-full resize-none rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
+          className="w-full resize-none rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
         />
       </div>
 

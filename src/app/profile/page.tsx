@@ -74,7 +74,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   commercialista: "bg-orange-500/15 text-orange-300",
   idraulico: "bg-cyan-500/15 text-cyan-300",
   elettricista: "bg-yellow-500/15 text-yellow-300",
-  altro: "bg-[#232340] text-[#8b8fa8]",
+  altro: "bg-[#1a1a1a] text-[#6b7280]",
 };
 
 // ─── Follows Drawer ───────────────────────────────────────────────────────────
@@ -213,7 +213,7 @@ function FollowsDrawer({
                         <p className="truncate text-[14px] font-semibold text-white">{name}</p>
                       )}
                       {u.username && (
-                        <p className="truncate text-[12px] text-[#5c5f7a]">@{u.username}</p>
+                        <p className="truncate text-[12px] text-[#6b7280]">@{u.username}</p>
                       )}
                       {u.city && (
                         <p className="truncate text-[12px] text-[#6b7280]">{u.city}</p>
@@ -226,7 +226,7 @@ function FollowsDrawer({
                         <button
                           type="button"
                           onClick={() => onUnfollow(u.id)}
-                          className="h-8 shrink-0 rounded-full border border-[#232340] px-3.5 text-xs font-semibold text-[#8b8fa8] transition hover:border-red-500/40 hover:text-red-400"
+                          className="h-8 shrink-0 rounded-full border border-[#1a1a1a] px-3.5 text-xs font-semibold text-[#6b7280] transition hover:border-red-500/40 hover:text-red-400"
                         >
                           Smetti
                         </button>
@@ -234,7 +234,7 @@ function FollowsDrawer({
                         <button
                           type="button"
                           onClick={() => onUnfollow(u.id)}
-                          className="h-8 shrink-0 rounded-full border border-[#232340] px-3.5 text-xs font-semibold text-[#8b8fa8] transition hover:border-red-500/40 hover:text-red-400"
+                          className="h-8 shrink-0 rounded-full border border-[#1a1a1a] px-3.5 text-xs font-semibold text-[#6b7280] transition hover:border-red-500/40 hover:text-red-400"
                         >
                           Seguito
                         </button>
@@ -424,8 +424,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-svh bg-[#0d0d17] text-white">
-        <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+      <div className="min-h-svh bg-[#0a0a0a] text-white">
+        <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between px-4">
             <div className="h-4 w-28 animate-pulse rounded-full bg-[#1a1a1a]" />
             <div className="h-5 w-5 animate-pulse rounded bg-[#1a1a1a]" />
@@ -452,7 +452,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="h-px bg-[#232340]" />
+          <div className="h-px bg-[#1a1a1a]" />
 
           <div className="px-4 pt-4">
             <div className="flex animate-pulse items-center justify-between pb-3">
@@ -463,7 +463,7 @@ export default function ProfilePage() {
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="animate-pulse rounded-2xl border border-[#232340] bg-[#16162a] p-4"
+                  className="animate-pulse rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="h-4 w-36 rounded-full bg-[#1a1a1a]" />
@@ -487,8 +487,8 @@ export default function ProfilePage() {
 
   return (
     <>
-      <div className="min-h-svh bg-[#0d0d17] text-white">
-        <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+      <div className="min-h-svh bg-[#0a0a0a] text-white">
+        <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <span className="text-[15px] font-bold">{fullName}</span>
@@ -504,7 +504,7 @@ export default function ProfilePage() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={1.8}
-                className="h-5 w-5 text-[#8b8fa8] transition hover:text-white"
+                className="h-5 w-5 text-[#6b7280] transition hover:text-white"
               >
                 <path
                   strokeLinecap="round"
@@ -548,47 +548,49 @@ export default function ProfilePage() {
                   <p className="text-[18px] font-bold leading-none">
                     {recs.length}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#8b8fa8]">consigli</p>
+                  <p className="mt-1 text-[11px] text-[#6b7280]">consigli</p>
                 </div>
-                <button
+                <motion.button
                   type="button"
+                  whileTap={{ scale: 0.88 }}
                   onClick={() => openDrawer("following")}
-                  className="text-center transition active:opacity-70"
+                  className="text-center"
                 >
                   <p className="text-[18px] font-bold leading-none">
                     {followingIds.length}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#8b8fa8]">seguiti</p>
-                </button>
-                <button
+                  <p className="mt-1 text-[11px] text-[#6b7280]">seguiti</p>
+                </motion.button>
+                <motion.button
                   type="button"
+                  whileTap={{ scale: 0.88 }}
                   onClick={() => openDrawer("followers")}
-                  className="text-center transition active:opacity-70"
+                  className="text-center"
                 >
                   <p className="text-[18px] font-bold leading-none">
                     {followerIds.length}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#8b8fa8]">follower</p>
-                </button>
+                  <p className="mt-1 text-[11px] text-[#6b7280]">follower</p>
+                </motion.button>
               </div>
             </div>
 
             {city ? (
-              <p className="mt-3 text-[13px] text-[#8b8fa8]">{city}</p>
+              <p className="mt-3 text-[13px] text-[#6b7280]">{city}</p>
             ) : null}
             {bio ? (
-              <p className="mt-1.5 text-[14px] leading-relaxed text-[#c4c8d8]">
+              <p className="mt-1.5 text-[14px] leading-relaxed text-[#9CA3AF]">
                 {bio}
               </p>
             ) : null}
           </div>
 
-          <div className="h-px bg-[#232340]" />
+          <div className="h-px bg-[#1a1a1a]" />
 
           {/* Recommendations */}
           <div className="px-4 pt-4">
             <div className="flex items-center justify-between pb-3">
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                 Raccomandazioni
               </span>
               <Link
@@ -614,7 +616,7 @@ export default function ProfilePage() {
 
             {recs.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-sm text-[#8b8fa8]">
+                <p className="text-sm text-[#6b7280]">
                   Nessuna raccomandazione ancora.
                 </p>
               </div>
@@ -623,7 +625,7 @@ export default function ProfilePage() {
                 {recs.map((r) => (
                   <div
                     key={r.id}
-                    className="rounded-2xl border border-[#232340] bg-[#16162a] p-4"
+                    className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <h2 className="font-semibold leading-tight text-white">
@@ -636,7 +638,7 @@ export default function ProfilePage() {
                           r.category.slice(1)}
                       </span>
                     </div>
-                    <p className="mt-1.5 flex items-center gap-1 text-xs text-[#8b8fa8]">
+                    <p className="mt-1.5 flex items-center gap-1 text-xs text-[#6b7280]">
                       <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -651,7 +653,7 @@ export default function ProfilePage() {
                       {r.city}
                     </p>
                     {r.note ? (
-                      <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#8b8fa8]">
+                      <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#6b7280]">
                         {r.note}
                       </p>
                     ) : null}

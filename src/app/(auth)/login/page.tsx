@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -40,7 +41,7 @@ export default function LoginPage() {
         <img
           src="/filo-logo-v2.png"
           alt="Filo"
-          className="h-20 w-auto object-contain"
+          className="h-24 w-auto object-contain"
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight text-white">Filo</h1>
@@ -113,11 +114,12 @@ export default function LoginPage() {
           </span>
         </label>
 
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.97 }}
           onClick={handleGoogleLogin}
           disabled={loading || !consented}
-          className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-white text-sm font-semibold text-[#111] shadow-[0_2px_16px_rgba(255,255,255,0.08)] transition hover:bg-zinc-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white text-[15px] font-semibold text-[#111] shadow-[0_4px_24px_rgba(255,255,255,0.1)] transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? (
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#111] border-t-transparent" />
@@ -132,7 +134,7 @@ export default function LoginPage() {
               Continua con Google
             </>
           )}
-        </button>
+        </motion.button>
       </div>
 
       {/* Footer */}

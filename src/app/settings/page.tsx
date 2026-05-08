@@ -34,7 +34,7 @@ function toSlug(name: string) {
     .replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
-const inputCls = "h-11 w-full rounded-2xl border border-[#232340] bg-[#0d0d17] px-3.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
+const inputCls = "h-11 w-full rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-3.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -206,15 +206,15 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-[#0d0d17]">
+      <div className="flex min-h-svh items-center justify-center bg-[#0a0a0a]">
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-svh bg-[#0d0d17] text-white">
-      <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+    <div className="min-h-svh bg-[#0a0a0a] text-white">
+      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[430px] items-center gap-3 px-4">
           <Link href="/profile" className="text-[#8b8fa8] transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
@@ -263,7 +263,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Account */}
-        <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4">
+        <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Account</p>
           <div className="mt-3 flex items-center justify-between gap-4">
             <span className="text-sm text-[#8b8fa8]">Email</span>
@@ -272,7 +272,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Città */}
-        <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4">
+        <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">La tua città</p>
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
@@ -299,7 +299,7 @@ export default function SettingsPage() {
 
         {/* Dati professionali */}
         {isProfessional && (
-          <div className="rounded-2xl border border-[#232340] bg-[#16162a] p-4 space-y-3">
+          <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4 space-y-3">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Dati professionali</p>
             <div>
               <label className="mb-1.5 block text-[11px] text-[#5c5f7a]">Telefono</label>
@@ -341,7 +341,7 @@ export default function SettingsPage() {
             setCopiedProfile(true);
             setTimeout(() => setCopiedProfile(false), 2000);
           }}
-          className="h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] text-sm font-medium text-white transition hover:border-teal-500/40 active:scale-[0.98]"
+          className="h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] text-sm font-medium text-white transition hover:border-teal-500/40 active:scale-[0.98]"
         >
           {copiedProfile ? "Link copiato!" : "Condividi il tuo profilo"}
         </button>
@@ -382,7 +382,7 @@ export default function SettingsPage() {
       {/* Delete account confirmation dialog */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6">
-          <div className="w-full max-w-sm rounded-3xl border border-[#232340] bg-[#111111] p-6 shadow-2xl">
+          <div className="w-full max-w-sm rounded-3xl border border-[#1a1a1a] bg-[#111111] p-6 shadow-2xl">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6 text-red-400">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={() => { setDeleteConfirm(false); setDeleteError(null); }}
                 disabled={deleteLoading}
-                className="h-11 flex-1 rounded-2xl border border-[#232340] text-sm text-[#8b8fa8] transition hover:text-white disabled:opacity-50"
+                className="h-11 flex-1 rounded-2xl border border-[#1a1a1a] text-sm text-[#8b8fa8] transition hover:text-white disabled:opacity-50"
               >
                 Annulla
               </button>

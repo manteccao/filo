@@ -10,8 +10,8 @@ export default async function AddRecommendationPage() {
   if (userError || !userData.user) redirect("/login");
 
   return (
-    <div className="min-h-svh bg-[#0d0d17] text-white">
-      <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+    <div className="min-h-svh bg-[#0a0a0a] text-white">
+      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[430px] items-center justify-center px-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/filo-logo-v2.png" alt="Filo" className="h-9 w-auto object-contain" />
@@ -20,7 +20,7 @@ export default async function AddRecommendationPage() {
 
       <main className="mx-auto max-w-[430px] px-4 pb-28 pt-4">
         <h1 className="text-xl font-bold tracking-tight">Nuova raccomandazione</h1>
-        <p className="mt-1 text-sm text-[#8b8fa8]">
+        <p className="mt-1 text-sm text-[#6b7280]">
           Consiglia un professionista di fiducia con una nota personale.
         </p>
 

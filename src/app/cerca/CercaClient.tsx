@@ -174,7 +174,7 @@ function PersonCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="flex items-center gap-3.5 rounded-2xl bg-[#111111] px-4 py-3.5"
+      className="flex items-center gap-3.5 rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3.5"
     >
       {/* Left: avatar + info (clickable) */}
       {profileHref ? (
@@ -224,7 +224,7 @@ function PersonCard({
         disabled={busy}
         className={`h-8 shrink-0 rounded-full px-4 text-xs font-semibold transition disabled:opacity-50 ${
           isFollowing
-            ? "border border-[#232340] bg-transparent text-[#8b8fa8] hover:border-red-500/30 hover:text-red-400"
+            ? "border border-[#1a1a1a] bg-transparent text-[#8b8fa8] hover:border-red-500/30 hover:text-red-400"
             : "bg-[#0D9488] text-white shadow-[0_0_12px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76]"
         }`}
       >
@@ -245,7 +245,7 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="flex items-center gap-3.5 rounded-2xl bg-[#111111] px-4 py-3.5 transition active:opacity-80"
+        className="flex items-center gap-3.5 rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3.5 transition active:opacity-80"
       >
         <Avatar profile={pro} />
         <div className="min-w-0 flex-1">
@@ -282,7 +282,7 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
 function SectionHeader({ title, count }: { title: string; count?: number }) {
   return (
     <div className="flex items-center justify-between pb-3 pt-6 first:pt-2">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
         {title}
       </span>
       {typeof count === "number" && count > 0 && (
@@ -307,18 +307,19 @@ function CategoryPills({
       style={{ scrollbarWidth: "none" }}
     >
       {CATEGORY_PILLS.map((cat) => (
-        <button
+        <motion.button
           key={cat}
           type="button"
+          whileTap={{ scale: 0.92 }}
           onClick={() => onChange(cat)}
           className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-medium transition ${
             selected === cat
-              ? "bg-[#0D9488] text-white"
+              ? "bg-[#0D9488] text-white shadow-[0_0_10px_rgba(13,148,136,0.3)]"
               : "bg-[#111111] text-[#6b7280] hover:text-white"
           }`}
         >
           {cat}
-        </button>
+        </motion.button>
       ))}
     </div>
   );
@@ -342,7 +343,7 @@ function SearchInput({
         fill="none"
         stroke="currentColor"
         strokeWidth={1.8}
-        className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#5c5f7a]"
+        className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]"
       >
         <path
           strokeLinecap="round"
@@ -355,7 +356,7 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-10 w-full rounded-xl border border-[#1a1a1a] bg-[#111111] pl-9 pr-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
+        className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#111111] pl-9 pr-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
       />
     </div>
   );
@@ -585,7 +586,7 @@ export function CercaClient({
   return (
     <div className="min-h-dvh bg-[#0a0a0a] text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
         <div className="mx-auto max-w-[430px] px-4 pb-3 pt-5">
           {/* Tab toggle */}
           <div className="mb-3 flex rounded-xl bg-[#111111] p-1">

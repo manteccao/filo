@@ -640,11 +640,11 @@ function FeedRequestCard({ r, followingIds, secondDegreeIds, currentUserId, inde
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="rounded-[20px] bg-[#111111] p-4"
+        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-4"
       >
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/20">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/20">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-[#0D9488]">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
             </svg>
@@ -848,11 +848,11 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="rounded-[20px] bg-[#111111] p-4"
+        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-4"
       >
         {/* Header row */}
         <div className="flex items-center gap-3">
-          <Link href={profileHref} className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
+          <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
             {r.profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={r.profile.avatar_url} alt={recommenderName} className="h-full w-full object-cover" />
@@ -952,10 +952,10 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
 
         {/* Category + city + price badges */}
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-[#0D9488]/15 px-[10px] py-[4px] text-[11px] text-[#0D9488]">
+          <span className="rounded-full bg-[#0D9488]/15 px-[10px] py-[4px] text-[11px] font-medium text-[#0D9488]">
             {capitalize(r.category)}
           </span>
-          <span className="rounded-full bg-[#1F2937] px-[10px] py-[4px] text-[11px] text-[#9CA3AF]">
+          <span className="rounded-full bg-[#1a1a1a] px-[10px] py-[4px] text-[11px] font-medium text-[#9CA3AF]">
             {capitalize(r.city)}
           </span>
           {r.price_range && (
@@ -1004,14 +1004,23 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
           {/* Like */}
           <motion.button
             type="button"
-            whileTap={{ scale: 0.88 }}
+            whileTap={{ scale: 0.82 }}
             onClick={handleLike}
             disabled={likeLoading}
             className="flex items-center gap-1.5 disabled:opacity-60"
           >
-            <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} className={`h-5 w-5 transition-all duration-200 ${liked ? "fill-red-500 text-red-500 scale-110" : "fill-none text-[#6b7280]"}`}>
+            <motion.svg
+              key={liked ? "liked" : "unliked"}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              initial={liked ? { scale: 0.6 } : false}
+              animate={liked ? { scale: 1 } : {}}
+              transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              className={`h-5 w-5 ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#6b7280]"}`}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-            </svg>
+            </motion.svg>
             <span className={`text-[13px] font-medium ${liked ? "text-red-500" : "text-[#6b7280]"}`}>{likesCount}</span>
           </motion.button>
 
@@ -1099,8 +1108,8 @@ export function FeedClient({
     <div className="min-h-dvh bg-[#0a0a0a] text-white">
 
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#0a0a0a]">
-        <div className="mx-auto flex max-w-[430px] items-center justify-between px-4 py-5">
+      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[430px] items-center justify-between px-4 py-4">
           <div className="w-10" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/filo-logo-v2.png" alt="Filo" className="h-12 w-auto object-contain" />
@@ -1159,7 +1168,7 @@ export function FeedClient({
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center text-sm text-[#9CA3AF]">Nessun contenuto da chi segui.</div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             {filtered.map((item, i) =>
               item.type === "recommendation" ? (
                 <PostCard

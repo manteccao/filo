@@ -40,8 +40,8 @@ export default async function UsersPage() {
   const others = (profiles ?? []).filter((p) => p.id !== user.id);
 
   return (
-    <div className="min-h-svh bg-[#0d0d17] text-white">
-      <header className="sticky top-0 z-40 bg-[#0d0d17]/95 backdrop-blur-md">
+    <div className="min-h-svh bg-[#0a0a0a] text-white">
+      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[430px] items-center justify-center px-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/filo-logo-v2.png" alt="Filo" className="h-9 w-auto object-contain" />
@@ -65,7 +65,7 @@ export default async function UsersPage() {
             return (
               <div
                 key={p.id}
-                className="flex items-center gap-3.5 rounded-2xl border border-[#232340] bg-[#16162a] px-4 py-3.5"
+                className="flex items-center gap-3.5 rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3.5"
               >
                 <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${color} text-sm font-bold text-white`}>
                   {initials(name)}
@@ -84,7 +84,7 @@ export default async function UsersPage() {
                     type="submit"
                     className={`h-8 rounded-full px-4 text-xs font-semibold transition ${
                       isFollowing
-                        ? "border border-[#232340] bg-transparent text-[#8b8fa8] hover:border-red-500/40 hover:text-red-400"
+                        ? "border border-[#1a1a1a] bg-transparent text-[#8b8fa8] hover:border-red-500/40 hover:text-red-400"
                         : "bg-[#0D9488] text-white shadow-[0_0_12px_rgba(13,148,136,0.35)] hover:bg-[#0b7c76]"
                     }`}
                   >

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 
 const NAV = [
   {
@@ -57,7 +58,7 @@ export function BottomNav() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#1a1a1a] bg-[#0d0d0d]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-[#1a1a1a] bg-[#0d0d0d]/95 backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[430px] items-center justify-around px-3">
         {NAV.map((item, i) => {
           const isAdd = item.label === "";
@@ -65,29 +66,44 @@ export function BottomNav() {
 
           if (isAdd) {
             return (
-              <Link key={i} href="/add" className="flex items-center justify-center" style={{ marginTop: -8 }}>
-                <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#0D9488] shadow-[0_4px_20px_rgba(13,148,136,0.4)] transition-transform active:scale-95">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} className="h-6 w-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                  </svg>
-                </span>
-              </Link>
+              <motion.div key={i} whileTap={{ scale: 0.88 }} style={{ marginTop: -8 }}>
+                <Link href="/add" className="flex items-center justify-center">
+                  <span className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#0D9488] shadow-[0_4px_24px_rgba(13,148,136,0.5)] transition-transform">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={2.5} className="h-6 w-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                  </span>
+                </Link>
+              </motion.div>
             );
           }
 
           return (
-            <Link
-              key={i}
-              href={item.href}
-              scroll={false}
-              prefetch={true}
-              className={`flex flex-col items-center gap-[3px] px-2 transition-colors ${
-                active ? "text-[#0D9488]" : "text-[#6b7280] hover:text-[#9ca3af]"
-              }`}
-            >
-              {item.icon!(active)}
-              <span className="text-[10px] font-medium leading-none">{item.label}</span>
-            </Link>
+            <motion.div key={i} whileTap={{ scale: 0.82 }} className="flex flex-col items-center">
+              <Link
+                href={item.href}
+                scroll={false}
+                prefetch={true}
+                className={`flex flex-col items-center gap-[3px] px-2 transition-colors ${
+                  active ? "text-[#0D9488]" : "text-[#6b7280] hover:text-[#9ca3af]"
+                }`}
+              >
+                {item.icon!(active)}
+                <span className="text-[10px] font-medium leading-none">{item.label}</span>
+              </Link>
+              <AnimatePresence>
+                {active && (
+                  <motion.div
+                    layoutId="nav-dot"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    className="mt-[3px] h-[3px] w-[3px] rounded-full bg-[#0D9488]"
+                  />
+                )}
+              </AnimatePresence>
+            </motion.div>
           );
         })}
       </div>
