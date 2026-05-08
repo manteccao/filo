@@ -101,7 +101,7 @@ function Avatar({
   const cls =
     size === "sm"
       ? "flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white overflow-hidden"
-      : "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white overflow-hidden";
+      : "flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white overflow-hidden";
   return (
     <div className={`${cls} bg-gradient-to-br ${color}`}>
       {profile.avatar_url ? (
@@ -222,9 +222,9 @@ function PersonCard({
         whileTap={{ scale: 0.92 }}
         onClick={handleFollow}
         disabled={busy}
-        className={`h-8 shrink-0 rounded-full px-4 text-xs font-semibold transition disabled:opacity-50 ${
+        className={`h-9 shrink-0 rounded-full px-4 text-[12px] font-semibold transition disabled:opacity-50 ${
           isFollowing
-            ? "border border-[#1a1a1a] bg-transparent text-[#8b8fa8] hover:border-red-500/30 hover:text-red-400"
+            ? "border border-[#1a1a1a] bg-transparent text-[#6b7280] hover:border-red-500/30 hover:text-red-400"
             : "bg-[#0D9488] text-white shadow-[0_0_12px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76]"
         }`}
       >
@@ -286,7 +286,7 @@ function SectionHeader({ title, count }: { title: string; count?: number }) {
         {title}
       </span>
       {typeof count === "number" && count > 0 && (
-        <span className="text-[11px] text-[#3a3a3a]">{count}</span>
+        <span className="text-[11px] font-medium text-[#6b7280]">{count}</span>
       )}
     </div>
   );
@@ -588,30 +588,27 @@ export function CercaClient({
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
         <div className="mx-auto max-w-[430px] px-4 pb-3 pt-5">
-          {/* Tab toggle */}
-          <div className="mb-3 flex rounded-xl bg-[#111111] p-1">
-            <button
-              type="button"
-              onClick={() => setTab("persone")}
-              className={`flex-1 rounded-lg py-2 text-[13px] font-semibold transition ${
-                tab === "persone"
-                  ? "bg-[#0a0a0a] text-white shadow"
-                  : "text-[#6b7280] hover:text-white"
-              }`}
-            >
-              Persone
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("professionisti")}
-              className={`flex-1 rounded-lg py-2 text-[13px] font-semibold transition ${
-                tab === "professionisti"
-                  ? "bg-[#0a0a0a] text-white shadow"
-                  : "text-[#6b7280] hover:text-white"
-              }`}
-            >
-              Professionisti
-            </button>
+          {/* Tab toggle — slide indicator */}
+          <div className="mb-3 flex rounded-full bg-[#111111] p-1">
+            {(["persone", "professionisti"] as const).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTab(t)}
+                className="relative flex-1 rounded-full py-2 text-[14px] font-semibold"
+              >
+                {tab === t && (
+                  <motion.div
+                    layoutId="cerca-tab-bg"
+                    className="absolute inset-0 rounded-full bg-[#0D9488]"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <span className={`relative z-10 transition-colors duration-200 ${tab === t ? "text-white" : "text-[#6b7280]"}`}>
+                  {t === "persone" ? "Persone" : "Professionisti"}
+                </span>
+              </button>
+            ))}
           </div>
 
           {/* Search */}

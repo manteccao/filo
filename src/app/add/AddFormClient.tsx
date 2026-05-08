@@ -64,7 +64,7 @@ export function AddFormClient({ userId }: { userId: string }) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const inputCls = "h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
-  const labelCls = "text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]";
+  const labelCls = "text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]";
 
   // Debounced search
   useEffect(() => {
@@ -128,7 +128,7 @@ export function AddFormClient({ userId }: { userId: string }) {
   }
 
   return (
-    <form action={formAction} className="mt-6 space-y-4">
+    <form action={formAction} className="mt-6 space-y-5">
       {state?.error && (
         <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
           {state.error}
@@ -169,7 +169,7 @@ export function AddFormClient({ userId }: { userId: string }) {
               <button
                 type="button"
                 onClick={clearSelection}
-                className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full text-[#5c5f7a] transition hover:text-white"
+                className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
                 aria-label="Cancella"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
@@ -337,7 +337,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.35)] transition hover:bg-[#0b7c76] active:scale-[0.98] disabled:opacity-60"
+        className="mt-2 h-14 w-full rounded-2xl bg-[#0D9488] text-[15px] font-semibold text-white shadow-[0_0_28px_rgba(13,148,136,0.4)] transition hover:bg-[#0b7c76] active:scale-[0.98] disabled:opacity-60"
       >
         {pending ? "Salvataggio…" : "Salva raccomandazione"}
       </button>

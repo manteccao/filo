@@ -848,11 +848,11 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-4"
+        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-5"
       >
         {/* Header row */}
         <div className="flex items-center gap-3">
-          <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}`}>
+          <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-[#0D9488]/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
             {r.profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={r.profile.avatar_url} alt={recommenderName} className="h-full w-full object-cover" />
@@ -946,20 +946,20 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         </div>
 
         {/* Professional name */}
-        <Link href={`/pro/${toProSlug(r.professional_name)}`} className="mt-3 block text-[17px] font-bold text-white transition hover:text-[#0D9488]">
+        <Link href={`/pro/${toProSlug(r.professional_name)}`} className="mt-4 block text-[20px] font-extrabold tracking-tight text-white transition hover:text-[#0D9488]">
           {r.professional_name}
         </Link>
 
         {/* Category + city + price badges */}
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-[#0D9488]/15 px-[10px] py-[4px] text-[11px] font-medium text-[#0D9488]">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-teal-500/15 px-[10px] py-[4px] text-[11px] font-semibold text-teal-300">
             {capitalize(r.category)}
           </span>
           <span className="rounded-full bg-[#1a1a1a] px-[10px] py-[4px] text-[11px] font-medium text-[#9CA3AF]">
             {capitalize(r.city)}
           </span>
           {r.price_range && (
-            <span className={`rounded-full px-[10px] py-[4px] text-[11px] ${
+            <span className={`rounded-full px-[10px] py-[4px] text-[11px] font-medium ${
               r.price_range === "€"  ? "bg-emerald-500/15 text-emerald-400" :
               r.price_range === "€€" ? "bg-amber-500/15 text-amber-400" :
                                        "bg-rose-500/15 text-rose-400"
@@ -981,7 +981,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         )}
 
         {/* Note */}
-        {r.note && <p className="mt-2 text-[14px] leading-[1.6] text-[#9CA3AF]">{r.note}</p>}
+        {r.note && <p className="mt-3 text-[14px] leading-[1.7] text-[#9CA3AF]">{r.note}</p>}
 
         {/* Delete confirm */}
         {confirming && (
@@ -997,7 +997,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         )}
 
         {/* Divider */}
-        <div className="my-3 h-px bg-[#1a1a1a]" />
+        <div className="my-4 h-px bg-[#1a1a1a]" />
 
         {/* Actions */}
         <div className="flex items-center gap-5">
@@ -1007,7 +1007,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             whileTap={{ scale: 0.82 }}
             onClick={handleLike}
             disabled={likeLoading}
-            className="flex items-center gap-1.5 disabled:opacity-60"
+            className="flex items-center gap-2 disabled:opacity-60"
           >
             <motion.svg
               key={liked ? "liked" : "unliked"}
@@ -1017,11 +1017,11 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
               initial={liked ? { scale: 0.6 } : false}
               animate={liked ? { scale: 1 } : {}}
               transition={{ type: "spring", stiffness: 500, damping: 15 }}
-              className={`h-5 w-5 ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#6b7280]"}`}
+              className={`h-[22px] w-[22px] ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#6b7280]"}`}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </motion.svg>
-            <span className={`text-[13px] font-medium ${liked ? "text-red-500" : "text-[#6b7280]"}`}>{likesCount}</span>
+            <span className={`text-[13px] font-semibold ${liked ? "text-red-500" : "text-[#6b7280]"}`}>{likesCount > 0 ? likesCount : ""}</span>
           </motion.button>
 
           {/* Comment */}
@@ -1029,12 +1029,12 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={() => setCommentsOpen(true)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-[#6b7280]">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[22px] w-[22px] text-[#6b7280]">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
             </svg>
-            <span className="text-[13px] font-medium text-[#6b7280]">{commentsCount}</span>
+            <span className="text-[13px] font-semibold text-[#6b7280]">{commentsCount > 0 ? commentsCount : ""}</span>
           </motion.button>
 
           {/* Share */}
@@ -1042,18 +1042,18 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={handleShare}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-5 w-5 transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
             </svg>
-            <span className={`text-[13px] font-medium transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>{copied ? "Copiato!" : "Condividi"}</span>
+            <span className={`text-[13px] font-semibold transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>{copied ? "Copiato!" : ""}</span>
           </motion.button>
 
           {/* Spacer + bookmark */}
           <div className="flex-1" />
           <motion.button type="button" whileTap={{ scale: 0.88 }} onClick={handleSaveToggle} disabled={saveLoading} className="disabled:opacity-60">
-            <svg viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-5 w-5 transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
+            <svg viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </motion.button>
@@ -1130,27 +1130,28 @@ export function FeedClient({
         </div>
       </header>
 
-      {/* Filter pills */}
+      {/* Filter tabs — slide indicator */}
       <div className="mx-auto max-w-[430px] px-4 pb-3 pt-4">
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setMode("tutti")}
-            className={`rounded-full px-4 py-[6px] text-[13px] font-medium transition ${
-              mode === "tutti" ? "bg-[#0D9488] text-white" : "bg-[#1a1a1a] text-[#6b7280]"
-            }`}
-          >
-            Tutti
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("seguiti")}
-            className={`rounded-full px-4 py-[6px] text-[13px] font-medium transition ${
-              mode === "seguiti" ? "bg-[#0D9488] text-white" : "bg-[#1a1a1a] text-[#6b7280]"
-            }`}
-          >
-            Seguiti
-          </button>
+        <div className="flex rounded-full bg-[#111111] p-1">
+          {(["tutti", "seguiti"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className="relative flex-1 rounded-full py-2 text-[14px] font-semibold"
+            >
+              {mode === m && (
+                <motion.div
+                  layoutId="feed-tab-bg"
+                  className="absolute inset-0 rounded-full bg-[#0D9488]"
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                />
+              )}
+              <span className={`relative z-10 transition-colors duration-200 ${mode === m ? "text-white" : "text-[#6b7280]"}`}>
+                {m === "tutti" ? "Tutti" : "Seguiti"}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 

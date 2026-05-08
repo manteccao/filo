@@ -554,7 +554,7 @@ function RequestCard({
             </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-white truncate">{name}</p>
+                <p className="text-[13px] font-semibold text-white truncate">{name}</p>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-[10px] text-[#6B7280]">{timeAgo(req.created_at)}</span>
                   {isOwner && (
@@ -572,7 +572,7 @@ function RequestCard({
                 </div>
               </div>
 
-              <p className="mt-1.5 text-sm leading-relaxed text-[#E5E7EB]">{req.content}</p>
+              <p className="mt-1.5 text-[15px] font-semibold leading-snug text-white">{req.content}</p>
 
               <div className="mt-2.5 flex items-center gap-2">
                 <Badge className="rounded-full bg-teal-500/20 text-teal-400 border-0 text-[10px] px-2.5">

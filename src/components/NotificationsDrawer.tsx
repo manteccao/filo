@@ -209,7 +209,7 @@ export function NotificationsDrawer({
                     const profileHref = n.actor_username ? `/p/${n.actor_username}` : null;
 
                     const inner = (
-                      <div className={`flex items-start gap-3 rounded-2xl px-3 py-3 ${!n.read ? "bg-[#0D9488]/10" : ""}`}>
+                      <div className={`flex items-start gap-3 rounded-2xl px-3 py-3 transition ${!n.read ? "bg-[#0D9488]/8 border-l-2 border-l-[#0D9488]" : ""}`}>
                         {/* Avatar */}
                         {profileHref ? (
                           <Link href={profileHref} onClick={() => onOpenChange(false)} className="shrink-0">
@@ -257,7 +257,7 @@ export function NotificationsDrawer({
 
 function AvatarCircle({ name, avatarUrl, seed }: { name: string; avatarUrl: string | null; seed: string }) {
   return (
-    <div className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ${avatarColor(seed)}`}>
+    <div className={`flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ${avatarColor(seed)}`}>
       {avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />

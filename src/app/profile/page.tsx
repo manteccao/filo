@@ -526,7 +526,7 @@ export default function ProfilePage() {
           <div className="px-5 pb-6 pt-5">
             <div className="flex items-center gap-5">
               <div
-                className={`relative h-[76px] w-[76px] shrink-0 overflow-hidden rounded-full bg-gradient-to-br ${gradient} ring-2 ring-teal-500/30 ring-offset-2 ring-offset-[#0d0d17]`}
+                className={`relative h-[82px] w-[82px] shrink-0 overflow-hidden rounded-full bg-gradient-to-br ${gradient} ring-2 ring-teal-500/30 ring-offset-2 ring-offset-[#0a0a0a]`}
               >
                 {avatarUrl ? (
                   <Image
@@ -545,10 +545,10 @@ export default function ProfilePage() {
 
               <div className="flex flex-1 justify-around">
                 <div className="text-center">
-                  <p className="text-[18px] font-bold leading-none">
+                  <p className="text-[22px] font-extrabold leading-none tracking-tight">
                     {recs.length}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#6b7280]">consigli</p>
+                  <p className="mt-1.5 text-[12px] text-[#6b7280]">consigli</p>
                 </div>
                 <motion.button
                   type="button"
@@ -556,10 +556,10 @@ export default function ProfilePage() {
                   onClick={() => openDrawer("following")}
                   className="text-center"
                 >
-                  <p className="text-[18px] font-bold leading-none">
+                  <p className="text-[22px] font-extrabold leading-none tracking-tight">
                     {followingIds.length}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#6b7280]">seguiti</p>
+                  <p className="mt-1.5 text-[12px] text-[#6b7280]">seguiti</p>
                 </motion.button>
                 <motion.button
                   type="button"
@@ -567,10 +567,10 @@ export default function ProfilePage() {
                   onClick={() => openDrawer("followers")}
                   className="text-center"
                 >
-                  <p className="text-[18px] font-bold leading-none">
+                  <p className="text-[22px] font-extrabold leading-none tracking-tight">
                     {followerIds.length}
                   </p>
-                  <p className="mt-1 text-[11px] text-[#6b7280]">follower</p>
+                  <p className="mt-1.5 text-[12px] text-[#6b7280]">follower</p>
                 </motion.button>
               </div>
             </div>
@@ -621,14 +621,14 @@ export default function ProfilePage() {
                 </p>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-3">
                 {recs.map((r) => (
                   <div
                     key={r.id}
                     className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h2 className="font-semibold leading-tight text-white">
+                      <h2 className="text-[15px] font-bold leading-tight text-white">
                         {r.professional_name}
                       </h2>
                       <span
@@ -653,7 +653,7 @@ export default function ProfilePage() {
                       {r.city}
                     </p>
                     {r.note ? (
-                      <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#6b7280]">
+                      <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#9CA3AF]">
                         {r.note}
                       </p>
                     ) : null}
