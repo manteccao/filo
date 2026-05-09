@@ -104,6 +104,34 @@ body {
     @apply font-sans;
   }
 
+  /* ── Keyboard focus rings (WCAG 2.4.7) ────────────────────────────── */
+  /* Provide a consistent, visible focus indicator for keyboard users.
+     Only shows on keyboard navigation (focus-visible), not on mouse click. */
+  :focus-visible {
+    outline: 2px solid #0D9488;
+    outline-offset: 2px;
+  }
+
+  /* Skip-to-main-content link — visible only on keyboard focus */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 1rem;
+    z-index: 9999;
+    background: #0D9488;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .skip-link:focus {
+    top: 1rem;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
   /* ── Mobile-native feel ───────────────────────────────────────────── */
 
   /* Remove the 300ms tap delay on Android and older iOS */

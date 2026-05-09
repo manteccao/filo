@@ -219,6 +219,8 @@ function PersonCard({
       {/* Follow button */}
       <motion.button
         type="button"
+        aria-label={isFollowing ? `Smetti di seguire ${user.full_name}` : `Segui ${user.full_name}`}
+        aria-pressed={isFollowing}
         whileTap={{ scale: 0.92 }}
         onClick={handleFollow}
         disabled={busy}
@@ -604,16 +606,21 @@ export function CercaClient({
       <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
         <div className="mx-auto max-w-[430px] px-4 pb-3 pt-5">
           {/* Tab toggle — slide indicator */}
-          <div className="mb-3 flex rounded-full bg-[#111111] p-1">
+          <div role="tablist" aria-label="Modalità di ricerca" className="mb-3 flex rounded-full bg-[#111111] p-1">
             {(["persone", "professionisti"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
+                role="tab"
+                aria-selected={tab === t}
+                aria-controls="cerca-tabpanel"
+                id={`cerca-tab-${t}`}
                 onClick={() => setTab(t)}
                 className="relative flex-1 rounded-full py-2 text-[14px] font-semibold"
               >
                 {tab === t && (
                   <motion.div
+                    aria-hidden="true"
                     layoutId="cerca-tab-bg"
                     className="absolute inset-0 rounded-full bg-[#0D9488]"
                     transition={{ type: "spring", stiffness: 500, damping: 35 }}

@@ -38,6 +38,9 @@ export default function RootLayout({
   return (
     <html lang="it" className={cn("h-full", "font-sans", geist.variable)}>
       <body className="min-h-full antialiased">
+        <a href="#main-content" className="skip-link">
+          Vai al contenuto principale
+        </a>
         <DeferredShell />
         <TabShell>{children}</TabShell>
         <Script

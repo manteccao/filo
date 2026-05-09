@@ -166,6 +166,9 @@ export function NotificationsDrawer({
           {/* Sheet */}
           <motion.div
             key="notifs-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Notifiche"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -182,10 +185,11 @@ export function NotificationsDrawer({
               <p className="text-base font-bold text-white">Notifiche</p>
               <button
                 type="button"
+                aria-label="Chiudi notifiche"
                 onClick={() => onOpenChange(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1a1a1a] text-[#6b7280] transition hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1a1a1a] text-[#6b7280] transition hover:text-white"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -194,15 +198,15 @@ export function NotificationsDrawer({
             <div className="h-px bg-[#1a1a1a] shrink-0" />
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto px-3 py-3">
+            <div className="flex-1 overflow-y-auto px-3 py-3" aria-live="polite" aria-atomic="false">
               {loading ? (
-                <div className="flex justify-center py-12">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#0D9488] border-t-transparent" />
+                <div className="flex justify-center py-12" aria-label="Caricamento notifiche">
+                  <div aria-hidden="true" className="h-5 w-5 animate-spin rounded-full border-2 border-[#0D9488] border-t-transparent" />
                 </div>
               ) : notifs.length === 0 ? (
                 <p className="py-12 text-center text-sm text-[#6b7280]">Nessuna notifica ancora.</p>
               ) : (
-                <div className="space-y-1">
+                <ul className="space-y-1" aria-label="Lista notifiche">
                   {notifs.map((n) => {
                     const name = n.actor_name ?? "Utente";
                     const href = notifHref(n);
@@ -237,15 +241,19 @@ export function NotificationsDrawer({
                       </div>
                     );
 
-                    return href ? (
-                      <Link key={n.id} href={href} onClick={() => onOpenChange(false)}>
-                        {inner}
-                      </Link>
-                    ) : (
-                      <div key={n.id}>{inner}</div>
+                    return (
+                      <li key={n.id}>
+                        {href ? (
+                          <Link href={href} onClick={() => onOpenChange(false)}>
+                            {inner}
+                          </Link>
+                        ) : (
+                          inner
+                        )}
+                      </li>
                     );
                   })}
-                </div>
+                </ul>
               )}
             </div>
           </motion.div>

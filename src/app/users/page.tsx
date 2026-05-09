@@ -51,7 +51,7 @@ export default async function UsersPage() {
       <main className="mx-auto max-w-[430px] px-4 pb-28 pt-2">
         {/* Section header */}
         <div className="flex items-center justify-between py-3">
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
             Persone · {others.length}
           </span>
         </div>

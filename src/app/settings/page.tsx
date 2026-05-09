@@ -258,13 +258,13 @@ export default function SettingsPage() {
               </span>
             )}
           </button>
-          <p className="text-xs text-[#5c5f7a]">Tocca per cambiare foto</p>
+          <p className="text-xs text-[#6b7280]">Tocca per cambiare foto</p>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
         </div>
 
         {/* Account */}
         <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Account</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">Account</p>
           <div className="mt-3 flex items-center justify-between gap-4">
             <span className="text-sm text-[#8b8fa8]">Email</span>
             <span className="truncate text-sm text-white">{email}</span>
@@ -273,7 +273,7 @@ export default function SettingsPage() {
 
         {/* Città */}
         <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">La tua città</p>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">La tua città</p>
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <CityAutocomplete
@@ -300,9 +300,9 @@ export default function SettingsPage() {
         {/* Dati professionali */}
         {isProfessional && (
           <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4 space-y-3">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">Dati professionali</p>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">Dati professionali</p>
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#5c5f7a]">Telefono</label>
+              <label className="mb-1.5 block text-[11px] text-[#6b7280]">Telefono</label>
               <input
                 type="tel"
                 value={phone}
@@ -312,7 +312,7 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#5c5f7a]">Indirizzo studio</label>
+              <label className="mb-1.5 block text-[11px] text-[#6b7280]">Indirizzo studio</label>
               <input
                 type="text"
                 value={workAddress}

@@ -217,7 +217,7 @@ export function AddFormClient({ userId }: { userId: string }) {
                     <button
                       type="button"
                       onMouseDown={(e) => { e.preventDefault(); setShowDropdown(false); }}
-                      className="text-xs text-[#5c5f7a] transition hover:text-white"
+                      className="text-xs text-[#6b7280] transition hover:text-white"
                     >
                       Non è su Filo — continua con questo nome
                     </button>
@@ -225,7 +225,7 @@ export function AddFormClient({ userId }: { userId: string }) {
                 </>
               ) : searched ? (
                 <div className="px-4 py-4">
-                  <p className="text-sm text-[#5c5f7a]">Nessun professionista trovato su Filo</p>
+                  <p className="text-sm text-[#6b7280]">Nessun professionista trovato su Filo</p>
                   <button
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); setShowDropdown(false); }}
@@ -276,7 +276,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       {/* Address */}
       <div className="space-y-1.5">
         <label className={labelCls} htmlFor="address">
-          Indirizzo <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+          Indirizzo <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
         </label>
         <input
           id="address"
@@ -292,7 +292,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       {/* Phone */}
       <div className="space-y-1.5">
         <label className={labelCls} htmlFor="phone">
-          Numero di telefono <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+          Numero di telefono <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
         </label>
         <input
           id="phone"
@@ -308,7 +308,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       {/* Price range */}
       <div className="space-y-1.5">
         <label className={labelCls} htmlFor="priceRange">
-          Fascia di prezzo <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+          Fascia di prezzo <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
         </label>
         <select id="priceRange" name="priceRange" defaultValue="" className={inputCls}>
           <option value="" className="bg-[#111111]">Seleziona…</option>
@@ -322,7 +322,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label className={labelCls} htmlFor="note">Nota personale</label>
-          <span className="text-[11px] text-[#5c5f7a]">max 300</span>
+          <span className="text-[11px] text-[#6b7280]">max 300</span>
         </div>
         <textarea
           id="note"

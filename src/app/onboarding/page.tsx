@@ -166,7 +166,7 @@ export default function OnboardingPage() {
     <div className="flex min-h-svh flex-col items-center justify-center bg-[#0a0a0a] px-6 py-12 text-white">
       <div className="w-full max-w-sm">
         <ProgressBar step={step} />
-        <p className="mt-2 text-right text-xs text-[#5c5f7a]">{step} di 3</p>
+        <p className="mt-2 text-right text-xs text-[#6b7280]">{step} di 3</p>
 
         {/* ── Step 1 — Tipo account ──────────────────────────────── */}
         {step === 1 && (
@@ -239,7 +239,7 @@ export default function OnboardingPage() {
             <form onSubmit={handleAddRec} className="mt-6 space-y-3">
               {/* Città dell'utente — obbligatoria */}
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                   La tua città <span className="text-[#0D9488]">*</span>
                 </label>
                 <CityAutocomplete
@@ -251,9 +251,9 @@ export default function OnboardingPage() {
               </div>
 
               <div className="pt-2">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                   Prima raccomandazione{" "}
-                  <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+                  <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
                 </p>
                 <div className="space-y-3">
                   <input
@@ -301,7 +301,7 @@ export default function OnboardingPage() {
               type="button"
               onClick={handleSkipRec}
               disabled={saving || !myCity.trim()}
-              className="mt-3 w-full text-center text-sm text-[#5c5f7a] transition hover:text-[#8b8fa8] disabled:opacity-40"
+              className="mt-3 w-full text-center text-sm text-[#6b7280] transition hover:text-[#8b8fa8] disabled:opacity-40"
             >
               Salta la raccomandazione
             </button>
@@ -318,7 +318,7 @@ export default function OnboardingPage() {
 
             <form onSubmit={handleProDetails} className="mt-6 space-y-3">
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                   Categoria professionale
                 </label>
                 <select
@@ -336,7 +336,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                   Città in cui lavori
                 </label>
                 <CityAutocomplete
@@ -348,7 +348,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                   Telefono <span className="text-[#0D9488]">*</span>
                 </label>
                 <input
@@ -362,9 +362,9 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+                <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                   Indirizzo studio{" "}
-                  <span className="normal-case font-normal text-[#5c5f7a]">(opzionale)</span>
+                  <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
                 </label>
                 <input
                   type="text"
@@ -409,7 +409,7 @@ export default function OnboardingPage() {
               </svg>
               Invita su WhatsApp
             </a>
-            <Link href="/feed" className="mt-4 text-sm text-[#5c5f7a] transition hover:text-[#8b8fa8]">
+            <Link href="/feed" className="mt-4 text-sm text-[#6b7280] transition hover:text-[#8b8fa8]">
               Vai al feed →
             </Link>
           </div>
@@ -432,7 +432,7 @@ export default function OnboardingPage() {
 
             {/* Link box */}
             <div className="mt-6 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5f7a]">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
                 Il tuo link personale
               </p>
               <p className="mt-1.5 break-all text-[13px] font-medium text-[#0D9488]">
@@ -452,7 +452,7 @@ export default function OnboardingPage() {
               Condividi su WhatsApp
             </a>
 
-            <Link href="/feed" className="mt-4 text-sm text-[#5c5f7a] transition hover:text-[#8b8fa8]">
+            <Link href="/feed" className="mt-4 text-sm text-[#6b7280] transition hover:text-[#8b8fa8]">
               Vai al feed →
             </Link>
           </div>

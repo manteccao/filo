@@ -879,9 +879,12 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                   type="button"
                   whileTap={{ scale: 0.85 }}
                   onClick={() => setMenuOpen((v) => !v)}
+                  aria-label="Altre opzioni"
+                  aria-expanded={menuOpen}
+                  aria-haspopup="menu"
                   className="flex h-11 w-11 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
                     <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
                   </svg>
                 </motion.button>
@@ -916,9 +919,12 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                   type="button"
                   whileTap={{ scale: 0.85 }}
                   onClick={() => setReportMenuOpen((v) => !v)}
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+                  aria-label="Altre opzioni"
+                  aria-expanded={reportMenuOpen}
+                  aria-haspopup="menu"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
                     <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
                   </svg>
                 </motion.button>
@@ -1007,9 +1013,12 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             whileTap={{ scale: 0.82 }}
             onClick={handleLike}
             disabled={likeLoading}
+            aria-label={liked ? `Rimuovi like${likesCount > 0 ? `, ${likesCount} like` : ""}` : `Metti like${likesCount > 0 ? `, ${likesCount} like` : ""}`}
+            aria-pressed={liked}
             className="flex min-h-[44px] items-center gap-2 disabled:opacity-60"
           >
             <motion.svg
+              aria-hidden="true"
               key={liked ? "liked" : "unliked"}
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -1021,7 +1030,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </motion.svg>
-            <span className={`text-[13px] font-semibold ${liked ? "text-red-500" : "text-[#6b7280]"}`}>{likesCount > 0 ? likesCount : ""}</span>
+            <span aria-hidden="true" className={`text-[13px] font-semibold ${liked ? "text-red-500" : "text-[#6b7280]"}`}>{likesCount > 0 ? likesCount : ""}</span>
           </motion.button>
 
           {/* Comment */}
@@ -1029,12 +1038,13 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={() => setCommentsOpen(true)}
+            aria-label={commentsCount > 0 ? `Commenti, ${commentsCount}` : "Commenta"}
             className="flex min-h-[44px] items-center gap-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[22px] w-[22px] text-[#6b7280]">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[22px] w-[22px] text-[#6b7280]">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
             </svg>
-            <span className="text-[13px] font-semibold text-[#6b7280]">{commentsCount > 0 ? commentsCount : ""}</span>
+            <span aria-hidden="true" className="text-[13px] font-semibold text-[#6b7280]">{commentsCount > 0 ? commentsCount : ""}</span>
           </motion.button>
 
           {/* Share */}
@@ -1042,18 +1052,27 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={handleShare}
+            aria-label={copied ? "Link copiato!" : "Condividi"}
             className="flex min-h-[44px] items-center gap-2"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
             </svg>
-            <span className={`text-[13px] font-semibold transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>{copied ? "Copiato!" : ""}</span>
+            <span aria-hidden="true" className={`text-[13px] font-semibold transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>{copied ? "Copiato!" : ""}</span>
           </motion.button>
 
           {/* Spacer + bookmark */}
           <div className="flex-1" />
-          <motion.button type="button" whileTap={{ scale: 0.88 }} onClick={handleSaveToggle} disabled={saveLoading} className="flex min-h-[44px] min-w-[44px] items-center justify-center disabled:opacity-60">
-            <svg viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
+          <motion.button
+            type="button"
+            whileTap={{ scale: 0.88 }}
+            onClick={handleSaveToggle}
+            disabled={saveLoading}
+            aria-label={saved ? "Rimuovi dai salvati" : "Salva"}
+            aria-pressed={saved}
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center disabled:opacity-60"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </motion.button>
@@ -1132,13 +1151,14 @@ export function FeedClient({
           <button
             type="button"
             onClick={() => setNotifsOpen(true)}
+            aria-label={unreadCount > 0 ? `Notifiche, ${unreadCount} non lette` : "Notifiche"}
             className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>
             {unreadCount > 0 && (
-              <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+              <span aria-hidden="true" className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
                 {unreadCount > 99 ? "99+" : unreadCount}
               </span>
             )}
@@ -1148,16 +1168,21 @@ export function FeedClient({
 
       {/* Filter tabs — slide indicator */}
       <div className="mx-auto max-w-[430px] px-4 pb-3 pt-4">
-        <div className="flex rounded-full bg-[#111111] p-1">
+        <div role="tablist" aria-label="Filtro raccomandazioni" className="flex rounded-full bg-[#111111] p-1">
           {(["tutti", "seguiti"] as const).map((m) => (
             <button
               key={m}
               type="button"
+              role="tab"
+              aria-selected={mode === m}
+              aria-controls="feed-tabpanel"
+              id={`feed-tab-${m}`}
               onClick={() => setMode(m)}
               className="relative flex-1 rounded-full py-2 text-[14px] font-semibold"
             >
               {mode === m && (
                 <motion.div
+                  aria-hidden="true"
                   layoutId="feed-tab-bg"
                   className="absolute inset-0 rounded-full bg-[#0D9488]"
                   transition={{ type: "spring", stiffness: 500, damping: 35 }}
@@ -1173,6 +1198,9 @@ export function FeedClient({
 
       {/* Feed — onTouchStart/End enables swipe-left/right between tabs */}
       <main
+        id="main-content"
+        role="tabpanel"
+        aria-labelledby={`feed-tab-${mode}`}
         className="mx-auto max-w-[430px] px-4 pb-28"
         onTouchStart={onSwipeStart}
         onTouchEnd={onSwipeEnd}
@@ -1189,30 +1217,32 @@ export function FeedClient({
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center text-sm text-[#9CA3AF]">Nessun contenuto da chi segui.</div>
         ) : (
-          <div className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-3">
             {filtered.map((item, i) =>
               item.type === "recommendation" ? (
-                <PostCard
-                  key={item.id}
-                  r={item}
-                  followingIds={followingIds}
-                  secondDegreeIds={secondDegreeIds}
-                  isOwner={item.user_id === currentUserId}
-                  currentUserId={currentUserId}
-                  index={i}
-                />
+                <li key={item.id}>
+                  <PostCard
+                    r={item}
+                    followingIds={followingIds}
+                    secondDegreeIds={secondDegreeIds}
+                    isOwner={item.user_id === currentUserId}
+                    currentUserId={currentUserId}
+                    index={i}
+                  />
+                </li>
               ) : (
-                <FeedRequestCard
-                  key={item.id}
-                  r={item}
-                  followingIds={followingIds}
-                  secondDegreeIds={secondDegreeIds}
-                  currentUserId={currentUserId}
-                  index={i}
-                />
+                <li key={item.id}>
+                  <FeedRequestCard
+                    r={item}
+                    followingIds={followingIds}
+                    secondDegreeIds={secondDegreeIds}
+                    currentUserId={currentUserId}
+                    index={i}
+                  />
+                </li>
               )
             )}
-          </div>
+          </ul>
         )}
       </main>
 
