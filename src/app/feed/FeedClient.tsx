@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
@@ -14,7 +14,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-import { deleteRecommendation, toggleLike, updateRecommendation } from "./actions";
+import { deleteRecommendation, loadMoreFeedItems, toggleLike, updateRecommendation } from "./actions";
+import type { FeedItem, FeedRecommendation, FeedRequest } from "./types";
 import { reportContent } from "@/app/moderation/actions";
 import { createClient } from "@/lib/supabase/browser";
 
@@ -30,36 +31,7 @@ const ReportDialog = dynamic(
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-
-export type FeedRecommendation = {
-  type: "recommendation";
-  id: string;
-  user_id: string;
-  professional_name: string;
-  category: string;
-  city: string;
-  note: string | null;
-  address: string | null;
-  price_range: string | null;
-  created_at: string;
-  likes_count: number;
-  liked_by_me: boolean;
-  profile: { full_name: string | null; city: string | null; username: string | null; avatar_url: string | null; account_type: string | null } | null;
-  saved_by_me: boolean;
-};
-
-export type FeedRequest = {
-  type: "request";
-  id: string;
-  user_id: string;
-  content: string;
-  category: string;
-  city: string;
-  created_at: string;
-  profile: { full_name: string | null } | null;
-};
-
-export type FeedItem = FeedRecommendation | FeedRequest;
+export type { FeedRecommendation, FeedRequest, FeedItem } from "./types";
 
 type Comment = {
   id: string;
@@ -1105,18 +1077,54 @@ export function FeedClient({
   secondDegreeIds,
   currentUserId,
   initialUnreadCount,
+  hasMoreInitial,
 }: {
   items: FeedItem[];
   followingIds: string[];
   secondDegreeIds: string[];
   currentUserId: string;
   initialUnreadCount: number;
+  hasMoreInitial: boolean;
 }) {
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const TABS_ORDER = ["tutti", "seguiti"] as const;
   const swipeStartX = useRef<number | null>(null);
+
+  // ── Infinite scroll state ──────────────────────────────────────────────────
+  const [allItems, setAllItems] = useState<FeedItem[]>(items);
+  const [cursor, setCursor] = useState<string>(() =>
+    items.length > 0 ? items[items.length - 1].created_at : ""
+  );
+  const [hasMore, setHasMore] = useState(hasMoreInitial);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore || !cursor) return;
+    setLoadingMore(true);
+    try {
+      const { items: newItems, hasMore: more } = await loadMoreFeedItems(cursor);
+      if (newItems.length > 0) {
+        setAllItems((prev) => [...prev, ...newItems]);
+        setCursor(newItems[newItems.length - 1].created_at);
+      }
+      setHasMore(more && newItems.length > 0);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [cursor, hasMore, loadingMore]);
+
+  useEffect(() => {
+    if (!hasMore) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMore(); },
+      { rootMargin: "300px" }
+    );
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, loadMore]);
 
   function onSwipeStart(e: React.TouchEvent) {
     swipeStartX.current = e.touches[0].clientX;
@@ -1132,10 +1140,10 @@ export function FeedClient({
   }
 
   const filtered = useMemo(() => {
-    return items.filter((r) =>
+    return allItems.filter((r) =>
       mode === "tutti" ? true : followingIds.includes(r.user_id)
     );
-  }, [items, mode, followingIds]);
+  }, [allItems, mode, followingIds]);
 
 
   return (
@@ -1205,7 +1213,7 @@ export function FeedClient({
         onTouchStart={onSwipeStart}
         onTouchEnd={onSwipeEnd}
       >
-        {items.length === 0 ? (
+        {allItems.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-20 text-center">
             <p className="text-sm text-subdued">Nessuna raccomandazione ancora.</p>
             <motion.div whileTap={{ scale: 0.97 }}>
@@ -1217,32 +1225,51 @@ export function FeedClient({
         ) : filtered.length === 0 ? (
           <div className="py-20 text-center text-sm text-subdued">Nessun contenuto da chi segui.</div>
         ) : (
-          <ul className="flex flex-col gap-3">
-            {filtered.map((item, i) =>
-              item.type === "recommendation" ? (
-                <li key={item.id}>
-                  <PostCard
-                    r={item}
-                    followingIds={followingIds}
-                    secondDegreeIds={secondDegreeIds}
-                    isOwner={item.user_id === currentUserId}
-                    currentUserId={currentUserId}
-                    index={i}
-                  />
-                </li>
-              ) : (
-                <li key={item.id}>
-                  <FeedRequestCard
-                    r={item}
-                    followingIds={followingIds}
-                    secondDegreeIds={secondDegreeIds}
-                    currentUserId={currentUserId}
-                    index={i}
-                  />
-                </li>
-              )
+          <>
+            <ul className="flex flex-col gap-3">
+              {filtered.map((item, i) =>
+                item.type === "recommendation" ? (
+                  <li key={item.id}>
+                    <PostCard
+                      r={item}
+                      followingIds={followingIds}
+                      secondDegreeIds={secondDegreeIds}
+                      isOwner={item.user_id === currentUserId}
+                      currentUserId={currentUserId}
+                      index={i}
+                    />
+                  </li>
+                ) : (
+                  <li key={item.id}>
+                    <FeedRequestCard
+                      r={item}
+                      followingIds={followingIds}
+                      secondDegreeIds={secondDegreeIds}
+                      currentUserId={currentUserId}
+                      index={i}
+                    />
+                  </li>
+                )
+              )}
+            </ul>
+
+            {/* Sentinel for infinite scroll */}
+            <div ref={sentinelRef} className="h-1" aria-hidden="true" />
+
+            {/* Loading more indicator */}
+            {loadingMore && (
+              <div className="flex justify-center py-6">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+              </div>
             )}
-          </ul>
+
+            {/* End of feed */}
+            {!hasMore && allItems.length > 0 && (
+              <p className="py-8 text-center text-xs text-muted-foreground">
+                Hai visto tutto il feed
+              </p>
+            )}
+          </>
         )}
       </main>
 

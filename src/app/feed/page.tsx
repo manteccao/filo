@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
-import { FeedClient, type FeedItem, type FeedRecommendation, type FeedRequest } from "./FeedClient";
+import { FeedClient } from "./FeedClient";
+import type { FeedItem, FeedRecommendation, FeedRequest } from "./types";
 
 export default async function FeedPage() {
   const supabase = await createClient();
@@ -144,6 +145,8 @@ export default async function FeedPage() {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
+  const hasMore = (recs?.length ?? 0) >= 20 || (reqs?.length ?? 0) >= 20;
+
   const { count: unreadCount } = await supabase
     .from("notifications")
     .select("id", { count: "exact", head: true })
@@ -157,6 +160,7 @@ export default async function FeedPage() {
       secondDegreeIds={secondDegreeIds}
       currentUserId={userId}
       initialUnreadCount={unreadCount ?? 0}
+      hasMoreInitial={hasMore}
     />
   );
 }

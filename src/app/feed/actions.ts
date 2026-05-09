@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { sendPush } from "@/lib/onesignal";
+import type { FeedItem, FeedRecommendation, FeedRequest } from "./types";
 
 const VALID_CATEGORIES = new Set([
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
@@ -121,6 +122,126 @@ export async function toggleSave(recommendationId: string): Promise<{ saved: boo
     if (error) return { error: error.message };
     return { saved: true };
   }
+}
+
+// ─── Cursor-based feed pagination ─────────────────────────────────────────────
+
+export async function loadMoreFeedItems(cursor: string): Promise<{
+  items: FeedItem[];
+  hasMore: boolean;
+}> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { items: [], hasMore: false };
+
+  const userId = user.id;
+
+  const [{ data: recs }, { data: reqs }, { data: blockedData }] = await Promise.all([
+    supabase
+      .from("recommendations")
+      .select("id,user_id,professional_name,category,city,note,address,price_range,created_at")
+      .lt("created_at", cursor)
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase
+      .from("requests_with_profile")
+      .select("id,user_id,content,category,city,created_at,full_name")
+      .lt("created_at", cursor)
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase.from("blocks").select("blocked_user_id").eq("user_id", userId),
+  ]);
+
+  const blockedUserIds = new Set((blockedData ?? []).map((b) => String(b.blocked_user_id)));
+  const recommendations = (recs ?? []).filter((r) => !blockedUserIds.has(String(r.user_id)));
+  const requests = (reqs ?? []).filter((r) => !blockedUserIds.has(String(r.user_id)));
+
+  const isValidId = (v: unknown): v is string =>
+    typeof v === "string" && v.length > 0 && v !== "null" && v !== "undefined";
+
+  const recUserIds = recommendations.map((r) => r.user_id).filter(isValidId);
+  const reqUserIds = requests.map((r) => r.user_id).filter(isValidId);
+  const allProfileIds = Array.from(new Set([...recUserIds, ...reqUserIds]));
+  const recIds = recommendations.map((r) => r.id);
+
+  const [profilesResult, { data: myLikes }, { data: allLikes }, { data: mySaves }] =
+    await Promise.all([
+      allProfileIds.length
+        ? supabase.from("profiles").select("id,full_name,city,username,account_type").in("id", allProfileIds)
+        : Promise.resolve({ data: [], error: null }),
+      recIds.length
+        ? supabase.from("recommendation_likes").select("recommendation_id").eq("user_id", userId).in("recommendation_id", recIds)
+        : Promise.resolve({ data: [] }),
+      recIds.length
+        ? supabase.from("recommendation_likes").select("recommendation_id").in("recommendation_id", recIds)
+        : Promise.resolve({ data: [] }),
+      recIds.length
+        ? supabase.from("saves").select("recommendation_id").eq("user_id", userId).in("recommendation_id", recIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+  const profiles = profilesResult.data ?? [];
+  const profileById = new Map(
+    profiles.map((p) => [
+      String(p.id),
+      {
+        full_name: p.full_name as string | null,
+        city: p.city as string | null,
+        username: p.username as string | null,
+        avatar_url: null as null,
+        account_type: (p as { account_type?: string | null }).account_type ?? "user",
+      },
+    ])
+  );
+
+  const likedByMe = new Set((myLikes ?? []).map((l) => l.recommendation_id));
+  const savedByMe = new Set((mySaves ?? []).map((s) => s.recommendation_id));
+  const likesPerRec = new Map<string, number>();
+  for (const l of allLikes ?? []) {
+    likesPerRec.set(l.recommendation_id, (likesPerRec.get(l.recommendation_id) ?? 0) + 1);
+  }
+
+  const recItems: FeedRecommendation[] = recommendations
+    .filter((r) => isValidId(r.user_id))
+    .map((r) => {
+      const uid = r.user_id as string;
+      const prof = profileById.get(uid) ?? null;
+      return {
+        type: "recommendation" as const,
+        id: r.id as string,
+        user_id: uid,
+        professional_name: r.professional_name as string,
+        category: r.category as string,
+        city: r.city as string,
+        note: r.note as string | null,
+        address: r.address as string | null,
+        price_range: r.price_range as string | null,
+        created_at: r.created_at as string,
+        likes_count: likesPerRec.get(r.id as string) ?? 0,
+        liked_by_me: likedByMe.has(r.id as string),
+        saved_by_me: savedByMe.has(r.id as string),
+        profile: prof,
+      };
+    });
+
+  const reqItems: FeedRequest[] = requests.map((r) => ({
+    type: "request" as const,
+    id: r.id as string,
+    user_id: String(r.user_id),
+    content: r.content as string,
+    category: r.category as string,
+    city: r.city as string,
+    created_at: r.created_at as string,
+    profile: { full_name: (r as { full_name?: string | null }).full_name ?? null },
+  }));
+
+  const items: FeedItem[] = [...recItems, ...reqItems].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  const hasMore = (recs?.length ?? 0) >= 20 || (reqs?.length ?? 0) >= 20;
+
+  return { items, hasMore };
 }
 
 export async function updateRecommendation(

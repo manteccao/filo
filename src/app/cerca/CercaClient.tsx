@@ -389,7 +389,8 @@ export function CercaClient({
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id,full_name,city,username,avatar_url,account_type,profession");
+        .select("id,full_name,city,username,avatar_url,account_type,profession")
+        .limit(1000);
 
       console.log("[cerca client] profiles fetched:", data?.length ?? 0, "error:", error);
 
