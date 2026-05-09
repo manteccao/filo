@@ -1,8 +1,16 @@
 import Link from "next/link";
 
-export const metadata = {
-  title: "Privacy Policy — Filo",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
   description: "Informativa sulla privacy di Filo, il social network del passaparola digitale.",
+  alternates: { canonical: "https://filo.network/privacy" },
+  openGraph: {
+    title: "Privacy Policy — Filo",
+    description: "Informativa sulla privacy di Filo, il social network del passaparola digitale.",
+    url: "https://filo.network/privacy",
+  },
 };
 
 const h2 = "mt-10 text-lg font-bold text-white";
@@ -342,8 +350,17 @@ export default function PrivacyPage() {
           verificarsi problemi tra noi e i nostri utenti. In tal caso, non esitare a contattarci.
         </p>
 
+        {/* Link ai Termini */}
+        <p className="mt-10 text-sm text-subdued">
+          Consulta anche i nostri{" "}
+          <Link href="/terms" className="text-primary underline underline-offset-2 hover:text-teal-400">
+            Termini e Condizioni
+          </Link>
+          .
+        </p>
+
         {/* Footer / Contatti */}
-        <div className="mt-12 rounded-2xl border border-border bg-card p-5">
+        <div className="mt-6 rounded-2xl border border-border bg-card p-5">
           <p className="text-sm font-semibold text-white">Contattaci</p>
           <p className="mt-2 text-sm font-bold text-white">Filo</p>
           <p className="mt-1 text-sm text-subdued">

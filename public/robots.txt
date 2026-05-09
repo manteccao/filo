@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /waitlist
+Allow: /privacy
+Allow: /terms
+Allow: /p/
+Allow: /pro/
+Allow: /invite/
+Disallow: /feed
+Disallow: /cerca
+Disallow: /add
+Disallow: /settings
+Disallow: /profile
+Disallow: /requests
+Disallow: /onboarding
+Disallow: /auth/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://filo.network/sitemap.xml

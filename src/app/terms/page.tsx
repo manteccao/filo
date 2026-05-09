@@ -1,8 +1,16 @@
 import Link from "next/link";
 
-export const metadata = {
-  title: "Termini e Condizioni — Filo",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Termini e Condizioni",
   description: "Termini e condizioni d'uso di Filo, il social network del passaparola digitale.",
+  alternates: { canonical: "https://filo.network/terms" },
+  openGraph: {
+    title: "Termini e Condizioni — Filo",
+    description: "Termini e condizioni d'uso di Filo, il social network del passaparola digitale.",
+    url: "https://filo.network/terms",
+  },
 };
 
 const h2 = "mt-10 text-lg font-bold text-white";

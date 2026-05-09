@@ -1,8 +1,42 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Filo — Il passaparola digitale",
+  description:
+    "Trova professionisti affidabili grazie alle raccomandazioni di persone che conosci. Il passaparola diventa digitale.",
+  alternates: { canonical: "https://filo.network" },
+  openGraph: {
+    title: "Filo — Il passaparola digitale",
+    description:
+      "Trova professionisti affidabili grazie alle raccomandazioni di persone che conosci.",
+    url: "https://filo.network",
+  },
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Filo",
+  url: "https://filo.network",
+  logo: "https://filo.network/filo-logo-v2.png",
+  description:
+    "Social network italiano per raccomandazioni di professionisti di fiducia. Il passaparola diventa digitale.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "filo.networks@gmail.com",
+    contactType: "customer support",
+    availableLanguage: "Italian",
+  },
+};
 
 export default function Home() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center bg-background px-6 py-16 text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+      />
       <main className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center text-center">
