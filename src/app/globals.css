@@ -96,8 +96,33 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    /* Prevent the whole page from bouncing on overscroll — keeps scroll
+       contained to the intended scroll container */
+    overscroll-behavior-y: none;
   }
   html {
     @apply font-sans;
+  }
+
+  /* ── Mobile-native feel ───────────────────────────────────────────── */
+
+  /* Remove the 300ms tap delay on Android and older iOS */
+  a, button, [role="button"], label, select, input, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Replace Android's default grey tap flash with transparent teal */
+  a, button, [role="button"] {
+    -webkit-tap-highlight-color: rgba(13, 148, 136, 0.08);
+    /* Prevent accidental text selection on tappable elements */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Prevent iOS long-press context menu on images */
+  img {
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 }

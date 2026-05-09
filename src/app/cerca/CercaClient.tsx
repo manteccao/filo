@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 import { createClient } from "@/lib/supabase/browser";
@@ -312,7 +312,7 @@ function CategoryPills({
           type="button"
           whileTap={{ scale: 0.92 }}
           onClick={() => onChange(cat)}
-          className={`shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-medium transition ${
+          className={`shrink-0 rounded-full px-3.5 py-2.5 text-[12px] font-medium transition ${
             selected === cat
               ? "bg-[#0D9488] text-white shadow-[0_0_10px_rgba(13,148,136,0.3)]"
               : "bg-[#111111] text-[#6b7280] hover:text-white"
@@ -382,6 +382,21 @@ export function CercaClient({
   const [proQuery, setProQuery] = useState("");
   const [followedSet, setFollowedSet] = useState(() => new Set(followingIds));
   const [categoryFilter, setCategoryFilter] = useState("Tutti");
+  const CERCA_TABS = ["persone", "professionisti"] as const;
+  const swipeStartX = useRef<number | null>(null);
+
+  function onSwipeStart(e: React.TouchEvent) {
+    swipeStartX.current = e.touches[0].clientX;
+  }
+  function onSwipeEnd(e: React.TouchEvent) {
+    if (swipeStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - swipeStartX.current;
+    swipeStartX.current = null;
+    if (Math.abs(dx) < 60) return;
+    const idx = CERCA_TABS.indexOf(tab);
+    if (dx < 0 && idx < CERCA_TABS.length - 1) setTab(CERCA_TABS[idx + 1]);
+    if (dx > 0 && idx > 0) setTab(CERCA_TABS[idx - 1]);
+  }
 
   // Profiles fetched client-side (browser JWT → RLS works correctly)
   const [sameCityUsers, setSameCityUsers] = useState<UserProfile[]>([]);
@@ -635,7 +650,11 @@ export function CercaClient({
         </div>
       </header>
 
-      <main className="mx-auto max-w-[430px] px-4 pb-28">
+      <main
+        className="mx-auto max-w-[430px] px-4 pb-28"
+        onTouchStart={onSwipeStart}
+        onTouchEnd={onSwipeEnd}
+      >
         {profilesLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" />

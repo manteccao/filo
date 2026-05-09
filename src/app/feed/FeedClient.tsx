@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 
 import { BottomNav } from "@/components/BottomNav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -677,7 +677,7 @@ function FeedRequestCard({ r, followingIds, secondDegreeIds, currentUserId, inde
           type="button"
           whileTap={{ scale: 0.96 }}
           onClick={() => setRepliesOpen(true)}
-          className="flex h-8 items-center gap-1.5 rounded-full bg-[#0D9488]/20 px-4 text-[13px] font-semibold text-[#0D9488] transition hover:bg-[#0D9488]/30"
+          className="flex h-11 items-center gap-1.5 rounded-full bg-[#0D9488]/20 px-4 text-[13px] font-semibold text-[#0D9488] transition hover:bg-[#0D9488]/30"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
@@ -855,7 +855,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
           <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-[#0D9488]/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
             {r.profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={r.profile.avatar_url} alt={recommenderName} className="h-full w-full object-cover" />
+              <img src={r.profile.avatar_url} alt={recommenderName} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover" />
             ) : (
               <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
             )}
@@ -879,7 +879,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                   type="button"
                   whileTap={{ scale: 0.85 }}
                   onClick={() => setMenuOpen((v) => !v)}
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
                     <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
@@ -1007,7 +1007,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             whileTap={{ scale: 0.82 }}
             onClick={handleLike}
             disabled={likeLoading}
-            className="flex items-center gap-2 disabled:opacity-60"
+            className="flex min-h-[44px] items-center gap-2 disabled:opacity-60"
           >
             <motion.svg
               key={liked ? "liked" : "unliked"}
@@ -1029,7 +1029,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={() => setCommentsOpen(true)}
-            className="flex items-center gap-2"
+            className="flex min-h-[44px] items-center gap-2"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[22px] w-[22px] text-[#6b7280]">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
@@ -1042,7 +1042,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             type="button"
             whileTap={{ scale: 0.88 }}
             onClick={handleShare}
-            className="flex items-center gap-2"
+            className="flex min-h-[44px] items-center gap-2"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
@@ -1052,7 +1052,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
 
           {/* Spacer + bookmark */}
           <div className="flex-1" />
-          <motion.button type="button" whileTap={{ scale: 0.88 }} onClick={handleSaveToggle} disabled={saveLoading} className="disabled:opacity-60">
+          <motion.button type="button" whileTap={{ scale: 0.88 }} onClick={handleSaveToggle} disabled={saveLoading} className="flex min-h-[44px] min-w-[44px] items-center justify-center disabled:opacity-60">
             <svg viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
@@ -1096,6 +1096,21 @@ export function FeedClient({
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
+  const TABS_ORDER = ["tutti", "seguiti"] as const;
+  const swipeStartX = useRef<number | null>(null);
+
+  function onSwipeStart(e: React.TouchEvent) {
+    swipeStartX.current = e.touches[0].clientX;
+  }
+  function onSwipeEnd(e: React.TouchEvent) {
+    if (swipeStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - swipeStartX.current;
+    swipeStartX.current = null;
+    if (Math.abs(dx) < 60) return; // ignore short swipes
+    const idx = TABS_ORDER.indexOf(mode);
+    if (dx < 0 && idx < TABS_ORDER.length - 1) setMode(TABS_ORDER[idx + 1]);
+    if (dx > 0 && idx > 0) setMode(TABS_ORDER[idx - 1]);
+  }
 
   const filtered = useMemo(() => {
     return items.filter((r) =>
@@ -1105,6 +1120,7 @@ export function FeedClient({
 
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-dvh bg-[#0a0a0a] text-white">
 
       {/* Header */}
@@ -1155,8 +1171,12 @@ export function FeedClient({
         </div>
       </div>
 
-      {/* Feed */}
-      <main className="mx-auto max-w-[430px] px-4 pb-28">
+      {/* Feed — onTouchStart/End enables swipe-left/right between tabs */}
+      <main
+        className="mx-auto max-w-[430px] px-4 pb-28"
+        onTouchStart={onSwipeStart}
+        onTouchEnd={onSwipeEnd}
+      >
         {items.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-20 text-center">
             <p className="text-sm text-[#9CA3AF]">Nessuna raccomandazione ancora.</p>
@@ -1204,5 +1224,6 @@ export function FeedClient({
         onMarkAllRead={() => setUnreadCount(0)}
       />
     </div>
+    </MotionConfig>
   );
 }
