@@ -31,7 +31,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-between bg-[#0a0a0a] px-6 py-10">
+    <div className="flex min-h-svh flex-col items-center justify-between bg-background px-6 py-10">
       {/* Spacer top */}
       <div />
 
@@ -45,13 +45,13 @@ export default function LoginPage() {
         />
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight text-white">Filo</h1>
-          <p className="mt-1 text-sm text-[#6b7280]">Il passaparola digitale</p>
+          <p className="mt-1 text-sm text-muted-foreground">Il passaparola digitale</p>
         </div>
       </div>
 
       {/* Card */}
       <div className="w-full max-w-[320px]">
-        <p className="mb-6 text-center text-[15px] leading-relaxed text-[#9ca3af]">
+        <p className="mb-6 text-center text-[15px] leading-relaxed text-subdued">
           Accedi con il tuo account Google per entrare nella tua rete di fiducia
         </p>
 
@@ -73,8 +73,8 @@ export default function LoginPage() {
             <div
               className={`flex h-5 w-5 items-center justify-center rounded border-2 transition ${
                 consented
-                  ? "border-[#0D9488] bg-[#0D9488]"
-                  : "border-[#374151] bg-transparent"
+                  ? "border-primary bg-primary"
+                  : "border-border bg-transparent"
               }`}
             >
               {consented && (
@@ -90,13 +90,13 @@ export default function LoginPage() {
               )}
             </div>
           </div>
-          <span className="text-[13px] leading-relaxed text-[#9ca3af]">
+          <span className="text-[13px] leading-relaxed text-subdued">
             Ho letto e accetto la{" "}
             <a
               href="https://filo.network/privacy"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#0D9488] underline hover:text-[#0b7c76]"
+              className="text-primary underline hover:text-primary-hover"
               onClick={(e) => e.stopPropagation()}
             >
               Privacy Policy
@@ -106,7 +106,7 @@ export default function LoginPage() {
               href="https://filo.network/terms"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#0D9488] underline hover:text-[#0b7c76]"
+              className="text-primary underline hover:text-primary-hover"
               onClick={(e) => e.stopPropagation()}
             >
               Termini e Condizioni
@@ -122,7 +122,7 @@ export default function LoginPage() {
           className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white text-[15px] font-semibold text-[#111] shadow-[0_4px_24px_rgba(255,255,255,0.1)] transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#111] border-t-transparent" />
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-border border-t-transparent" />
           ) : (
             <>
               <svg viewBox="0 0 24 24" className="h-5 w-5 shrink-0" aria-hidden="true">
@@ -139,13 +139,13 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="flex flex-col items-center gap-2 pt-8">
-        <p className="text-sm font-semibold text-[#6b7280]">Filo &mdash; Il passaparola digitale</p>
-        <div className="flex items-center gap-3 text-[12px] text-[#4b5563]">
-          <a href="https://filo.network/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-[#0D9488] transition">Privacy Policy</a>
+        <p className="text-sm font-semibold text-muted-foreground">Filo &mdash; Il passaparola digitale</p>
+        <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
+          <a href="https://filo.network/privacy" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">Privacy Policy</a>
           <span>·</span>
-          <a href="https://filo.network/terms" target="_blank" rel="noopener noreferrer" className="hover:text-[#0D9488] transition">Termini e Condizioni</a>
+          <a href="https://filo.network/terms" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition">Termini e Condizioni</a>
         </div>
-        <p className="text-[11px] text-[#3a3a3a]">© 2026 Filo</p>
+        <p className="text-[11px] text-muted-foreground">© 2026 Filo</p>
       </footer>
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/browser";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,28 +22,6 @@ type Notif = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-violet-600 to-purple-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-emerald-600 to-teal-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-];
-
-function avatarColor(seed: string) {
-  let hash = 0;
-  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2)
-    .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
-}
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -173,11 +152,11 @@ export function NotificationsDrawer({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 32, stiffness: 320 }}
-            className="fixed bottom-0 left-0 right-0 z-[60] flex max-h-[75vh] flex-col rounded-t-3xl bg-[#111111]"
+            className="fixed bottom-0 left-0 right-0 z-[60] flex max-h-[75vh] flex-col rounded-t-3xl bg-card"
           >
             {/* Handle */}
             <div className="flex shrink-0 justify-center pt-3 pb-1">
-              <div className="h-1 w-10 rounded-full bg-[#2a2a2a]" />
+              <div className="h-1 w-10 rounded-full bg-surface-raised" />
             </div>
 
             {/* Header */}
@@ -187,7 +166,7 @@ export function NotificationsDrawer({
                 type="button"
                 aria-label="Chiudi notifiche"
                 onClick={() => onOpenChange(false)}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1a1a1a] text-[#6b7280] transition hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:text-white"
               >
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -195,16 +174,16 @@ export function NotificationsDrawer({
               </button>
             </div>
 
-            <div className="h-px bg-[#1a1a1a] shrink-0" />
+            <div className="h-px bg-muted shrink-0" />
 
             {/* List */}
             <div className="flex-1 overflow-y-auto px-3 py-3" aria-live="polite" aria-atomic="false">
               {loading ? (
                 <div className="flex justify-center py-12" aria-label="Caricamento notifiche">
-                  <div aria-hidden="true" className="h-5 w-5 animate-spin rounded-full border-2 border-[#0D9488] border-t-transparent" />
+                  <div aria-hidden="true" className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
                 </div>
               ) : notifs.length === 0 ? (
-                <p className="py-12 text-center text-sm text-[#6b7280]">Nessuna notifica ancora.</p>
+                <p className="py-12 text-center text-sm text-muted-foreground">Nessuna notifica ancora.</p>
               ) : (
                 <ul className="space-y-1" aria-label="Lista notifiche">
                   {notifs.map((n) => {
@@ -213,7 +192,7 @@ export function NotificationsDrawer({
                     const profileHref = n.actor_username ? `/p/${n.actor_username}` : null;
 
                     const inner = (
-                      <div className={`flex items-start gap-3 rounded-2xl px-3 py-3 transition ${!n.read ? "bg-[#0D9488]/8 border-l-2 border-l-[#0D9488]" : ""}`}>
+                      <div className={`flex items-start gap-3 rounded-2xl px-3 py-3 transition ${!n.read ? "bg-primary/8 border-l-2 border-l-[#0D9488]" : ""}`}>
                         {/* Avatar */}
                         {profileHref ? (
                           <Link href={profileHref} onClick={() => onOpenChange(false)} className="shrink-0">
@@ -229,14 +208,14 @@ export function NotificationsDrawer({
                         <div className="min-w-0 flex-1">
                           <p className="text-sm leading-snug text-white">
                             <span className="font-semibold">{name.split(" ")[0]}</span>{" "}
-                            <span className="text-[#9ca3af]">{notifBody(n.type)}</span>
+                            <span className="text-subdued">{notifBody(n.type)}</span>
                           </p>
-                          <p className="mt-0.5 text-[11px] text-[#6b7280]">{timeAgo(n.created_at)}</p>
+                          <p className="mt-0.5 text-[11px] text-muted-foreground">{timeAgo(n.created_at)}</p>
                         </div>
 
                         {/* Unread dot */}
                         {!n.read && (
-                          <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#0D9488]" />
+                          <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
                         )}
                       </div>
                     );
@@ -270,7 +249,7 @@ function AvatarCircle({ name, avatarUrl, seed }: { name: string; avatarUrl: stri
         // eslint-disable-next-line @next/next/no-img-element
         <img src={avatarUrl} alt={name} className="h-full w-full object-cover" />
       ) : (
-        <span className="text-xs font-bold text-white">{initials(name)}</span>
+        <span className="text-xs font-bold text-white">{avatarInitials(name)}</span>
       )}
     </div>
   );

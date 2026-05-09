@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 
 import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,17 +38,6 @@ export type ProCard = { slug: string; professional_name: string; category: strin
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-violet-600 to-purple-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-emerald-600 to-teal-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-];
-
 const CATEGORY_PILLS = [
   "Tutti",
   "Dentista",
@@ -65,24 +55,6 @@ const CATEGORY_PILLS = [
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
-
-function avatarColor(seed: string) {
-  let hash = 0;
-  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase())
-      .filter(Boolean)
-      .join("") || "?"
-  );
-}
 
 function capitalize(s: string) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
@@ -112,7 +84,7 @@ function Avatar({
           className="h-full w-full object-cover"
         />
       ) : (
-        initials(profile.full_name)
+        avatarInitials(profile.full_name)
       )}
     </div>
   );
@@ -174,7 +146,7 @@ function PersonCard({
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.28, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
-      className="flex items-center gap-3.5 rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3.5"
+      className="flex items-center gap-3.5 rounded-2xl border border-border bg-card px-4 py-3.5"
     >
       {/* Left: avatar + info (clickable) */}
       {profileHref ? (
@@ -188,10 +160,10 @@ function PersonCard({
               {user.full_name}
             </p>
             {user.city && (
-              <p className="truncate text-[12px] text-[#6b7280]">{user.city}</p>
+              <p className="truncate text-[12px] text-muted-foreground">{user.city}</p>
             )}
             {badge && (
-              <p className="mt-0.5 truncate text-[11px] font-medium text-[#0D9488]">
+              <p className="mt-0.5 truncate text-[11px] font-medium text-primary">
                 {badge}
               </p>
             )}
@@ -205,10 +177,10 @@ function PersonCard({
               {user.full_name}
             </p>
             {user.city && (
-              <p className="truncate text-[12px] text-[#6b7280]">{user.city}</p>
+              <p className="truncate text-[12px] text-muted-foreground">{user.city}</p>
             )}
             {badge && (
-              <p className="mt-0.5 truncate text-[11px] font-medium text-[#0D9488]">
+              <p className="mt-0.5 truncate text-[11px] font-medium text-primary">
                 {badge}
               </p>
             )}
@@ -226,8 +198,8 @@ function PersonCard({
         disabled={busy}
         className={`h-9 shrink-0 rounded-full px-4 text-[12px] font-semibold transition disabled:opacity-50 ${
           isFollowing
-            ? "border border-[#1a1a1a] bg-transparent text-[#6b7280] hover:border-red-500/30 hover:text-red-400"
-            : "bg-[#0D9488] text-white shadow-[0_0_12px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76]"
+            ? "border border-border bg-transparent text-muted-foreground hover:border-red-500/30 hover:text-red-400"
+            : "bg-primary text-white shadow-[0_0_12px_rgba(13,148,136,0.3)] hover:bg-primary-hover"
         }`}
       >
         {busy ? "…" : isFollowing ? "Seguito" : "Segui"}
@@ -247,7 +219,7 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="flex items-center gap-3.5 rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3.5 transition active:opacity-80"
+        className="flex items-center gap-3.5 rounded-2xl border border-border bg-card px-4 py-3.5 transition active:opacity-80"
       >
         <Avatar profile={pro} />
         <div className="min-w-0 flex-1">
@@ -256,12 +228,12 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
           </p>
           <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
             {pro.profession && (
-              <span className="rounded-full bg-[#0D9488]/15 px-2 py-[2px] text-[11px] font-medium text-[#0D9488]">
+              <span className="rounded-full bg-primary/15 px-2 py-[2px] text-[11px] font-medium text-primary">
                 {capitalize(pro.profession)}
               </span>
             )}
             {pro.city && (
-              <span className="text-[12px] text-[#6b7280]">{pro.city}</span>
+              <span className="text-[12px] text-muted-foreground">{pro.city}</span>
             )}
           </div>
         </div>
@@ -270,7 +242,7 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
           fill="none"
           stroke="currentColor"
           strokeWidth={1.8}
-          className="h-4 w-4 shrink-0 text-[#3a3a3a]"
+          className="h-4 w-4 shrink-0 text-muted-foreground"
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
         </svg>
@@ -284,11 +256,11 @@ function ProProfileCard({ pro, index }: { pro: ProProfile; index: number }) {
 function SectionHeader({ title, count }: { title: string; count?: number }) {
   return (
     <div className="flex items-center justify-between pb-3 pt-6 first:pt-2">
-      <span className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
+      <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
         {title}
       </span>
       {typeof count === "number" && count > 0 && (
-        <span className="text-[11px] font-medium text-[#6b7280]">{count}</span>
+        <span className="text-[11px] font-medium text-muted-foreground">{count}</span>
       )}
     </div>
   );
@@ -316,8 +288,8 @@ function CategoryPills({
           onClick={() => onChange(cat)}
           className={`shrink-0 rounded-full px-3.5 py-2.5 text-[12px] font-medium transition ${
             selected === cat
-              ? "bg-[#0D9488] text-white shadow-[0_0_10px_rgba(13,148,136,0.3)]"
-              : "bg-[#111111] text-[#6b7280] hover:text-white"
+              ? "bg-primary text-white shadow-[0_0_10px_rgba(13,148,136,0.3)]"
+              : "bg-card text-muted-foreground hover:text-white"
           }`}
         >
           {cat}
@@ -345,7 +317,7 @@ function SearchInput({
         fill="none"
         stroke="currentColor"
         strokeWidth={1.8}
-        className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280]"
+        className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
       >
         <path
           strokeLinecap="round"
@@ -358,7 +330,7 @@ function SearchInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#111111] pl-9 pr-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
+        className="h-11 w-full rounded-xl border border-border bg-card pl-9 pr-4 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary"
       />
     </div>
   );
@@ -601,12 +573,12 @@ export function CercaClient({
   }, [sameCityPros, proQuery, categoryFilter]);
 
   return (
-    <div className="min-h-dvh bg-[#0a0a0a] text-white">
+    <div className="min-h-dvh bg-background text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="mx-auto max-w-[430px] px-4 pb-3 pt-5">
           {/* Tab toggle — slide indicator */}
-          <div role="tablist" aria-label="Modalità di ricerca" className="mb-3 flex rounded-full bg-[#111111] p-1">
+          <div role="tablist" aria-label="Modalità di ricerca" className="mb-3 flex rounded-full bg-card p-1">
             {(["persone", "professionisti"] as const).map((t) => (
               <button
                 key={t}
@@ -622,11 +594,11 @@ export function CercaClient({
                   <motion.div
                     aria-hidden="true"
                     layoutId="cerca-tab-bg"
-                    className="absolute inset-0 rounded-full bg-[#0D9488]"
+                    className="absolute inset-0 rounded-full bg-primary"
                     transition={{ type: "spring", stiffness: 500, damping: 35 }}
                   />
                 )}
-                <span className={`relative z-10 transition-colors duration-200 ${tab === t ? "text-white" : "text-[#6b7280]"}`}>
+                <span className={`relative z-10 transition-colors duration-200 ${tab === t ? "text-white" : "text-muted-foreground"}`}>
                   {t === "persone" ? "Persone" : "Professionisti"}
                 </span>
               </button>
@@ -672,7 +644,7 @@ export function CercaClient({
             {userQuery ? (
               filteredAllUsers.length === 0 ? (
                 <div className="py-10 text-center">
-                  <p className="text-sm text-[#6b7280]">
+                  <p className="text-sm text-muted-foreground">
                     Nessun risultato per &ldquo;{userQuery}&rdquo;
                   </p>
                 </div>
@@ -702,19 +674,19 @@ export function CercaClient({
                 {filteredCityUsers.length === 0 ? (
                   <div className="pb-2 text-center">
                     {!myCity ? (
-                      <p className="text-sm text-[#6b7280]">
+                      <p className="text-sm text-muted-foreground">
                         Imposta la tua città nelle{" "}
-                        <a href="/settings" className="text-[#0D9488] underline">
+                        <a href="/settings" className="text-primary underline">
                           impostazioni
                         </a>{" "}
                         per vedere chi è vicino a te.
                       </p>
                     ) : (
                       <>
-                        <p className="text-sm text-[#6b7280]">
+                        <p className="text-sm text-muted-foreground">
                           Nessun utente trovato nella tua città.
                         </p>
-                        <p className="mt-1 text-sm font-medium text-[#0D9488]">
+                        <p className="mt-1 text-sm font-medium text-primary">
                           Invita i tuoi amici!
                         </p>
                       </>
@@ -740,7 +712,7 @@ export function CercaClient({
                   count={filteredFof.length}
                 />
                 {filteredFof.length === 0 ? (
-                  <p className="pb-4 text-sm text-[#6b7280]">
+                  <p className="pb-4 text-sm text-muted-foreground">
                     Segui più persone per scoprire nuove connessioni.
                   </p>
                 ) : (
@@ -793,7 +765,7 @@ export function CercaClient({
             {filteredPros.length === 0 ? (
               <div className="py-10 text-center">
                 {proQuery || categoryFilter !== "Tutti" ? (
-                  <p className="text-sm text-[#6b7280]">
+                  <p className="text-sm text-muted-foreground">
                     Nessun professionista trovato
                     {categoryFilter !== "Tutti"
                       ? ` nella categoria "${categoryFilter}"`
@@ -801,7 +773,7 @@ export function CercaClient({
                     {proQuery ? ` per "${proQuery}"` : ""}.
                   </p>
                 ) : (
-                  <p className="text-sm text-[#6b7280]">
+                  <p className="text-sm text-muted-foreground">
                     Nessun professionista registrato nella tua città ancora.
                     <br />
                     Invita i professionisti che conosci!

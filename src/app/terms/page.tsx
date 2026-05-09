@@ -7,16 +7,16 @@ export const metadata = {
 
 const h2 = "mt-10 text-lg font-bold text-white";
 const h3 = "mt-6 text-base font-semibold text-white";
-const p = "mt-3 text-sm leading-relaxed text-[#9ca3af]";
-const li = "mt-1.5 text-sm leading-relaxed text-[#9ca3af]";
+const p = "mt-3 text-sm leading-relaxed text-subdued";
+const li = "mt-1.5 text-sm leading-relaxed text-subdued";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-svh bg-[#0a0a0a] text-white">
+    <div className="min-h-svh bg-background text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#1a1a1a] bg-[#0a0a0a]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-2 text-sm text-[#6b7280] transition hover:text-white">
+          <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
@@ -33,14 +33,14 @@ export default function TermsPage() {
           Benvenuto su Filo. Utilizzando la nostra applicazione accetti i presenti Termini e Condizioni.
           Ti invitiamo a leggerli attentamente prima di utilizzare il servizio.
         </p>
-        <p className="mt-3 text-xs text-[#6b7280]">Ultima modifica: 23 aprile 2026</p>
+        <p className="mt-3 text-xs text-muted-foreground">Ultima modifica: 23 aprile 2026</p>
 
         {/* Accettazione */}
         <h2 className={h2}>1. Accettazione dei Termini</h2>
         <p className={p}>
           Accedendo o utilizzando Filo (il "Servizio"), dichiari di aver letto, compreso e accettato
           i presenti Termini e Condizioni e la nostra{" "}
-          <Link href="/privacy" className="text-[#0D9488] underline underline-offset-2 hover:text-teal-400">
+          <Link href="/privacy" className="text-primary underline underline-offset-2 hover:text-teal-400">
             Privacy Policy
           </Link>
           . Se non accetti questi termini, non puoi utilizzare il Servizio.
@@ -55,7 +55,7 @@ export default function TermsPage() {
         <p className={p}>
           Il Servizio è fornito da Carlo Mantecchini, con sede in Strada san Martino 18,
           Castiglione Torinese (TO), 10090, Italia. Contatto:{" "}
-          <a href="mailto:filo.networks@gmail.com" className="text-[#0D9488] underline underline-offset-2 hover:text-teal-400">
+          <a href="mailto:filo.networks@gmail.com" className="text-primary underline underline-offset-2 hover:text-teal-400">
             filo.networks@gmail.com
           </a>
           .
@@ -76,7 +76,7 @@ export default function TermsPage() {
             "Sei responsabile di mantenere riservate le credenziali di accesso.",
           ].map((item, i) => (
             <li key={i} className={`flex items-start gap-2 ${li}`}>
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -96,7 +96,7 @@ export default function TermsPage() {
             "Rispettare la privacy degli altri utenti.",
           ].map((item, i) => (
             <li key={i} className={`flex items-start gap-2 ${li}`}>
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -138,7 +138,7 @@ export default function TermsPage() {
             "Perdita di dati causata da eventi al di fuori del nostro controllo.",
           ].map((item, i) => (
             <li key={i} className={`flex items-start gap-2 ${li}`}>
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -161,7 +161,7 @@ export default function TermsPage() {
         <h2 className={h2}>9. Privacy</h2>
         <p className={p}>
           Il trattamento dei tuoi dati personali è disciplinato dalla nostra{" "}
-          <Link href="/privacy" className="text-[#0D9488] underline underline-offset-2 hover:text-teal-400">
+          <Link href="/privacy" className="text-primary underline underline-offset-2 hover:text-teal-400">
             Privacy Policy
           </Link>
           , che fa parte integrante dei presenti Termini e Condizioni.
@@ -185,21 +185,21 @@ export default function TermsPage() {
         </p>
 
         {/* Contatti */}
-        <div className="mt-12 rounded-2xl border border-[#1a1a1a] bg-[#111111] p-5">
+        <div className="mt-12 rounded-2xl border border-border bg-card p-5">
           <p className="text-sm font-semibold text-white">Contattaci</p>
           <p className="mt-2 text-sm font-bold text-white">Filo</p>
-          <p className="mt-1 text-sm text-[#9ca3af]">
+          <p className="mt-1 text-sm text-subdued">
             Carlo Mantecchini — Strada san Martino, 18. Castiglione torinese. 10090, Torino
           </p>
           <a
             href="mailto:filo.networks@gmail.com"
-            className="mt-1 block text-sm text-[#0D9488] underline underline-offset-2 hover:text-teal-400"
+            className="mt-1 block text-sm text-primary underline underline-offset-2 hover:text-teal-400"
           >
             filo.networks@gmail.com
           </a>
         </div>
 
-        <p className="mt-6 text-center text-xs text-[#4b5563]">
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           Ultima modifica: 23 aprile 2026
         </p>
       </main>

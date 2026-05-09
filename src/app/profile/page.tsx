@@ -9,35 +9,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
 import { cacheGet, cacheSet } from "@/lib/page-cache";
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-emerald-600 to-teal-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-  "from-violet-600 to-purple-500",
-];
-
-function avatarGradient(name: string) {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return (
-    name
-      .trim()
-      .split(/\s+/)
-      .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase())
-      .filter(Boolean)
-      .join("") || "U"
-  );
-}
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 type Rec = {
   id: string;
@@ -74,7 +46,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   commercialista: "bg-orange-500/15 text-orange-300",
   idraulico: "bg-cyan-500/15 text-cyan-300",
   elettricista: "bg-yellow-500/15 text-yellow-300",
-  altro: "bg-[#1a1a1a] text-[#6b7280]",
+  altro: "bg-muted text-muted-foreground",
 };
 
 // ─── Follows Drawer ───────────────────────────────────────────────────────────
@@ -117,7 +89,7 @@ function FollowsDrawer({
     >
       <motion.div
         ref={sheetRef}
-        className="w-full max-w-[430px] rounded-t-[20px] bg-[#111111]"
+        className="w-full max-w-[430px] rounded-t-[20px] bg-card"
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
@@ -126,16 +98,16 @@ function FollowsDrawer({
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
-          <div className="h-1 w-10 rounded-full bg-[#2a2a2a]" />
+          <div className="h-1 w-10 rounded-full bg-surface-raised" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#1a1a1a] px-5 py-3">
+        <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <span className="text-[15px] font-bold text-white">{title}</span>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1a1a1a] text-[#6b7280] transition hover:text-white"
+            className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:text-white"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -149,17 +121,17 @@ function FollowsDrawer({
             <div className="flex flex-col gap-3 pt-2">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="flex animate-pulse items-center gap-3 py-1">
-                  <div className="h-11 w-11 shrink-0 rounded-full bg-[#1a1a1a]" />
+                  <div className="h-11 w-11 shrink-0 rounded-full bg-muted" />
                   <div className="flex-1 space-y-2">
-                    <div className="h-3 w-28 rounded-full bg-[#1a1a1a]" />
-                    <div className="h-3 w-20 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-3 w-28 rounded-full bg-muted" />
+                    <div className="h-3 w-20 rounded-full bg-muted" />
                   </div>
-                  <div className="h-8 w-20 rounded-full bg-[#1a1a1a]" />
+                  <div className="h-8 w-20 rounded-full bg-muted" />
                 </div>
               ))}
             </div>
           ) : users.length === 0 ? (
-            <p className="py-10 text-center text-sm text-[#6b7280]">
+            <p className="py-10 text-center text-sm text-muted-foreground">
               {type === "following"
                 ? "Non segui ancora nessuno."
                 : "Nessun follower ancora."}
@@ -168,7 +140,7 @@ function FollowsDrawer({
             <div className="flex flex-col divide-y divide-[#1a1a1a]">
               {users.map((u) => {
                 const name = u.full_name ?? "Utente";
-                const color = avatarGradient(u.id);
+                const color = avatarColor(u.id);
                 const isFollowing = followingIds.includes(u.id);
                 const isMe = u.id === currentUserId;
 
@@ -184,7 +156,7 @@ function FollowsDrawer({
                             // eslint-disable-next-line @next/next/no-img-element
                             <img src={u.avatar_url} alt={name} className="h-full w-full object-cover" />
                           ) : (
-                            <span className="text-sm font-bold text-white">{initials(name)}</span>
+                            <span className="text-sm font-bold text-white">{avatarInitials(name)}</span>
                           )}
                         </div>
                       </Link>
@@ -196,7 +168,7 @@ function FollowsDrawer({
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={u.avatar_url} alt={name} className="h-full w-full object-cover" />
                         ) : (
-                          <span className="text-sm font-bold text-white">{initials(name)}</span>
+                          <span className="text-sm font-bold text-white">{avatarInitials(name)}</span>
                         )}
                       </div>
                     )}
@@ -205,7 +177,7 @@ function FollowsDrawer({
                     <div className="min-w-0 flex-1">
                       {u.username ? (
                         <Link href={`/p/${u.username}`} onClick={onClose}>
-                          <p className="truncate text-[14px] font-semibold text-white transition hover:text-[#0D9488]">
+                          <p className="truncate text-[14px] font-semibold text-white transition hover:text-primary">
                             {name}
                           </p>
                         </Link>
@@ -213,10 +185,10 @@ function FollowsDrawer({
                         <p className="truncate text-[14px] font-semibold text-white">{name}</p>
                       )}
                       {u.username && (
-                        <p className="truncate text-[12px] text-[#6b7280]">@{u.username}</p>
+                        <p className="truncate text-[12px] text-muted-foreground">@{u.username}</p>
                       )}
                       {u.city && (
-                        <p className="truncate text-[12px] text-[#6b7280]">{u.city}</p>
+                        <p className="truncate text-[12px] text-muted-foreground">{u.city}</p>
                       )}
                     </div>
 
@@ -226,7 +198,7 @@ function FollowsDrawer({
                         <button
                           type="button"
                           onClick={() => onUnfollow(u.id)}
-                          className="h-8 shrink-0 rounded-full border border-[#1a1a1a] px-3.5 text-xs font-semibold text-[#6b7280] transition hover:border-red-500/40 hover:text-red-400"
+                          className="h-8 shrink-0 rounded-full border border-border px-3.5 text-xs font-semibold text-muted-foreground transition hover:border-red-500/40 hover:text-red-400"
                         >
                           Smetti
                         </button>
@@ -234,7 +206,7 @@ function FollowsDrawer({
                         <button
                           type="button"
                           onClick={() => onUnfollow(u.id)}
-                          className="h-8 shrink-0 rounded-full border border-[#1a1a1a] px-3.5 text-xs font-semibold text-[#6b7280] transition hover:border-red-500/40 hover:text-red-400"
+                          className="h-8 shrink-0 rounded-full border border-border px-3.5 text-xs font-semibold text-muted-foreground transition hover:border-red-500/40 hover:text-red-400"
                         >
                           Seguito
                         </button>
@@ -242,7 +214,7 @@ function FollowsDrawer({
                         <button
                           type="button"
                           onClick={() => onFollow(u.id)}
-                          className="h-8 shrink-0 rounded-full bg-[#0D9488] px-3.5 text-xs font-semibold text-white shadow-[0_0_10px_rgba(13,148,136,0.25)] transition hover:bg-[#0b7c76]"
+                          className="h-8 shrink-0 rounded-full bg-primary px-3.5 text-xs font-semibold text-white shadow-[0_0_10px_rgba(13,148,136,0.25)] transition hover:bg-primary-hover"
                         >
                           Segui
                         </button>
@@ -420,59 +392,59 @@ export default function ProfilePage() {
       .eq("following_id", targetId);
   }
 
-  const gradient = avatarGradient(fullName || "U");
+  const gradient = avatarColor(fullName || "U");
 
   if (loading) {
     return (
-      <div className="min-h-svh bg-[#0a0a0a] text-white">
-        <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+      <div className="min-h-svh bg-background text-white">
+        <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between px-4">
-            <div className="h-4 w-28 animate-pulse rounded-full bg-[#1a1a1a]" />
-            <div className="h-5 w-5 animate-pulse rounded bg-[#1a1a1a]" />
+            <div className="h-4 w-28 animate-pulse rounded-full bg-muted" />
+            <div className="h-5 w-5 animate-pulse rounded bg-muted" />
           </div>
         </header>
 
         <main className="mx-auto max-w-[430px] pb-28">
           <div className="px-5 pb-6 pt-5">
             <div className="flex animate-pulse items-center gap-5">
-              <div className="h-[76px] w-[76px] shrink-0 rounded-full bg-[#1a1a1a]" />
+              <div className="h-[76px] w-[76px] shrink-0 rounded-full bg-muted" />
               <div className="flex flex-1 justify-around">
                 {[...Array(3)].map((_, i) => (
                   <div key={i} className="flex flex-col items-center gap-1.5">
-                    <div className="h-5 w-8 rounded-full bg-[#1a1a1a]" />
-                    <div className="h-3 w-12 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-5 w-8 rounded-full bg-muted" />
+                    <div className="h-3 w-12 rounded-full bg-muted" />
                   </div>
                 ))}
               </div>
             </div>
-            <div className="mt-3 h-3 w-20 animate-pulse rounded-full bg-[#1a1a1a]" />
+            <div className="mt-3 h-3 w-20 animate-pulse rounded-full bg-muted" />
             <div className="mt-2 animate-pulse space-y-1.5">
-              <div className="h-3 w-full rounded-full bg-[#1a1a1a]" />
-              <div className="h-3 w-3/4 rounded-full bg-[#1a1a1a]" />
+              <div className="h-3 w-full rounded-full bg-muted" />
+              <div className="h-3 w-3/4 rounded-full bg-muted" />
             </div>
           </div>
 
-          <div className="h-px bg-[#1a1a1a]" />
+          <div className="h-px bg-muted" />
 
           <div className="px-4 pt-4">
             <div className="flex animate-pulse items-center justify-between pb-3">
-              <div className="h-3 w-24 rounded-full bg-[#1a1a1a]" />
-              <div className="h-7 w-20 rounded-full bg-[#1a1a1a]" />
+              <div className="h-3 w-24 rounded-full bg-muted" />
+              <div className="h-7 w-20 rounded-full bg-muted" />
             </div>
             <div className="flex flex-col gap-2.5">
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="animate-pulse rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4"
+                  className="animate-pulse rounded-2xl border border-border bg-card p-4"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="h-4 w-36 rounded-full bg-[#1a1a1a]" />
-                    <div className="h-5 w-16 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-4 w-36 rounded-full bg-muted" />
+                    <div className="h-5 w-16 rounded-full bg-muted" />
                   </div>
-                  <div className="mt-2 h-3 w-16 rounded-full bg-[#1a1a1a]" />
+                  <div className="mt-2 h-3 w-16 rounded-full bg-muted" />
                   <div className="mt-2 space-y-1.5">
-                    <div className="h-3 w-full rounded-full bg-[#1a1a1a]" />
-                    <div className="h-3 w-2/3 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-3 w-full rounded-full bg-muted" />
+                    <div className="h-3 w-2/3 rounded-full bg-muted" />
                   </div>
                 </div>
               ))}
@@ -487,13 +459,13 @@ export default function ProfilePage() {
 
   return (
     <>
-      <div className="min-h-svh bg-[#0a0a0a] text-white">
-        <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+      <div className="min-h-svh bg-background text-white">
+        <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
           <div className="mx-auto flex h-14 max-w-[430px] items-center justify-between px-4">
             <div className="flex items-center gap-2">
               <span className="text-[15px] font-bold">{fullName}</span>
               {accountType === "professional" && (
-                <span className="rounded-full bg-[#0D9488]/15 px-2 py-[2px] text-[10px] font-semibold text-[#0D9488]">
+                <span className="rounded-full bg-primary/15 px-2 py-[2px] text-[10px] font-semibold text-primary">
                   Professionista
                 </span>
               )}
@@ -504,7 +476,7 @@ export default function ProfilePage() {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={1.8}
-                className="h-5 w-5 text-[#6b7280] transition hover:text-white"
+                className="h-5 w-5 text-muted-foreground transition hover:text-white"
               >
                 <path
                   strokeLinecap="round"
@@ -538,7 +510,7 @@ export default function ProfilePage() {
                   />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center text-2xl font-bold text-white">
-                    {initials(fullName)}
+                    {avatarInitials(fullName)}
                   </span>
                 )}
               </div>
@@ -548,7 +520,7 @@ export default function ProfilePage() {
                   <p className="text-[22px] font-extrabold leading-none tracking-tight">
                     {recs.length}
                   </p>
-                  <p className="mt-1.5 text-[12px] text-[#6b7280]">consigli</p>
+                  <p className="mt-1.5 text-[12px] text-muted-foreground">consigli</p>
                 </div>
                 <motion.button
                   type="button"
@@ -559,7 +531,7 @@ export default function ProfilePage() {
                   <p className="text-[22px] font-extrabold leading-none tracking-tight">
                     {followingIds.length}
                   </p>
-                  <p className="mt-1.5 text-[12px] text-[#6b7280]">seguiti</p>
+                  <p className="mt-1.5 text-[12px] text-muted-foreground">seguiti</p>
                 </motion.button>
                 <motion.button
                   type="button"
@@ -570,32 +542,32 @@ export default function ProfilePage() {
                   <p className="text-[22px] font-extrabold leading-none tracking-tight">
                     {followerIds.length}
                   </p>
-                  <p className="mt-1.5 text-[12px] text-[#6b7280]">follower</p>
+                  <p className="mt-1.5 text-[12px] text-muted-foreground">follower</p>
                 </motion.button>
               </div>
             </div>
 
             {city ? (
-              <p className="mt-3 text-[13px] text-[#6b7280]">{city}</p>
+              <p className="mt-3 text-[13px] text-muted-foreground">{city}</p>
             ) : null}
             {bio ? (
-              <p className="mt-1.5 text-[14px] leading-relaxed text-[#9CA3AF]">
+              <p className="mt-1.5 text-[14px] leading-relaxed text-subdued">
                 {bio}
               </p>
             ) : null}
           </div>
 
-          <div className="h-px bg-[#1a1a1a]" />
+          <div className="h-px bg-muted" />
 
           {/* Recommendations */}
           <div className="px-4 pt-4">
             <div className="flex items-center justify-between pb-3">
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Raccomandazioni
               </span>
               <Link
                 href="/add"
-                className="flex h-7 items-center gap-1.5 rounded-full bg-[#0D9488] px-3 text-[11px] font-semibold text-white transition hover:bg-[#0b7c76]"
+                className="flex h-7 items-center gap-1.5 rounded-full bg-primary px-3 text-[11px] font-semibold text-white transition hover:bg-primary-hover"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -616,7 +588,7 @@ export default function ProfilePage() {
 
             {recs.length === 0 ? (
               <div className="py-12 text-center">
-                <p className="text-sm text-[#6b7280]">
+                <p className="text-sm text-muted-foreground">
                   Nessuna raccomandazione ancora.
                 </p>
               </div>
@@ -625,7 +597,7 @@ export default function ProfilePage() {
                 {recs.map((r) => (
                   <div
                     key={r.id}
-                    className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4"
+                    className="rounded-2xl border border-border bg-card p-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <h2 className="text-[15px] font-bold leading-tight text-white">
@@ -638,7 +610,7 @@ export default function ProfilePage() {
                           r.category.slice(1)}
                       </span>
                     </div>
-                    <p className="mt-1.5 flex items-center gap-1 text-xs text-[#6b7280]">
+                    <p className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">
                       <svg
                         viewBox="0 0 24 24"
                         fill="currentColor"
@@ -653,7 +625,7 @@ export default function ProfilePage() {
                       {r.city}
                     </p>
                     {r.note ? (
-                      <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-[#9CA3AF]">
+                      <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-subdued">
                         {r.note}
                       </p>
                     ) : null}

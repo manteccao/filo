@@ -40,8 +40,8 @@ export default async function UsersPage() {
   const others = (profiles ?? []).filter((p) => p.id !== user.id);
 
   return (
-    <div className="min-h-svh bg-[#0a0a0a] text-white">
-      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+    <div className="min-h-svh bg-background text-white">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[430px] items-center justify-center px-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/filo-logo-v2.png" alt="Filo" className="h-9 w-auto object-contain" />
@@ -51,7 +51,7 @@ export default async function UsersPage() {
       <main className="mx-auto max-w-[430px] px-4 pb-28 pt-2">
         {/* Section header */}
         <div className="flex items-center justify-between py-3">
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
             Persone · {others.length}
           </span>
         </div>
@@ -65,7 +65,7 @@ export default async function UsersPage() {
             return (
               <div
                 key={p.id}
-                className="flex items-center gap-3.5 rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3.5"
+                className="flex items-center gap-3.5 rounded-2xl border border-border bg-card px-4 py-3.5"
               >
                 <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${color} text-sm font-bold text-white`}>
                   {initials(name)}
@@ -73,7 +73,7 @@ export default async function UsersPage() {
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[15px] font-semibold text-white">{name}</p>
-                  <p className="mt-0.5 text-[12px] text-[#8b8fa8]">
+                  <p className="mt-0.5 text-[12px] text-muted-foreground">
                     {p.city ?? "—"}
                   </p>
                 </div>
@@ -84,8 +84,8 @@ export default async function UsersPage() {
                     type="submit"
                     className={`h-8 rounded-full px-4 text-xs font-semibold transition ${
                       isFollowing
-                        ? "border border-[#1a1a1a] bg-transparent text-[#8b8fa8] hover:border-red-500/40 hover:text-red-400"
-                        : "bg-[#0D9488] text-white shadow-[0_0_12px_rgba(13,148,136,0.35)] hover:bg-[#0b7c76]"
+                        ? "border border-border bg-transparent text-muted-foreground hover:border-red-500/40 hover:text-red-400"
+                        : "bg-primary text-white shadow-[0_0_12px_rgba(13,148,136,0.35)] hover:bg-primary-hover"
                     }`}
                   >
                     {isFollowing ? "Seguito" : "Segui"}

@@ -66,7 +66,7 @@ export default function WaitlistPage() {
   const busy = status === "loading";
 
   return (
-    <div className="flex min-h-dvh flex-col items-center bg-[#0a0a0a] px-5 py-12 text-white">
+    <div className="flex min-h-dvh flex-col items-center bg-background px-5 py-12 text-white">
       <div className="flex flex-1 flex-col items-center justify-center w-full max-w-[400px]">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
@@ -85,7 +85,7 @@ export default function WaitlistPage() {
         </h1>
 
         {/* Description */}
-        <p className="mx-auto mt-4 max-w-[320px] text-center text-[15px] leading-relaxed text-[#6b7280]">
+        <p className="mx-auto mt-4 max-w-[320px] text-center text-[15px] leading-relaxed text-muted-foreground">
           Filo è il social network del passaparola digitale. Trova professionisti
           di fiducia grazie alle raccomandazioni delle persone che conosci.
         </p>
@@ -93,13 +93,13 @@ export default function WaitlistPage() {
         {/* Live counter */}
         <div className="mt-6 flex justify-center">
           {count === null ? (
-            <div className="h-5 w-40 animate-pulse rounded-full bg-[#1a1a1a]" />
+            <div className="h-5 w-40 animate-pulse rounded-full bg-muted" />
           ) : (
             <motion.p
               key={count}
               initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-[14px] font-semibold text-[#0D9488]"
+              className="text-[14px] font-semibold text-primary"
             >
               Già {count.toLocaleString("it-IT")} {count === 1 ? "persona" : "persone"} in lista
             </motion.p>
@@ -119,14 +119,14 @@ export default function WaitlistPage() {
             }}
             placeholder="La tua email"
             disabled={busy || status === "success"}
-            className="h-12 w-full rounded-full border border-[#1a1a1a] bg-[#111111] px-5 text-[15px] text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488] disabled:opacity-50"
+            className="h-12 w-full rounded-full border border-border bg-card px-5 text-[15px] text-white placeholder:text-subdued outline-none transition focus:border-primary disabled:opacity-50"
           />
 
           <motion.button
             type="submit"
             disabled={busy || status === "success"}
             whileTap={{ scale: 0.97 }}
-            className="h-12 w-full rounded-full bg-[#0D9488] text-[15px] font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.3)] transition hover:bg-[#0b7c76] disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-12 w-full rounded-full bg-primary text-[15px] font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.3)] transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
             {busy ? "…" : "Voglio essere tra i primi"}
           </motion.button>
@@ -141,7 +141,7 @@ export default function WaitlistPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="text-center text-[14px] font-medium text-[#0D9488]"
+                className="text-center text-[14px] font-medium text-primary"
               >
                 Sei nella lista! Ti avvisiamo appena siamo live 🎉
               </motion.p>
@@ -152,7 +152,7 @@ export default function WaitlistPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="text-center text-[14px] text-[#6b7280]"
+                className="text-center text-[14px] text-muted-foreground"
               >
                 Questa email è già in lista — ci vediamo al lancio!
               </motion.p>
@@ -172,19 +172,19 @@ export default function WaitlistPage() {
         </div>
 
         {/* Anti-spam note */}
-        <p className="mt-10 text-center text-[12px] text-[#3a3a3a]">
+        <p className="mt-10 text-center text-[12px] text-muted-foreground">
           Nessuno spam. Solo un&apos;email quando siamo live.
         </p>
       </div>
 
       {/* Footer */}
       <footer className="mt-8 flex flex-col items-center gap-2">
-        <div className="flex items-center gap-4 text-[12px] text-[#4b5563]">
-          <a href="https://filo.network/privacy" className="hover:text-[#0D9488] transition">Privacy Policy</a>
+        <div className="flex items-center gap-4 text-[12px] text-muted-foreground">
+          <a href="https://filo.network/privacy" className="hover:text-primary transition">Privacy Policy</a>
           <span>·</span>
-          <a href="https://filo.network/terms" className="hover:text-[#0D9488] transition">Termini e Condizioni</a>
+          <a href="https://filo.network/terms" className="hover:text-primary transition">Termini e Condizioni</a>
         </div>
-        <p className="text-[11px] text-[#3a3a3a]">© 2026 Filo</p>
+        <p className="text-[11px] text-muted-foreground">© 2026 Filo</p>
       </footer>
     </div>
   );

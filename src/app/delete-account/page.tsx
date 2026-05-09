@@ -9,11 +9,11 @@ export const metadata: Metadata = {
 
 export default function DeleteAccountPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-background text-white">
       {/* Header */}
       <header className="border-b border-white/5">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-sm text-[#6b7280] transition hover:text-white">
+          <Link href="/" className="text-sm text-muted-foreground transition hover:text-white">
             ← Torna a Filo
           </Link>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -47,7 +47,7 @@ export default function DeleteAccountPage() {
         <h1 className="mt-6 text-3xl font-bold tracking-tight">
           Elimina il tuo account
         </h1>
-        <p className="mt-3 text-[#9ca3af]">
+        <p className="mt-3 text-subdued">
           Puoi eliminare il tuo account Filo in qualsiasi momento direttamente
           dall&apos;app. L&apos;eliminazione è permanente e rimuove tutti i
           dati associati al tuo profilo.
@@ -58,7 +58,7 @@ export default function DeleteAccountPage() {
           <p className="text-sm font-semibold text-red-400">
             Cosa viene eliminato definitivamente:
           </p>
-          <ul className="mt-3 space-y-1.5 text-sm text-[#9ca3af]">
+          <ul className="mt-3 space-y-1.5 text-sm text-subdued">
             {[
               "Il tuo profilo e tutte le informazioni personali",
               "Tutte le raccomandazioni che hai pubblicato",
@@ -102,12 +102,12 @@ export default function DeleteAccountPage() {
               },
             ].map((step) => (
               <li key={step.n} className="flex gap-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/15 text-sm font-bold text-[#0D9488]">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
                   {step.n}
                 </div>
                 <div>
                   <p className="font-semibold text-white">{step.title}</p>
-                  <p className="mt-0.5 text-sm text-[#9ca3af]">{step.body}</p>
+                  <p className="mt-0.5 text-sm text-subdued">{step.body}</p>
                 </div>
               </li>
             ))}
@@ -115,8 +115,8 @@ export default function DeleteAccountPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-10 rounded-2xl border border-[#232340] bg-[#111111] p-6 text-center">
-          <p className="text-sm text-[#9ca3af]">
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6 text-center">
+          <p className="text-sm text-subdued">
             Hai già un account e vuoi eliminarlo adesso?
           </p>
           <Link
@@ -129,11 +129,11 @@ export default function DeleteAccountPage() {
 
         {/* Contact */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-[#6b7280]">
+          <p className="text-sm text-muted-foreground">
             Hai bisogno di aiuto?{" "}
             <a
               href="mailto:filo.networks@gmail.com"
-              className="text-[#0D9488] transition hover:underline"
+              className="text-primary transition hover:underline"
             >
               filo.networks@gmail.com
             </a>

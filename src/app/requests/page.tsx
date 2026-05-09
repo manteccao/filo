@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { BottomNav } from "@/components/BottomNav";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -69,28 +70,6 @@ type MyRec = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-violet-600 to-purple-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-emerald-600 to-teal-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-];
-
-function avatarColor(name: string) {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2)
-    .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
-}
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -167,17 +146,17 @@ function NewRequestSheet({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="rounded-t-3xl bg-[#111111] border-t border-[#1a1a1a] gap-0 p-0 flex flex-col"
+        className="rounded-t-3xl bg-card border-t border-border gap-0 p-0 flex flex-col"
         style={{ maxHeight: "85vh" }}
       >
         <SheetTitle className="sr-only">Nuova richiesta</SheetTitle>
 
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="h-1 w-10 rounded-full bg-[#374151]" />
+          <div className="h-1 w-10 rounded-full bg-surface-raised" />
         </div>
-        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-[#1a1a1a]">
+        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-border">
           <h3 className="text-sm font-semibold text-white">Nuova richiesta</h3>
-          <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="rounded-full p-1 text-[#6B7280] transition hover:text-white">
+          <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="rounded-full p-1 text-muted-foreground transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -190,33 +169,33 @@ function NewRequestSheet({
               <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</p>
             )}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">Cosa stai cercando?</label>
+              <label className="text-xs font-medium uppercase tracking-wider text-subdued">Cosa stai cercando?</label>
               <textarea
                 autoFocus
                 value={content}
                 onChange={(e) => setContent(e.target.value.slice(0, 200))}
                 rows={3}
                 placeholder="Es. Cerco un buon commercialista a Milano per la partita IVA…"
-                className="w-full resize-none rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-teal-500"
+                className="w-full resize-none rounded-2xl border border-border bg-background px-4 py-3 text-sm text-white placeholder:text-subdued outline-none transition focus:border-teal-500"
               />
-              <p className="text-right text-[11px] text-[#6B7280]">{content.length}/200</p>
+              <p className="text-right text-[11px] text-muted-foreground">{content.length}/200</p>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">Categoria</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value)} required className="h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white outline-none transition focus:border-teal-500">
-                <option value="" className="bg-[#111111]">Seleziona…</option>
-                {CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111111]">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+              <label className="text-xs font-medium uppercase tracking-wider text-subdued">Categoria</label>
+              <select value={category} onChange={(e) => setCategory(e.target.value)} required className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-sm text-white outline-none transition focus:border-teal-500">
+                <option value="" className="bg-card">Seleziona…</option>
+                {CATEGORIES.map((c) => <option key={c} value={c} className="bg-card">{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">Città</label>
-              <input value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Es. Milano" className="h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-teal-500" />
+              <label className="text-xs font-medium uppercase tracking-wider text-subdued">Città</label>
+              <input value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Es. Milano" className="h-12 w-full rounded-2xl border border-border bg-background px-4 text-sm text-white placeholder:text-subdued outline-none transition focus:border-teal-500" />
             </div>
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 type="submit"
                 disabled={saving || !content.trim() || !category || !city.trim()}
-                className="h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76] disabled:opacity-50"
+                className="h-12 w-full rounded-2xl bg-primary text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(13,148,136,0.3)] hover:bg-primary-hover disabled:opacity-50"
               >
                 {saving ? "Pubblicazione…" : "Pubblica richiesta"}
               </Button>
@@ -355,40 +334,40 @@ function RepliesSheet({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="rounded-t-3xl bg-[#111111] border-t border-[#1a1a1a] gap-0 p-0 flex flex-col"
+        className="rounded-t-3xl bg-card border-t border-border gap-0 p-0 flex flex-col"
         style={{ maxHeight: "80vh" }}
       >
         <SheetTitle className="sr-only">Risposte</SheetTitle>
 
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="h-1 w-10 rounded-full bg-[#374151]" />
+          <div className="h-1 w-10 rounded-full bg-surface-raised" />
         </div>
 
         {/* Original request header */}
-        <div className="shrink-0 px-5 py-3 border-b border-[#1a1a1a]">
+        <div className="shrink-0 px-5 py-3 border-b border-border">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <Avatar className={`bg-gradient-to-br ${avatarColor(authorName)} after:hidden`}>
-                <AvatarFallback className="bg-transparent text-white text-xs font-bold">{initials(authorName)}</AvatarFallback>
+                <AvatarFallback className="bg-transparent text-white text-xs font-bold">{avatarInitials(authorName)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-white">{authorName}</p>
-                <p className="mt-0.5 text-sm leading-relaxed text-[#D1D5DB]">{request.content}</p>
+                <p className="mt-0.5 text-sm leading-relaxed text-subdued">{request.content}</p>
                 <div className="mt-1.5 flex items-center gap-2">
                   <Badge className="rounded-full bg-teal-500/20 text-teal-400 border-0 text-[10px] px-2">
                     {request.category.charAt(0).toUpperCase() + request.category.slice(1)}
                   </Badge>
-                  <span className="text-[10px] text-[#6B7280]">{request.city}</span>
+                  <span className="text-[10px] text-muted-foreground">{request.city}</span>
                 </div>
               </div>
             </div>
-            <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="shrink-0 rounded-full p-1 text-[#6B7280] transition hover:text-white">
+            <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="shrink-0 rounded-full p-1 text-muted-foreground transition hover:text-white">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </motion.button>
           </div>
-          <p className="mt-2 text-xs font-semibold text-[#6B7280] uppercase tracking-wider">
+          <p className="mt-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             {replies.length} {replies.length === 1 ? "risposta" : "risposte"}
           </p>
         </div>
@@ -400,7 +379,7 @@ function RepliesSheet({
               <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
             </div>
           ) : replies.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[#6B7280]">Nessuna risposta ancora. Sii il primo!</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Nessuna risposta ancora. Sii il primo!</p>
           ) : (
             <div className="space-y-5">
               {replies.map((rep) => {
@@ -410,22 +389,22 @@ function RepliesSheet({
                 return (
                   <div key={rep.id} className="flex gap-3">
                     <Avatar className={`bg-gradient-to-br ${isDeleted ? "from-zinc-700 to-zinc-600" : avatarColor(name)} after:hidden`}>
-                      <AvatarFallback className="bg-transparent text-white text-xs font-bold">{isDeleted ? "·" : initials(name)}</AvatarFallback>
+                      <AvatarFallback className="bg-transparent text-white text-xs font-bold">{isDeleted ? "·" : avatarInitials(name)}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       {isDeleted ? (
-                        <p className="text-sm italic text-[#4b5563]">Risposta eliminata</p>
+                        <p className="text-sm italic text-muted-foreground">Risposta eliminata</p>
                       ) : (
                         <>
                           <div className="flex items-baseline justify-between gap-2">
                             <div className="flex items-baseline gap-2">
                               <span className="text-xs font-semibold text-white">{name}</span>
-                              <span className="text-[10px] text-[#6B7280]">{timeAgo(rep.created_at)}</span>
+                              <span className="text-[10px] text-muted-foreground">{timeAgo(rep.created_at)}</span>
                             </div>
                             {isOwn && (
                               confirmDeleteReplyId === rep.id ? (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[10px] text-[#6B7280]">Eliminare?</span>
+                                  <span className="text-[10px] text-muted-foreground">Eliminare?</span>
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteReply(rep.id)}
@@ -436,7 +415,7 @@ function RepliesSheet({
                                   <button
                                     type="button"
                                     onClick={() => setConfirmDeleteReplyId(null)}
-                                    className="text-[10px] text-[#6B7280] hover:text-white"
+                                    className="text-[10px] text-muted-foreground hover:text-white"
                                   >
                                     No
                                   </button>
@@ -445,7 +424,7 @@ function RepliesSheet({
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteReplyId(rep.id)}
-                                  className="shrink-0 text-[#3a3a3a] transition hover:text-red-400"
+                                  className="shrink-0 text-muted-foreground transition hover:text-red-400"
                                 >
                                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -454,11 +433,11 @@ function RepliesSheet({
                               )
                             )}
                           </div>
-                          <p className="mt-1 text-sm leading-relaxed text-[#D1D5DB]">{rep.content}</p>
+                          <p className="mt-1 text-sm leading-relaxed text-subdued">{rep.content}</p>
                           {rep.professional_name && (
-                            <div className="mt-2 rounded-xl border border-teal-900/40 bg-[#0a0a0a] px-3 py-2">
+                            <div className="mt-2 rounded-xl border border-teal-900/40 bg-background px-3 py-2">
                               <p className="text-xs font-semibold text-teal-400">{rep.professional_name}</p>
-                              <p className="text-[11px] text-[#6B7280]">{rep.rec_category} · {rep.rec_city}</p>
+                              <p className="text-[11px] text-muted-foreground">{rep.rec_category} · {rep.rec_city}</p>
                             </div>
                           )}
                         </>
@@ -472,13 +451,13 @@ function RepliesSheet({
         </div>
 
         {/* Reply input */}
-        <div className="shrink-0 border-t border-[#1a1a1a] px-4 py-3">
+        <div className="shrink-0 border-t border-border px-4 py-3">
           <form onSubmit={handlePost} className="space-y-2">
             {myRecs.length > 0 && (
-              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-xs text-white outline-none transition focus:border-teal-500">
-                <option value="" className="bg-[#111111]">Allega una tua raccomandazione (opzionale)</option>
+              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs text-white outline-none transition focus:border-teal-500">
+                <option value="" className="bg-card">Allega una tua raccomandazione (opzionale)</option>
                 {myRecs.map((r) => (
-                  <option key={r.id} value={r.id} className="bg-[#111111]">{r.professional_name} · {r.category} · {r.city}</option>
+                  <option key={r.id} value={r.id} className="bg-card">{r.professional_name} · {r.category} · {r.city}</option>
                 ))}
               </select>
             )}
@@ -490,9 +469,9 @@ function RepliesSheet({
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }}
                 rows={1}
                 placeholder="Scrivi una risposta..."
-                className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-teal-500"
+                className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white placeholder:text-subdued outline-none transition focus:border-teal-500"
               />
-              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D9488] text-white transition disabled:opacity-40">
+              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition disabled:opacity-40">
                 {posting ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 ) : (
@@ -544,25 +523,25 @@ function RequestCard({
       transition={{ duration: 0.3, delay: index * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       <Card
-        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] gap-0 py-0 shadow-none ring-0 cursor-pointer active:scale-[0.99] transition-transform"
+        className="rounded-[20px] border border-border bg-card gap-0 py-0 shadow-none ring-0 cursor-pointer active:scale-[0.99] transition-transform"
         onClick={onOpen}
       >
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Avatar className={`bg-gradient-to-br ${avatarColor(name)} after:hidden`}>
-              <AvatarFallback className="bg-transparent text-white text-xs font-bold">{initials(name)}</AvatarFallback>
+              <AvatarFallback className="bg-transparent text-white text-xs font-bold">{avatarInitials(name)}</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-[13px] font-semibold text-white truncate">{name}</p>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-[10px] text-[#6B7280]">{timeAgo(req.created_at)}</span>
+                  <span className="text-[10px] text-muted-foreground">{timeAgo(req.created_at)}</span>
                   {isOwner && (
                     <motion.button
                       type="button"
                       whileTap={{ scale: 0.85 }}
                       onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
-                      className="rounded-full p-1 text-[#6B7280] transition hover:text-red-400"
+                      className="rounded-full p-1 text-muted-foreground transition hover:text-red-400"
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -578,13 +557,13 @@ function RequestCard({
                 <Badge className="rounded-full bg-teal-500/20 text-teal-400 border-0 text-[10px] px-2.5">
                   {req.category.charAt(0).toUpperCase() + req.category.slice(1)}
                 </Badge>
-                <span className="flex items-center gap-1 text-[10px] text-[#6B7280]">
+                <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3 shrink-0">
                     <path fillRule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.003 3.5-4.697 3.5-8.333 0-4.36-3.515-7.498-7.5-7.498S4.5 7.64 4.5 12c0 3.636 1.556 6.33 3.5 8.333a19.583 19.583 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
                   </svg>
                   {req.city}
                 </span>
-                <span className="ml-auto flex items-center gap-1 text-[10px] text-[#6B7280]">
+                <span className="ml-auto flex items-center gap-1 text-[10px] text-muted-foreground">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
                   </svg>
@@ -670,11 +649,11 @@ export default function RequestsPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-[#0a0a0a] text-white">
-      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+    <div className="min-h-dvh bg-background text-white">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-12 max-w-[430px] items-center justify-between px-4">
           <span className="text-base font-bold text-white">Richieste</span>
-          <span className="text-xs text-[#6B7280]">Dalla tua rete</span>
+          <span className="text-xs text-muted-foreground">Dalla tua rete</span>
         </div>
       </header>
 
@@ -682,7 +661,7 @@ export default function RequestsPage() {
         <motion.div whileTap={{ scale: 0.97 }} className="mb-5">
           <Button
             onClick={() => setNewSheetOpen(true)}
-            className="h-12 w-full rounded-2xl bg-[#0D9488] text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(13,148,136,0.3)] hover:bg-[#0b7c76]"
+            className="h-12 w-full rounded-2xl bg-primary text-sm font-semibold text-white border-0 shadow-[0_0_24px_rgba(13,148,136,0.3)] hover:bg-primary-hover"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-5 w-5 mr-2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -694,32 +673,32 @@ export default function RequestsPage() {
         {loading ? (
           <div className="flex flex-col gap-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="animate-pulse rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
+              <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-4">
                 <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 shrink-0 rounded-full bg-[#1a1a1a]" />
+                  <div className="h-9 w-9 shrink-0 rounded-full bg-muted" />
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="h-3.5 w-24 rounded-full bg-[#1a1a1a]" />
-                      <div className="h-3 w-10 rounded-full bg-[#1a1a1a]" />
+                      <div className="h-3.5 w-24 rounded-full bg-muted" />
+                      <div className="h-3 w-10 rounded-full bg-muted" />
                     </div>
-                    <div className="h-3 w-full rounded-full bg-[#1a1a1a]" />
-                    <div className="h-3 w-4/5 rounded-full bg-[#1a1a1a]" />
+                    <div className="h-3 w-full rounded-full bg-muted" />
+                    <div className="h-3 w-4/5 rounded-full bg-muted" />
                     <div className="flex gap-2 pt-0.5">
-                      <div className="h-5 w-16 rounded-full bg-[#1a1a1a]" />
-                      <div className="h-5 w-14 rounded-full bg-[#1a1a1a]" />
+                      <div className="h-5 w-16 rounded-full bg-muted" />
+                      <div className="h-5 w-14 rounded-full bg-muted" />
                     </div>
                   </div>
                 </div>
                 <div className="mt-3 flex justify-end">
-                  <div className="h-7 w-24 rounded-full bg-[#1a1a1a]" />
+                  <div className="h-7 w-24 rounded-full bg-muted" />
                 </div>
               </div>
             ))}
           </div>
         ) : requests.length === 0 ? (
           <div className="py-16 text-center">
-            <p className="text-sm text-[#6B7280]">Nessuna richiesta ancora.</p>
-            <p className="mt-1 text-xs text-[#4B5563]">Sii il primo a chiedere alla tua rete.</p>
+            <p className="text-sm text-muted-foreground">Nessuna richiesta ancora.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Sii il primo a chiedere alla tua rete.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">

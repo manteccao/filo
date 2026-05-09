@@ -4,28 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 
 import { createClient } from "@/lib/supabase/browser";
-
-const AVATAR_COLORS = [
-  "bg-violet-600",
-  "bg-blue-600",
-  "bg-emerald-600",
-  "bg-rose-600",
-  "bg-amber-600",
-  "bg-cyan-600",
-  "bg-pink-600",
-  "bg-indigo-600",
-];
-
-function avatarColor(name: string): string {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "U";
-}
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 export function AvatarUpload({
   userId,
@@ -89,7 +68,7 @@ export function AvatarUpload({
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
-        className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl ring-2 ring-[#8B5CF6]/60 transition hover:ring-[#8B5CF6] active:scale-95 ${color}`}
+        className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl ring-2 ring-violet/60 transition hover:ring-violet active:scale-95 bg-gradient-to-br ${color}`}
         aria-label="Cambia foto profilo"
       >
         {avatarUrl ? (
@@ -102,7 +81,7 @@ export function AvatarUpload({
           />
         ) : (
           <span className="flex h-full w-full items-center justify-center text-lg font-bold text-white">
-            {initials(fullName)}
+            {avatarInitials(fullName)}
           </span>
         )}
 

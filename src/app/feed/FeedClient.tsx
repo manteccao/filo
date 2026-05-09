@@ -139,7 +139,7 @@ function ConnectionBadge({ userId, followingIds, secondDegreeIds }: {
 }) {
   if (followingIds.includes(userId)) {
     return (
-      <span className="rounded-full bg-[#0D9488]/15 px-2 py-[3px] text-[11px] font-medium text-[#0D9488]">
+      <span className="rounded-full bg-primary/15 px-2 py-[3px] text-[11px] font-medium text-primary">
         1° grado
       </span>
     );
@@ -152,7 +152,7 @@ function ConnectionBadge({ userId, followingIds, secondDegreeIds }: {
     );
   }
   return (
-    <span className="rounded-full bg-[#1F2937] px-2 py-[3px] text-[11px] font-medium text-[#6b7280]">
+    <span className="rounded-full bg-muted px-2 py-[3px] text-[11px] font-medium text-muted-foreground">
       Community
     </span>
   );
@@ -285,11 +285,11 @@ function RequestRepliesSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl bg-[#111111] border-t border-[#1a1a1a] gap-0 p-0 flex flex-col" style={{ maxHeight: "80vh" }}>
+      <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl bg-card border-t border-border gap-0 p-0 flex flex-col" style={{ maxHeight: "80vh" }}>
         <SheetTitle className="sr-only">Risposte alla richiesta</SheetTitle>
-        <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-[#2a2a2a]" /></div>
+        <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-surface-raised" /></div>
 
-        <div className="shrink-0 px-5 py-3 border-b border-[#1a1a1a]">
+        <div className="shrink-0 px-5 py-3 border-b border-border">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(authorName)}`}>
@@ -297,27 +297,27 @@ function RequestRepliesSheet({
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-white">{authorName}</p>
-                <p className="mt-0.5 text-sm leading-relaxed text-[#9CA3AF]">{request.content}</p>
+                <p className="mt-0.5 text-sm leading-relaxed text-subdued">{request.content}</p>
                 <div className="mt-1.5 flex items-center gap-2">
-                  <span className="rounded-full bg-[#0D9488]/15 px-2.5 py-[3px] text-[10px] text-[#0D9488]">
+                  <span className="rounded-full bg-primary/15 px-2.5 py-[3px] text-[10px] text-primary">
                     {capitalize(request.category)}
                   </span>
-                  <span className="text-[10px] text-[#6b7280]">{request.city}</span>
+                  <span className="text-[10px] text-muted-foreground">{request.city}</span>
                 </div>
               </div>
             </div>
-            <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="shrink-0 rounded-full p-1 text-[#6b7280] transition hover:text-white">
+            <motion.button type="button" whileTap={{ scale: 0.9 }} onClick={() => onOpenChange(false)} className="shrink-0 rounded-full p-1 text-muted-foreground transition hover:text-white">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             </motion.button>
           </div>
-          <p className="mt-2 text-xs font-semibold text-[#6b7280] uppercase tracking-wider">{replies.length} {replies.length === 1 ? "risposta" : "risposte"}</p>
+          <p className="mt-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{replies.length} {replies.length === 1 ? "risposta" : "risposte"}</p>
         </div>
 
         <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
           {loading ? (
-            <div className="flex justify-center py-10"><div className="h-5 w-5 animate-spin rounded-full border-2 border-[#0D9488] border-t-transparent" /></div>
+            <div className="flex justify-center py-10"><div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" /></div>
           ) : replies.length === 0 ? (
-            <p className="py-8 text-center text-sm text-[#6b7280]">Nessuna risposta ancora. Sii il primo!</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">Nessuna risposta ancora. Sii il primo!</p>
           ) : (
             <div className="space-y-5">
               {replies.map((rep) => {
@@ -330,13 +330,13 @@ function RequestRepliesSheet({
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xs font-semibold text-white">{name}</span>
-                        <span className="text-[10px] text-[#6b7280]">{timeAgo(rep.created_at)}</span>
+                        <span className="text-[10px] text-muted-foreground">{timeAgo(rep.created_at)}</span>
                       </div>
-                      <p className="mt-1 text-sm leading-relaxed text-[#9CA3AF]">{rep.content}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-subdued">{rep.content}</p>
                       {rep.professional_name && (
-                        <div className="mt-2 rounded-xl border border-[#0D9488]/20 bg-[#0a0a0a] px-3 py-2">
-                          <p className="text-xs font-semibold text-[#0D9488]">{rep.professional_name}</p>
-                          <p className="text-[11px] text-[#6b7280]">{rep.rec_category} · {rep.rec_city}</p>
+                        <div className="mt-2 rounded-xl border border-primary/20 bg-background px-3 py-2">
+                          <p className="text-xs font-semibold text-primary">{rep.professional_name}</p>
+                          <p className="text-[11px] text-muted-foreground">{rep.rec_category} · {rep.rec_city}</p>
                         </div>
                       )}
                     </div>
@@ -347,17 +347,17 @@ function RequestRepliesSheet({
           )}
         </div>
 
-        <div className="shrink-0 border-t border-[#1a1a1a] px-4 py-3">
+        <div className="shrink-0 border-t border-border px-4 py-3">
           <form onSubmit={handlePost} className="space-y-2">
             {myRecs.length > 0 && (
-              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-xs text-white outline-none transition focus:border-[#0D9488]">
-                <option value="" className="bg-[#111111]">Allega una tua raccomandazione (opzionale)</option>
-                {myRecs.map((r) => <option key={r.id} value={r.id} className="bg-[#111111]">{r.professional_name} · {r.category} · {r.city}</option>)}
+              <select value={selectedRec} onChange={(e) => setSelectedRec(e.target.value)} className="h-9 w-full rounded-xl border border-border bg-background px-3 text-xs text-white outline-none transition focus:border-primary">
+                <option value="" className="bg-card">Allega una tua raccomandazione (opzionale)</option>
+                {myRecs.map((r) => <option key={r.id} value={r.id} className="bg-card">{r.professional_name} · {r.category} · {r.city}</option>)}
               </select>
             )}
             <div className="flex items-end gap-2">
-              <textarea autoFocus value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }} rows={1} placeholder="Scrivi una risposta..." className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]" />
-              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D9488] text-white transition disabled:opacity-40">
+              <textarea autoFocus value={text} onChange={(e) => setText(e.target.value.slice(0, 500))} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }} rows={1} placeholder="Scrivi una risposta..." className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary" />
+              <motion.button type="submit" disabled={!text.trim() || posting} whileTap={{ scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition disabled:opacity-40">
                 {posting ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4"><path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>}
               </motion.button>
             </div>
@@ -496,22 +496,22 @@ function CommentsSheet({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="rounded-t-3xl bg-[#111111] border-t border-[#1a1a1a] gap-0 p-0 flex flex-col"
+        className="rounded-t-3xl bg-card border-t border-border gap-0 p-0 flex flex-col"
         style={{ maxHeight: "75vh" }}
       >
         <SheetTitle className="sr-only">Commenti</SheetTitle>
 
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="h-1 w-10 rounded-full bg-[#2a2a2a]" />
+          <div className="h-1 w-10 rounded-full bg-surface-raised" />
         </div>
 
-        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-[#1a1a1a]">
+        <div className="flex shrink-0 items-center justify-between px-5 py-3 border-b border-border">
           <h3 className="text-sm font-semibold text-white">Commenti</h3>
           <motion.button
             type="button"
             whileTap={{ scale: 0.9 }}
             onClick={() => onOpenChange(false)}
-            className="rounded-full p-1 text-[#6b7280] transition hover:text-white"
+            className="rounded-full p-1 text-muted-foreground transition hover:text-white"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -522,10 +522,10 @@ function CommentsSheet({
         <div ref={listRef} className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
           {loading ? (
             <div className="flex justify-center py-10">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#0D9488] border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             </div>
           ) : comments.length === 0 ? (
-            <p className="py-10 text-center text-sm text-[#6b7280]">Nessun commento ancora. Sii il primo!</p>
+            <p className="py-10 text-center text-sm text-muted-foreground">Nessun commento ancora. Sii il primo!</p>
           ) : (
             <div className="space-y-5">
               {comments.map((c) => {
@@ -539,18 +539,18 @@ function CommentsSheet({
                     </div>
                     <div className="min-w-0 flex-1">
                       {isDeleted ? (
-                        <p className="text-sm italic text-[#4b5563]">Commento eliminato</p>
+                        <p className="text-sm italic text-muted-foreground">Commento eliminato</p>
                       ) : (
                         <>
                           <div className="flex items-baseline justify-between gap-2">
                             <div className="flex items-baseline gap-2">
                               <span className="text-xs font-semibold text-white">{name}</span>
-                              <span className="text-[10px] text-[#6b7280]">{timeAgo(c.created_at)}</span>
+                              <span className="text-[10px] text-muted-foreground">{timeAgo(c.created_at)}</span>
                             </div>
                             {isOwn && (
                               confirmDeleteId === c.id ? (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[10px] text-[#6b7280]">Eliminare?</span>
+                                  <span className="text-[10px] text-muted-foreground">Eliminare?</span>
                                   <button
                                     type="button"
                                     onClick={() => handleDeleteComment(c.id)}
@@ -561,7 +561,7 @@ function CommentsSheet({
                                   <button
                                     type="button"
                                     onClick={() => setConfirmDeleteId(null)}
-                                    className="text-[10px] text-[#6b7280] hover:text-white"
+                                    className="text-[10px] text-muted-foreground hover:text-white"
                                   >
                                     No
                                   </button>
@@ -570,7 +570,7 @@ function CommentsSheet({
                                 <button
                                   type="button"
                                   onClick={() => setConfirmDeleteId(c.id)}
-                                  className="shrink-0 text-[#3a3a3a] transition hover:text-red-400"
+                                  className="shrink-0 text-muted-foreground transition hover:text-red-400"
                                 >
                                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
@@ -579,7 +579,7 @@ function CommentsSheet({
                               )
                             )}
                           </div>
-                          <p className="mt-1 text-sm leading-relaxed text-[#9CA3AF]">{c.content}</p>
+                          <p className="mt-1 text-sm leading-relaxed text-subdued">{c.content}</p>
                         </>
                       )}
                     </div>
@@ -590,7 +590,7 @@ function CommentsSheet({
           )}
         </div>
 
-        <div className="shrink-0 border-t border-[#1a1a1a] px-4 py-3">
+        <div className="shrink-0 border-t border-border px-4 py-3">
           <form onSubmit={handlePost} className="flex items-end gap-2">
             <textarea
               autoFocus
@@ -599,13 +599,13 @@ function CommentsSheet({
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handlePost(e as unknown as React.FormEvent); } }}
               rows={1}
               placeholder="Scrivi un commento..."
-              className="flex-1 resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-2.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
+              className="flex-1 resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary"
             />
             <motion.button
               type="submit"
               disabled={!text.trim() || posting}
               whileTap={{ scale: 0.9 }}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#0D9488] text-white transition disabled:opacity-40"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white transition disabled:opacity-40"
             >
               {posting ? (
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -640,18 +640,18 @@ function FeedRequestCard({ r, followingIds, secondDegreeIds, currentUserId, inde
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-4"
+        className="rounded-[20px] border border-border bg-card p-4"
       >
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/20">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-[#0D9488]">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/20">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-5 w-5 text-primary">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
             </svg>
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-[15px] font-bold text-white truncate">{name}</p>
-            <p className="text-[12px] text-[#6b7280]">sta cercando…</p>
+            <p className="text-[12px] text-muted-foreground">sta cercando…</p>
           </div>
           <ConnectionBadge userId={r.user_id} followingIds={followingIds} secondDegreeIds={secondDegreeIds} />
         </div>
@@ -661,23 +661,23 @@ function FeedRequestCard({ r, followingIds, secondDegreeIds, currentUserId, inde
 
         {/* Badges */}
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-[#0D9488]/15 px-[10px] py-[4px] text-[11px] text-[#0D9488]">
+          <span className="rounded-full bg-primary/15 px-[10px] py-[4px] text-[11px] text-primary">
             {capitalize(r.category)}
           </span>
-          <span className="rounded-full bg-[#1F2937] px-[10px] py-[4px] text-[11px] text-[#9CA3AF]">
+          <span className="rounded-full bg-muted px-[10px] py-[4px] text-[11px] text-subdued">
             {capitalize(r.city)}
           </span>
         </div>
 
         {/* Divider */}
-        <div className="my-3 h-px bg-[#1a1a1a]" />
+        <div className="my-3 h-px bg-muted" />
 
         {/* Action */}
         <motion.button
           type="button"
           whileTap={{ scale: 0.96 }}
           onClick={() => setRepliesOpen(true)}
-          className="flex h-11 items-center gap-1.5 rounded-full bg-[#0D9488]/20 px-4 text-[13px] font-semibold text-[#0D9488] transition hover:bg-[#0D9488]/30"
+          className="flex h-11 items-center gap-1.5 rounded-full bg-primary/20 px-4 text-[13px] font-semibold text-primary transition hover:bg-primary/30"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
@@ -808,28 +808,28 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
   // Edit form
   if (editing) {
     return (
-      <div className="rounded-[20px] bg-[#111111] p-4">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[#0D9488]">Modifica raccomandazione</p>
+      <div className="rounded-[20px] bg-card p-4">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-primary">Modifica raccomandazione</p>
         <form onSubmit={handleSave} className="space-y-3">
-          <input value={draft.professional_name} onChange={(e) => setDraft({ ...draft, professional_name: e.target.value })} required placeholder="Nome professionista" className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
+          <input value={draft.professional_name} onChange={(e) => setDraft({ ...draft, professional_name: e.target.value })} required placeholder="Nome professionista" className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-subdued outline-none focus:border-primary" />
           <div className="grid grid-cols-2 gap-3">
-            <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="h-11 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white outline-none focus:border-[#0D9488]">
-              {EDIT_CATEGORIES.map((c) => <option key={c} value={c} className="bg-[#111111]">{capitalize(c)}</option>)}
+            <select value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="h-11 rounded-xl border border-border bg-background px-3 text-sm text-white outline-none focus:border-primary">
+              {EDIT_CATEGORIES.map((c) => <option key={c} value={c} className="bg-card">{capitalize(c)}</option>)}
             </select>
-            <input value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required placeholder="Città" className="h-11 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
+            <input value={draft.city} onChange={(e) => setDraft({ ...draft, city: e.target.value })} required placeholder="Città" className="h-11 rounded-xl border border-border bg-background px-3 text-sm text-white placeholder:text-subdued outline-none focus:border-primary" />
           </div>
-          <input value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} placeholder="Indirizzo o zona (opzionale)" className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
-          <select value={draft.price_range} onChange={(e) => setDraft({ ...draft, price_range: e.target.value })} className="h-11 w-full rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-3 text-sm text-white outline-none focus:border-[#0D9488]">
-            <option value="" className="bg-[#111111]">Fascia di prezzo (opzionale)</option>
-            <option value="€" className="bg-[#111111]">€ — Economico</option>
-            <option value="€€" className="bg-[#111111]">€€ — Nella media</option>
-            <option value="€€€" className="bg-[#111111]">€€€ — Premium</option>
+          <input value={draft.address} onChange={(e) => setDraft({ ...draft, address: e.target.value })} placeholder="Indirizzo o zona (opzionale)" className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-white placeholder:text-subdued outline-none focus:border-primary" />
+          <select value={draft.price_range} onChange={(e) => setDraft({ ...draft, price_range: e.target.value })} className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm text-white outline-none focus:border-primary">
+            <option value="" className="bg-card">Fascia di prezzo (opzionale)</option>
+            <option value="€" className="bg-card">€ — Economico</option>
+            <option value="€€" className="bg-card">€€ — Nella media</option>
+            <option value="€€€" className="bg-card">€€€ — Premium</option>
           </select>
-          <textarea value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value.slice(0, 300) })} rows={4} placeholder="Nota personale" className="w-full resize-none rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none focus:border-[#0D9488]" />
+          <textarea value={draft.note} onChange={(e) => setDraft({ ...draft, note: e.target.value.slice(0, 300) })} rows={4} placeholder="Nota personale" className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-white placeholder:text-subdued outline-none focus:border-primary" />
           <div className="flex gap-3 pt-1">
-            <Button type="button" variant="outline" onClick={() => setEditing(false)} className="h-11 flex-1 rounded-xl border-[#1a1a1a] bg-transparent text-sm text-white">Annulla</Button>
+            <Button type="button" variant="outline" onClick={() => setEditing(false)} className="h-11 flex-1 rounded-xl border-border bg-transparent text-sm text-white">Annulla</Button>
             <motion.div whileTap={{ scale: 0.97 }} className="flex-1">
-              <Button type="submit" disabled={saving} className="h-11 w-full rounded-xl bg-[#0D9488] text-sm font-semibold text-white border-0 hover:bg-[#0b8076] disabled:opacity-50">
+              <Button type="submit" disabled={saving} className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-white border-0 hover:bg-primary-hover disabled:opacity-50">
                 {saving ? "Salvataggio…" : "Salva modifiche"}
               </Button>
             </motion.div>
@@ -848,11 +848,11 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, delay: index * 0.06, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-5"
+        className="rounded-[20px] border border-border bg-card p-5"
       >
         {/* Header row */}
         <div className="flex items-center gap-3">
-          <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-[#0D9488]/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
+          <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-primary/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
             {r.profile?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={r.profile.avatar_url} alt={recommenderName} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover" />
@@ -862,14 +862,14 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
           </Link>
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-1.5">
-              <Link href={profileHref} className="truncate text-[15px] font-bold text-white transition hover:text-[#0D9488]">{recommenderName}</Link>
+              <Link href={profileHref} className="truncate text-[15px] font-bold text-white transition hover:text-primary">{recommenderName}</Link>
               {r.profile?.account_type === "professional" && (
-                <span className="shrink-0 rounded-full bg-[#0D9488]/15 px-1.5 py-[2px] text-[10px] font-semibold text-[#0D9488]">
+                <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-[2px] text-[10px] font-semibold text-primary">
                   Pro
                 </span>
               )}
             </div>
-            {metaLine && <p className="text-[12px] text-[#6b7280] truncate">{metaLine}</p>}
+            {metaLine && <p className="text-[12px] text-muted-foreground truncate">{metaLine}</p>}
           </div>
           <div className="flex items-center gap-2">
             <ConnectionBadge userId={r.user_id} followingIds={followingIds} secondDegreeIds={secondDegreeIds} />
@@ -882,7 +882,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                   aria-label="Altre opzioni"
                   aria-expanded={menuOpen}
                   aria-haspopup="menu"
-                  className="flex h-11 w-11 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition hover:text-white"
                 >
                   <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
                     <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
@@ -895,15 +895,15 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.92, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-8 z-10 min-w-[130px] overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] shadow-2xl"
+                      className="absolute right-0 top-8 z-10 min-w-[130px] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
                     >
-                      <button type="button" onClick={() => { setMenuOpen(false); setEditing(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-white hover:bg-[#111111]">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4 text-[#0D9488]">
+                      <button type="button" onClick={() => { setMenuOpen(false); setEditing(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-white hover:bg-card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4 text-primary">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
                         </svg>
                         Modifica
                       </button>
-                      <button type="button" onClick={() => { setMenuOpen(false); setConfirming(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-[#111111]">
+                      <button type="button" onClick={() => { setMenuOpen(false); setConfirming(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-card">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                         </svg>
@@ -922,7 +922,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                   aria-label="Altre opzioni"
                   aria-expanded={reportMenuOpen}
                   aria-haspopup="menu"
-                  className="flex h-11 w-11 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition hover:text-white"
                 >
                   <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
                     <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
@@ -935,9 +935,9 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.92, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-8 z-10 min-w-[160px] overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] shadow-2xl"
+                      className="absolute right-0 top-8 z-10 min-w-[160px] overflow-hidden rounded-2xl border border-border bg-background shadow-2xl"
                     >
-                      <button type="button" onClick={() => { setReportMenuOpen(false); setReportOpen(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-[#111111]">
+                      <button type="button" onClick={() => { setReportMenuOpen(false); setReportOpen(true); }} className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-red-400 hover:bg-card">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-4 w-4 shrink-0">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 3l1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 011.743-1.342 48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664L19.5 19.5" />
                         </svg>
@@ -952,7 +952,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         </div>
 
         {/* Professional name */}
-        <Link href={`/pro/${toProSlug(r.professional_name)}`} className="mt-4 block text-[20px] font-extrabold tracking-tight text-white transition hover:text-[#0D9488]">
+        <Link href={`/pro/${toProSlug(r.professional_name)}`} className="mt-4 block text-[20px] font-extrabold tracking-tight text-white transition hover:text-primary">
           {r.professional_name}
         </Link>
 
@@ -961,7 +961,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
           <span className="rounded-full bg-teal-500/15 px-[10px] py-[4px] text-[11px] font-semibold text-teal-300">
             {capitalize(r.category)}
           </span>
-          <span className="rounded-full bg-[#1a1a1a] px-[10px] py-[4px] text-[11px] font-medium text-[#9CA3AF]">
+          <span className="rounded-full bg-muted px-[10px] py-[4px] text-[11px] font-medium text-subdued">
             {capitalize(r.city)}
           </span>
           {r.price_range && (
@@ -977,7 +977,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
 
         {/* Address */}
         {r.address && (
-          <p className="mt-2 flex items-center gap-1.5 text-[12px] text-[#6b7280]">
+          <p className="mt-2 flex items-center gap-1.5 text-[12px] text-muted-foreground">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3 w-3 shrink-0">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
@@ -987,14 +987,14 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         )}
 
         {/* Note */}
-        {r.note && <p className="mt-3 text-[14px] leading-[1.7] text-[#9CA3AF]">{r.note}</p>}
+        {r.note && <p className="mt-3 text-[14px] leading-[1.7] text-subdued">{r.note}</p>}
 
         {/* Delete confirm */}
         {confirming && (
           <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3">
             <p className="text-xs text-red-300">Eliminare questa raccomandazione?</p>
             <div className="mt-2 flex gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => setConfirming(false)} className="flex-1 h-8 rounded-lg border-[#1a1a1a] bg-transparent text-xs text-white">Annulla</Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setConfirming(false)} className="flex-1 h-8 rounded-lg border-border bg-transparent text-xs text-white">Annulla</Button>
               <Button type="button" size="sm" onClick={handleDelete} disabled={deleting} className="flex-1 h-8 rounded-lg bg-red-500 text-xs font-semibold text-white border-0 hover:bg-red-600 disabled:opacity-50">
                 {deleting ? "…" : "Elimina"}
               </Button>
@@ -1003,7 +1003,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
         )}
 
         {/* Divider */}
-        <div className="my-4 h-px bg-[#1a1a1a]" />
+        <div className="my-4 h-px bg-muted" />
 
         {/* Actions */}
         <div className="flex items-center gap-5">
@@ -1026,11 +1026,11 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
               initial={liked ? { scale: 0.6 } : false}
               animate={liked ? { scale: 1 } : {}}
               transition={{ type: "spring", stiffness: 500, damping: 15 }}
-              className={`h-[22px] w-[22px] ${liked ? "fill-red-500 text-red-500" : "fill-none text-[#6b7280]"}`}
+              className={`h-[22px] w-[22px] ${liked ? "fill-red-500 text-red-500" : "fill-none text-muted-foreground"}`}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </motion.svg>
-            <span aria-hidden="true" className={`text-[13px] font-semibold ${liked ? "text-red-500" : "text-[#6b7280]"}`}>{likesCount > 0 ? likesCount : ""}</span>
+            <span aria-hidden="true" className={`text-[13px] font-semibold ${liked ? "text-red-500" : "text-muted-foreground"}`}>{likesCount > 0 ? likesCount : ""}</span>
           </motion.button>
 
           {/* Comment */}
@@ -1041,10 +1041,10 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             aria-label={commentsCount > 0 ? `Commenti, ${commentsCount}` : "Commenta"}
             className="flex min-h-[44px] items-center gap-2"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[22px] w-[22px] text-[#6b7280]">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-[22px] w-[22px] text-muted-foreground">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 01-.923 1.785A5.969 5.969 0 006 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337z" />
             </svg>
-            <span aria-hidden="true" className="text-[13px] font-semibold text-[#6b7280]">{commentsCount > 0 ? commentsCount : ""}</span>
+            <span aria-hidden="true" className="text-[13px] font-semibold text-muted-foreground">{commentsCount > 0 ? commentsCount : ""}</span>
           </motion.button>
 
           {/* Share */}
@@ -1055,10 +1055,10 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             aria-label={copied ? "Link copiato!" : "Condividi"}
             className="flex min-h-[44px] items-center gap-2"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition ${copied ? "text-primary" : "text-muted-foreground"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25H15m0-3l-3-3m0 0l-3 3m3-3V15" />
             </svg>
-            <span aria-hidden="true" className={`text-[13px] font-semibold transition ${copied ? "text-[#0D9488]" : "text-[#6b7280]"}`}>{copied ? "Copiato!" : ""}</span>
+            <span aria-hidden="true" className={`text-[13px] font-semibold transition ${copied ? "text-primary" : "text-muted-foreground"}`}>{copied ? "Copiato!" : ""}</span>
           </motion.button>
 
           {/* Spacer + bookmark */}
@@ -1072,7 +1072,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
             aria-pressed={saved}
             className="flex min-h-[44px] min-w-[44px] items-center justify-center disabled:opacity-60"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition-colors ${saved ? "text-[#0D9488]" : "text-[#6b7280]"}`}>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill={saved ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.8} className={`h-[22px] w-[22px] transition-colors ${saved ? "text-primary" : "text-muted-foreground"}`}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </motion.button>
@@ -1140,10 +1140,10 @@ export function FeedClient({
 
   return (
     <MotionConfig reducedMotion="user">
-    <div className="min-h-dvh bg-[#0a0a0a] text-white">
+    <div className="min-h-dvh bg-background text-white">
 
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[430px] items-center justify-between px-4 py-4">
           <div className="w-10" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1152,7 +1152,7 @@ export function FeedClient({
             type="button"
             onClick={() => setNotifsOpen(true)}
             aria-label={unreadCount > 0 ? `Notifiche, ${unreadCount} non lette` : "Notifiche"}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition hover:text-white"
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -1168,7 +1168,7 @@ export function FeedClient({
 
       {/* Filter tabs — slide indicator */}
       <div className="mx-auto max-w-[430px] px-4 pb-3 pt-4">
-        <div role="tablist" aria-label="Filtro raccomandazioni" className="flex rounded-full bg-[#111111] p-1">
+        <div role="tablist" aria-label="Filtro raccomandazioni" className="flex rounded-full bg-card p-1">
           {(["tutti", "seguiti"] as const).map((m) => (
             <button
               key={m}
@@ -1184,11 +1184,11 @@ export function FeedClient({
                 <motion.div
                   aria-hidden="true"
                   layoutId="feed-tab-bg"
-                  className="absolute inset-0 rounded-full bg-[#0D9488]"
+                  className="absolute inset-0 rounded-full bg-primary"
                   transition={{ type: "spring", stiffness: 500, damping: 35 }}
                 />
               )}
-              <span className={`relative z-10 transition-colors duration-200 ${mode === m ? "text-white" : "text-[#6b7280]"}`}>
+              <span className={`relative z-10 transition-colors duration-200 ${mode === m ? "text-white" : "text-muted-foreground"}`}>
                 {m === "tutti" ? "Tutti" : "Seguiti"}
               </span>
             </button>
@@ -1207,15 +1207,15 @@ export function FeedClient({
       >
         {items.length === 0 ? (
           <div className="flex flex-col items-center gap-4 py-20 text-center">
-            <p className="text-sm text-[#9CA3AF]">Nessuna raccomandazione ancora.</p>
+            <p className="text-sm text-subdued">Nessuna raccomandazione ancora.</p>
             <motion.div whileTap={{ scale: 0.97 }}>
-              <Link href="/add" className="inline-flex h-12 items-center gap-2 rounded-2xl bg-[#0D9488] px-6 text-sm font-semibold text-white">
+              <Link href="/add" className="inline-flex h-12 items-center gap-2 rounded-2xl bg-primary px-6 text-sm font-semibold text-white">
                 Aggiungi la prima
               </Link>
             </motion.div>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-sm text-[#9CA3AF]">Nessun contenuto da chi segui.</div>
+          <div className="py-20 text-center text-sm text-subdued">Nessun contenuto da chi segui.</div>
         ) : (
           <ul className="flex flex-col gap-3">
             {filtered.map((item, i) =>

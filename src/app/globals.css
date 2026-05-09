@@ -45,6 +45,13 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* ── Filo design tokens ─────────────────────────────────────────────────── */
+  --color-surface-raised: var(--surface-raised);
+  --color-subdued: var(--subdued);
+  --color-primary-hover: var(--primary-hover);
+  --color-violet: var(--violet);
+  --color-whatsapp: var(--whatsapp);
+  --color-whatsapp-hover: var(--whatsapp-hover);
 }
 
 body {
@@ -61,33 +68,46 @@ body {
 
 /* Always dark — app has no light mode */
 :root {
-  --background: #0d0d17;
+  /* ── Base tokens (aligned with actual Filo dark theme) ─────────────────── */
+  --background: #0a0a0a;
   --foreground: #ffffff;
-  --card: #16162a;
+  --card: #111111;
   --card-foreground: #ffffff;
-  --popover: #16162a;
+  --popover: #111111;
   --popover-foreground: #ffffff;
   --primary: #0d9488;
   --primary-foreground: #ffffff;
-  --secondary: #232340;
+  --secondary: #1a1a1a;
   --secondary-foreground: #ffffff;
-  --muted: #232340;
-  --muted-foreground: #8b8fa8;
-  --accent: #232340;
+  --muted: #1a1a1a;
+  --muted-foreground: #6b7280;
+  --accent: #1a1a1a;
   --accent-foreground: #ffffff;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: #232340;
-  --input: #232340;
+  --border: #1a1a1a;
+  --input: #1a1a1a;
   --ring: #0d9488;
   --radius: 0.625rem;
-  --sidebar: #16162a;
+  --sidebar: #111111;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #0d9488;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #232340;
+  --sidebar-accent: #1a1a1a;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #232340;
+  --sidebar-border: #1a1a1a;
   --sidebar-ring: #0d9488;
+
+  /* ── Filo design tokens ─────────────────────────────────────────────────── */
+  /* Surfaces */
+  --surface-raised: #2a2a2a;   /* drawer handles, modal inner elements */
+  /* Text */
+  --subdued: #9ca3af;          /* secondary text (lighter than muted-foreground) */
+  /* Accent states */
+  --primary-hover: #0b7c76;    /* teal hover state */
+  /* Brand colors */
+  --violet: #8b5cf6;           /* requests/invites accent */
+  --whatsapp: #25d366;
+  --whatsapp-hover: #1ebe5d;
 }
 
 @layer base {

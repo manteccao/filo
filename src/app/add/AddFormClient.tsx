@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { addRecommendation } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 const CATEGORIES = [
   "dentista", "medico di base", "pediatra", "dermatologo", "oculista",
@@ -29,21 +30,6 @@ type ProfessionalResult = {
   work_address: string | null;
 };
 
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
-}
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500", "from-blue-600 to-indigo-500",
-  "from-violet-600 to-purple-500", "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500", "from-emerald-600 to-teal-500",
-];
-function avatarColor(id: string) {
-  let h = 0;
-  for (const c of id) h = (h * 31 + c.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
-}
-
 export function AddFormClient({ userId }: { userId: string }) {
   const [state, formAction, pending] = useActionState(addRecommendation, null);
 
@@ -63,8 +49,8 @@ export function AddFormClient({ userId }: { userId: string }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const inputCls = "h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
-  const labelCls = "text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]";
+  const inputCls = "h-12 w-full rounded-2xl border border-border bg-card px-4 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary";
+  const labelCls = "text-[11px] font-semibold uppercase tracking-widest text-muted-foreground";
 
   // Debounced search
   useEffect(() => {
@@ -169,7 +155,7 @@ export function AddFormClient({ userId }: { userId: string }) {
               <button
                 type="button"
                 onClick={clearSelection}
-                className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full text-[#6b7280] transition hover:text-white"
+                className="absolute right-3 flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground transition hover:text-white"
                 aria-label="Cancella"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
@@ -181,7 +167,7 @@ export function AddFormClient({ userId }: { userId: string }) {
 
           {/* Dropdown */}
           {showDropdown && !selected && (
-            <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 overflow-hidden rounded-2xl border border-[#1a1a1a] bg-[#111111] shadow-2xl">
+            <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
               {results.length > 0 ? (
                 <>
                   {results.map((prof) => (
@@ -189,7 +175,7 @@ export function AddFormClient({ userId }: { userId: string }) {
                       key={prof.id}
                       type="button"
                       onMouseDown={(e) => { e.preventDefault(); selectProfessional(prof); }}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#111111]"
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-card"
                     >
                       {/* Avatar */}
                       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(prof.id)} text-xs font-bold text-white overflow-hidden`}>
@@ -197,13 +183,13 @@ export function AddFormClient({ userId }: { userId: string }) {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={prof.avatar_url} alt={prof.full_name ?? ""} className="h-full w-full object-cover" />
                         ) : (
-                          initials(prof.full_name ?? "?")
+                          avatarInitials(prof.full_name ?? "?")
                         )}
                       </div>
                       {/* Info */}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-white">{prof.full_name}</p>
-                        <p className="truncate text-[11px] text-[#6b7280]">
+                        <p className="truncate text-[11px] text-muted-foreground">
                           {prof.city ?? ""}
                         </p>
                       </div>
@@ -213,11 +199,11 @@ export function AddFormClient({ userId }: { userId: string }) {
                       </span>
                     </button>
                   ))}
-                  <div className="border-t border-[#1a1a1a] px-4 py-2.5">
+                  <div className="border-t border-border px-4 py-2.5">
                     <button
                       type="button"
                       onMouseDown={(e) => { e.preventDefault(); setShowDropdown(false); }}
-                      className="text-xs text-[#6b7280] transition hover:text-white"
+                      className="text-xs text-muted-foreground transition hover:text-white"
                     >
                       Non è su Filo — continua con questo nome
                     </button>
@@ -225,11 +211,11 @@ export function AddFormClient({ userId }: { userId: string }) {
                 </>
               ) : searched ? (
                 <div className="px-4 py-4">
-                  <p className="text-sm text-[#6b7280]">Nessun professionista trovato su Filo</p>
+                  <p className="text-sm text-muted-foreground">Nessun professionista trovato su Filo</p>
                   <button
                     type="button"
                     onMouseDown={(e) => { e.preventDefault(); setShowDropdown(false); }}
-                    className="mt-1.5 text-xs text-[#0D9488] transition hover:text-[#0b7c76]"
+                    className="mt-1.5 text-xs text-primary transition hover:text-primary-hover"
                   >
                     Continua comunque con questo nome →
                   </button>
@@ -252,9 +238,9 @@ export function AddFormClient({ userId }: { userId: string }) {
             onChange={(e) => setCategory(e.target.value)}
             className={inputCls}
           >
-            <option value="" disabled className="bg-[#111111]">Seleziona…</option>
+            <option value="" disabled className="bg-card">Seleziona…</option>
             {CATEGORIES.map((c) => (
-              <option key={c} value={c} className="bg-[#111111]">
+              <option key={c} value={c} className="bg-card">
                 {c.charAt(0).toUpperCase() + c.slice(1)}
               </option>
             ))}
@@ -276,7 +262,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       {/* Address */}
       <div className="space-y-1.5">
         <label className={labelCls} htmlFor="address">
-          Indirizzo <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
+          Indirizzo <span className="normal-case font-normal text-muted-foreground">(opzionale)</span>
         </label>
         <input
           id="address"
@@ -292,7 +278,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       {/* Phone */}
       <div className="space-y-1.5">
         <label className={labelCls} htmlFor="phone">
-          Numero di telefono <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
+          Numero di telefono <span className="normal-case font-normal text-muted-foreground">(opzionale)</span>
         </label>
         <input
           id="phone"
@@ -308,13 +294,13 @@ export function AddFormClient({ userId }: { userId: string }) {
       {/* Price range */}
       <div className="space-y-1.5">
         <label className={labelCls} htmlFor="priceRange">
-          Fascia di prezzo <span className="normal-case font-normal text-[#6b7280]">(opzionale)</span>
+          Fascia di prezzo <span className="normal-case font-normal text-muted-foreground">(opzionale)</span>
         </label>
         <select id="priceRange" name="priceRange" defaultValue="" className={inputCls}>
-          <option value="" className="bg-[#111111]">Seleziona…</option>
-          <option value="€" className="bg-[#111111]">€ — Economico</option>
-          <option value="€€" className="bg-[#111111]">€€ — Nella media</option>
-          <option value="€€€" className="bg-[#111111]">€€€ — Premium</option>
+          <option value="" className="bg-card">Seleziona…</option>
+          <option value="€" className="bg-card">€ — Economico</option>
+          <option value="€€" className="bg-card">€€ — Nella media</option>
+          <option value="€€€" className="bg-card">€€€ — Premium</option>
         </select>
       </div>
 
@@ -322,7 +308,7 @@ export function AddFormClient({ userId }: { userId: string }) {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <label className={labelCls} htmlFor="note">Nota personale</label>
-          <span className="text-[11px] text-[#6b7280]">max 300</span>
+          <span className="text-[11px] text-muted-foreground">max 300</span>
         </div>
         <textarea
           id="note"
@@ -330,14 +316,14 @@ export function AddFormClient({ userId }: { userId: string }) {
           maxLength={300}
           rows={4}
           placeholder="Perché lo/la consigli? Cosa ti ha colpito?"
-          className="w-full resize-none rounded-2xl border border-[#1a1a1a] bg-[#111111] px-4 py-3 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]"
+          className="w-full resize-none rounded-2xl border border-border bg-card px-4 py-3 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary"
         />
       </div>
 
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 h-14 w-full rounded-2xl bg-[#0D9488] text-[15px] font-semibold text-white shadow-[0_0_28px_rgba(13,148,136,0.4)] transition hover:bg-[#0b7c76] active:scale-[0.98] disabled:opacity-60"
+        className="mt-2 h-14 w-full rounded-2xl bg-primary text-[15px] font-semibold text-white shadow-[0_0_28px_rgba(13,148,136,0.4)] transition hover:bg-primary-hover active:scale-[0.98] disabled:opacity-60"
       >
         {pending ? "Salvataggio…" : "Salva raccomandazione"}
       </button>

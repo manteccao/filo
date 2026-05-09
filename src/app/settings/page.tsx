@@ -9,32 +9,16 @@ import { createClient } from "@/lib/supabase/browser";
 import { BottomNav } from "@/components/BottomNav";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
 import { deleteAccount } from "./actions";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 const BASE_URL = "https://filo.network";
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500", "from-blue-600 to-indigo-500",
-  "from-emerald-600 to-teal-500", "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500", "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500", "from-violet-600 to-purple-500",
-];
-
-function avatarGradient(name: string) {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "U";
-}
 
 function toSlug(name: string) {
   return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
 }
 
-const inputCls = "h-11 w-full rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] px-3.5 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
+const inputCls = "h-11 w-full rounded-2xl border border-border bg-background px-3.5 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -199,24 +183,24 @@ export default function SettingsPage() {
     }
   }
 
-  const gradient = avatarGradient(fullName || "U");
+  const gradient = avatarColor(fullName || "U");
   const profileUrl = `${BASE_URL}/p/${username}`;
   const inviteUrl = `${BASE_URL}/invite/${username}`;
   const whatsappText = `Ho trovato un'app fantastica per trovare professionisti di fiducia — iscriviti gratis: ${inviteUrl}`;
 
   if (loading) {
     return (
-      <div className="flex min-h-svh items-center justify-center bg-[#0a0a0a]">
+      <div className="flex min-h-svh items-center justify-center bg-background">
         <div className="h-5 w-5 animate-spin rounded-full border-2 border-teal-500 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-svh bg-[#0a0a0a] text-white">
-      <header className="sticky top-0 z-40 border-b border-[#111111] bg-[#0a0a0a]/90 backdrop-blur-xl">
+    <div className="min-h-svh bg-background text-white">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-[430px] items-center gap-3 px-4">
-          <Link href="/profile" className="text-[#8b8fa8] transition hover:text-white">
+          <Link href="/profile" className="text-muted-foreground transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
@@ -240,7 +224,7 @@ export default function SettingsPage() {
               <Image src={avatarUrl} alt={fullName} fill className="object-cover" unoptimized />
             ) : (
               <span className="flex h-full w-full items-center justify-center text-2xl font-bold text-white">
-                {initials(fullName)}
+                {avatarInitials(fullName)}
               </span>
             )}
             <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition hover:opacity-100">
@@ -258,22 +242,22 @@ export default function SettingsPage() {
               </span>
             )}
           </button>
-          <p className="text-xs text-[#6b7280]">Tocca per cambiare foto</p>
+          <p className="text-xs text-muted-foreground">Tocca per cambiare foto</p>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
         </div>
 
         {/* Account */}
-        <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">Account</p>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Account</p>
           <div className="mt-3 flex items-center justify-between gap-4">
-            <span className="text-sm text-[#8b8fa8]">Email</span>
+            <span className="text-sm text-muted-foreground">Email</span>
             <span className="truncate text-sm text-white">{email}</span>
           </div>
         </div>
 
         {/* Città */}
-        <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">La tua città</p>
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">La tua città</p>
           <div className="mt-3 flex items-center gap-2">
             <div className="flex-1">
               <CityAutocomplete
@@ -287,7 +271,7 @@ export default function SettingsPage() {
               type="button"
               onClick={handleSaveCity}
               disabled={savingCity || !city.trim()}
-              className="h-11 shrink-0 rounded-xl bg-[#0D9488] px-4 text-sm font-semibold text-white transition hover:bg-[#0b7c76] disabled:opacity-50"
+              className="h-11 shrink-0 rounded-xl bg-primary px-4 text-sm font-semibold text-white transition hover:bg-primary-hover disabled:opacity-50"
             >
               {savingCity ? "…" : citySaved ? "Salvata ✓" : "Salva"}
             </button>
@@ -299,10 +283,10 @@ export default function SettingsPage() {
 
         {/* Dati professionali */}
         {isProfessional && (
-          <div className="rounded-2xl border border-[#1a1a1a] bg-[#111111] p-4 space-y-3">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#6b7280]">Dati professionali</p>
+          <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Dati professionali</p>
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#6b7280]">Telefono</label>
+              <label className="mb-1.5 block text-[11px] text-muted-foreground">Telefono</label>
               <input
                 type="tel"
                 value={phone}
@@ -312,7 +296,7 @@ export default function SettingsPage() {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-[11px] text-[#6b7280]">Indirizzo studio</label>
+              <label className="mb-1.5 block text-[11px] text-muted-foreground">Indirizzo studio</label>
               <input
                 type="text"
                 value={workAddress}
@@ -326,7 +310,7 @@ export default function SettingsPage() {
               type="button"
               onClick={handleSaveProDetails}
               disabled={savingPro}
-              className="h-11 w-full rounded-xl bg-[#0D9488] text-sm font-semibold text-white transition hover:bg-[#0b7c76] disabled:opacity-50"
+              className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-white transition hover:bg-primary-hover disabled:opacity-50"
             >
               {savingPro ? "…" : proSaved ? "Salvato ✓" : "Salva dati professionali"}
             </button>
@@ -341,7 +325,7 @@ export default function SettingsPage() {
             setCopiedProfile(true);
             setTimeout(() => setCopiedProfile(false), 2000);
           }}
-          className="h-12 w-full rounded-2xl border border-[#1a1a1a] bg-[#111111] text-sm font-medium text-white transition hover:border-teal-500/40 active:scale-[0.98]"
+          className="h-12 w-full rounded-2xl border border-border bg-card text-sm font-medium text-white transition hover:border-teal-500/40 active:scale-[0.98]"
         >
           {copiedProfile ? "Link copiato!" : "Condividi il tuo profilo"}
         </button>
@@ -351,7 +335,7 @@ export default function SettingsPage() {
           href={`https://wa.me/?text=${encodeURIComponent(whatsappText)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-[#25D366] text-sm font-semibold text-white shadow-[0_0_20px_rgba(37,211,102,0.2)] transition hover:bg-[#1ebe5d] active:scale-[0.98]"
+          className="flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-whatsapp text-sm font-semibold text-white shadow-[0_0_20px_rgba(37,211,102,0.2)] transition hover:bg-whatsapp-hover active:scale-[0.98]"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
@@ -382,7 +366,7 @@ export default function SettingsPage() {
       {/* Delete account confirmation dialog */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-6">
-          <div className="w-full max-w-sm rounded-3xl border border-[#1a1a1a] bg-[#111111] p-6 shadow-2xl">
+          <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/15">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-6 w-6 text-red-400">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
@@ -390,7 +374,7 @@ export default function SettingsPage() {
             </div>
 
             <h2 className="mt-4 text-base font-bold text-white">Elimina account</h2>
-            <p className="mt-2 text-sm leading-relaxed text-[#8b8fa8]">
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Sei sicuro? Tutti i tuoi dati verranno eliminati permanentemente: raccomandazioni, commenti, connessioni e profilo.
             </p>
             <p className="mt-2 text-xs text-red-400">Questa operazione non può essere annullata.</p>
@@ -406,7 +390,7 @@ export default function SettingsPage() {
                 type="button"
                 onClick={() => { setDeleteConfirm(false); setDeleteError(null); }}
                 disabled={deleteLoading}
-                className="h-11 flex-1 rounded-2xl border border-[#1a1a1a] text-sm text-[#8b8fa8] transition hover:text-white disabled:opacity-50"
+                className="h-11 flex-1 rounded-2xl border border-border text-sm text-muted-foreground transition hover:text-white disabled:opacity-50"
               >
                 Annulla
               </button>

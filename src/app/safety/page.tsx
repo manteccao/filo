@@ -9,13 +9,13 @@ export const metadata: Metadata = {
 
 export default function SafetyPage() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-background text-white">
       {/* Header */}
       <header className="border-b border-white/5">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
           <Link
             href="/"
-            className="text-sm text-[#6b7280] transition hover:text-white"
+            className="text-sm text-muted-foreground transition hover:text-white"
           >
             ← Torna a Filo
           </Link>
@@ -31,13 +31,13 @@ export default function SafetyPage() {
 
       <main className="mx-auto max-w-2xl px-6 py-12">
         {/* Hero */}
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0D9488]/10">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth={1.8}
-            className="h-8 w-8 text-[#0D9488]"
+            className="h-8 w-8 text-primary"
           >
             <path
               strokeLinecap="round"
@@ -50,7 +50,7 @@ export default function SafetyPage() {
         <h1 className="mt-6 text-3xl font-bold tracking-tight">
           Standard di Sicurezza per i Minori
         </h1>
-        <p className="mt-3 text-[#9ca3af]">
+        <p className="mt-3 text-subdued">
           Filo è una piattaforma dedicata alla condivisione di raccomandazioni
           professionali tra adulti di fiducia. La protezione dei minori è una
           priorità assoluta e non negoziabile.
@@ -69,7 +69,7 @@ export default function SafetyPage() {
             <p className="text-sm font-semibold text-red-400">
               È severamente vietato pubblicare, condividere o promuovere:
             </p>
-            <ul className="mt-3 space-y-2 text-sm text-[#9ca3af]">
+            <ul className="mt-3 space-y-2 text-sm text-subdued">
               {[
                 "Qualsiasi contenuto sessuale o esplicito che coinvolga minori (CSAM)",
                 "Contenuti che glorificano, normalizzano o promuovono abusi su minori",
@@ -88,7 +88,7 @@ export default function SafetyPage() {
             </ul>
           </div>
 
-          <p className="mt-4 text-sm text-[#9ca3af]">
+          <p className="mt-4 text-sm text-subdued">
             Le violazioni di questa politica comportano la{" "}
             <span className="font-semibold text-white">
               rimozione immediata del contenuto e la sospensione permanente
@@ -103,7 +103,7 @@ export default function SafetyPage() {
         {/* Report content */}
         <section className="mt-10">
           <h2 className="text-xl font-bold">Come segnalare contenuti inappropriati</h2>
-          <p className="mt-2 text-sm text-[#9ca3af]">
+          <p className="mt-2 text-sm text-subdued">
             Se noti qualcosa che non va, agisci subito. Ogni segnalazione viene
             presa sul serio e trattata con la massima priorità.
           </p>
@@ -132,12 +132,12 @@ export default function SafetyPage() {
               },
             ].map((step) => (
               <li key={step.n} className="flex gap-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/15 text-sm font-bold text-[#0D9488]">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
                   {step.n}
                 </div>
                 <div>
                   <p className="font-semibold text-white">{step.title}</p>
-                  <p className="mt-0.5 text-sm text-[#9ca3af]">{step.body}</p>
+                  <p className="mt-0.5 text-sm text-subdued">{step.body}</p>
                 </div>
               </li>
             ))}
@@ -147,38 +147,38 @@ export default function SafetyPage() {
         {/* Block users */}
         <section className="mt-10">
           <h2 className="text-xl font-bold">Come bloccare un utente</h2>
-          <p className="mt-2 text-sm text-[#9ca3af]">
+          <p className="mt-2 text-sm text-subdued">
             Il blocco è immediato e impedisce all&apos;utente bloccato di
             interagire con i tuoi contenuti. I suoi post non appariranno più nel
             tuo feed.
           </p>
 
-          <div className="mt-5 rounded-2xl border border-[#232340] bg-[#111111] p-5">
+          <div className="mt-5 rounded-2xl border border-border bg-card p-5">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/15 text-xs font-bold text-[#0D9488]">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
                   A
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">
                     Dal profilo pubblico
                   </p>
-                  <p className="mt-0.5 text-xs text-[#9ca3af]">
+                  <p className="mt-0.5 text-xs text-subdued">
                     Vai su /p/[username] → tocca il bottone "Altro" → "Blocca
                     [nome]". Il blocco è istantaneo.
                   </p>
                 </div>
               </div>
-              <div className="h-px bg-[#1a1a1a]" />
+              <div className="h-px bg-muted" />
               <div className="flex items-start gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#0D9488]/15 text-xs font-bold text-[#0D9488]">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">
                   B
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-white">
                     Cosa succede dopo il blocco
                   </p>
-                  <p className="mt-0.5 text-xs text-[#9ca3af]">
+                  <p className="mt-0.5 text-xs text-subdued">
                     I contenuti dell&apos;utente bloccato scompaiono dal tuo
                     feed. L&apos;utente non riceve notifica del blocco. Puoi
                     sbloccare in qualsiasi momento dallo stesso menu.
@@ -194,7 +194,7 @@ export default function SafetyPage() {
           <h2 className="text-xl font-bold">
             Conformità alle normative sulla protezione dei minori
           </h2>
-          <p className="mt-2 text-sm text-[#9ca3af]">
+          <p className="mt-2 text-sm text-subdued">
             Filo opera in conformità con le seguenti normative italiane ed
             europee:
           </p>
@@ -224,12 +224,12 @@ export default function SafetyPage() {
             ].map((law) => (
               <div
                 key={law.title}
-                className="rounded-2xl border border-[#232340] bg-[#111111] p-4"
+                className="rounded-2xl border border-border bg-card p-4"
               >
-                <p className="text-sm font-semibold text-[#0D9488]">
+                <p className="text-sm font-semibold text-primary">
                   {law.title}
                 </p>
-                <p className="mt-1 text-sm text-[#9ca3af]">{law.body}</p>
+                <p className="mt-1 text-sm text-subdued">{law.body}</p>
               </div>
             ))}
           </div>
@@ -256,7 +256,7 @@ export default function SafetyPage() {
                 <p className="text-sm font-semibold text-amber-400">
                   Filo è riservato agli utenti di età pari o superiore a 16 anni
                 </p>
-                <p className="mt-1 text-sm text-[#9ca3af]">
+                <p className="mt-1 text-sm text-subdued">
                   In conformità con il GDPR (art. 8) e il Codice Privacy
                   italiano, gli utenti devono avere almeno 16 anni per
                   registrarsi. Gli account di utenti minorenni rilevati vengono
@@ -270,19 +270,19 @@ export default function SafetyPage() {
         {/* Contact */}
         <section className="mt-10">
           <h2 className="text-xl font-bold">Contatti per la sicurezza</h2>
-          <p className="mt-2 text-sm text-[#9ca3af]">
+          <p className="mt-2 text-sm text-subdued">
             Per segnalazioni urgenti legate alla sicurezza dei minori, il nostro
             team risponde entro 24 ore.
           </p>
 
-          <div className="mt-4 rounded-2xl border border-[#0D9488]/20 bg-[#0D9488]/5 p-5">
+          <div className="mt-4 rounded-2xl border border-primary/20 bg-primary/5 p-5">
             <div className="flex items-center gap-3">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth={1.8}
-                className="h-5 w-5 shrink-0 text-[#0D9488]"
+                className="h-5 w-5 shrink-0 text-primary"
               >
                 <path
                   strokeLinecap="round"
@@ -291,16 +291,16 @@ export default function SafetyPage() {
                 />
               </svg>
               <div>
-                <p className="text-xs text-[#6b7280]">Email sicurezza</p>
+                <p className="text-xs text-muted-foreground">Email sicurezza</p>
                 <a
                   href="mailto:filo.networks@gmail.com"
-                  className="text-sm font-semibold text-[#0D9488] transition hover:underline"
+                  className="text-sm font-semibold text-primary transition hover:underline"
                 >
                   filo.networks@gmail.com
                 </a>
               </div>
             </div>
-            <p className="mt-3 text-xs text-[#6b7280]">
+            <p className="mt-3 text-xs text-muted-foreground">
               Per segnalazioni urgenti usa come oggetto:{" "}
               <span className="font-mono font-semibold text-white">
                 SEGNALAZIONE URGENTE — MINORI
@@ -308,14 +308,14 @@ export default function SafetyPage() {
             </p>
           </div>
 
-          <p className="mt-4 text-sm text-[#6b7280]">
+          <p className="mt-4 text-sm text-muted-foreground">
             Per contenuti illegali che coinvolgono minori, contatta direttamente
             la{" "}
             <a
               href="https://www.commissariatodips.it"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#0D9488] transition hover:underline"
+              className="text-primary transition hover:underline"
             >
               Polizia Postale (commissariatodips.it)
             </a>{" "}
@@ -324,7 +324,7 @@ export default function SafetyPage() {
         </section>
 
         {/* Footer links */}
-        <div className="mt-12 flex flex-wrap gap-4 border-t border-white/5 pt-8 text-sm text-[#6b7280]">
+        <div className="mt-12 flex flex-wrap gap-4 border-t border-white/5 pt-8 text-sm text-muted-foreground">
           <Link href="/privacy" className="transition hover:text-white">
             Privacy Policy
           </Link>

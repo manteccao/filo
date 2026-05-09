@@ -52,11 +52,11 @@ export function ReportDialog({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 16 }}
             transition={{ duration: 0.2 }}
-            className="fixed left-1/2 top-1/2 z-[71] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-[#232340] bg-[#111111] p-6 shadow-2xl"
+            className="fixed left-1/2 top-1/2 z-[71] w-[90vw] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-border bg-card p-6 shadow-2xl"
           >
             {done ? (
               <div className="flex flex-col items-center gap-3 py-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0D9488]/15">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
@@ -74,14 +74,14 @@ export function ReportDialog({
                 <p className="text-sm font-semibold text-white">
                   Segnalazione inviata
                 </p>
-                <p className="text-xs text-[#6b7280]">
+                <p className="text-xs text-muted-foreground">
                   Grazie, rivedremo il contenuto.
                 </p>
               </div>
             ) : (
               <>
                 <h2 className="text-base font-bold text-white">{title}</h2>
-                <p className="mt-1 text-xs text-[#6b7280]">
+                <p className="mt-1 text-xs text-muted-foreground">
                   Seleziona il motivo della segnalazione
                 </p>
 
@@ -91,8 +91,8 @@ export function ReportDialog({
                       key={r.value}
                       className={`flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 transition ${
                         reason === r.value
-                          ? "border-[#0D9488] bg-[#0D9488]/10"
-                          : "border-[#1a1a1a] bg-[#0a0a0a]"
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-background"
                       }`}
                     >
                       <input
@@ -106,8 +106,8 @@ export function ReportDialog({
                       <div
                         className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition ${
                           reason === r.value
-                            ? "border-[#0D9488] bg-[#0D9488]"
-                            : "border-[#3a3a3a]"
+                            ? "border-primary bg-primary"
+                            : "border-border"
                         }`}
                       >
                         {reason === r.value && (
@@ -123,7 +123,7 @@ export function ReportDialog({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="h-11 flex-1 rounded-2xl border border-[#1a1a1a] text-sm text-[#6b7280] transition hover:text-white"
+                    className="h-11 flex-1 rounded-2xl border border-border text-sm text-muted-foreground transition hover:text-white"
                   >
                     Annulla
                   </button>

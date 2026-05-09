@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/browser";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 function capitalize(s: string) {
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
@@ -20,28 +21,6 @@ function timeAgo(iso: string) {
   if (days === 1) return "ieri";
   if (days < 7) return `${days} giorni fa`;
   return new Date(iso).toLocaleDateString("it-IT", { day: "numeric", month: "short" });
-}
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-violet-600 to-purple-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-emerald-600 to-teal-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-];
-
-function avatarColor(seed: string) {
-  let hash = 0;
-  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2)
-    .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
 }
 
 type Rec = {
@@ -117,18 +96,18 @@ export default function ProPageClient() {
 
   if (loading) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0a0a0a]">
+      <div className="flex min-h-dvh items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-[#0a0a0a] text-white">
+    <div className="min-h-dvh bg-background text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#1a1a1a] bg-[#0a0a0a]">
+      <header className="sticky top-0 z-40 border-b border-border bg-background">
         <div className="mx-auto flex h-12 max-w-[430px] items-center gap-3 px-4">
-          <Link href="/feed" className="text-[#6b7280] transition hover:text-white">
+          <Link href="/feed" className="text-muted-foreground transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
@@ -136,7 +115,7 @@ export default function ProPageClient() {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-white">{displayName}</p>
             {category && (
-              <p className="text-[11px] text-[#6b7280]">{capitalize(category)}</p>
+              <p className="text-[11px] text-muted-foreground">{capitalize(category)}</p>
             )}
           </div>
         </div>
@@ -144,14 +123,14 @@ export default function ProPageClient() {
 
       <main className="mx-auto max-w-[430px] px-4 pb-12 pt-4">
         {/* Summary */}
-        <div className="mb-4 rounded-[20px] bg-[#111111] p-4">
+        <div className="mb-4 rounded-[20px] bg-card p-4">
           <p className="text-2xl font-bold text-white">{displayName}</p>
           {category && (
-            <span className="mt-2 inline-block rounded-full bg-[#0D9488]/15 px-3 py-1 text-[12px] text-[#0D9488]">
+            <span className="mt-2 inline-block rounded-full bg-primary/15 px-3 py-1 text-[12px] text-primary">
               {capitalize(category)}
             </span>
           )}
-          <p className="mt-3 text-sm text-[#6b7280]">
+          <p className="mt-3 text-sm text-muted-foreground">
             {recommendations.length === 0
               ? "Nessuna raccomandazione"
               : `${recommendations.length} ${recommendations.length === 1 ? "raccomandazione" : "raccomandazioni"}`}
@@ -159,7 +138,7 @@ export default function ProPageClient() {
         </div>
 
         {recommendations.length === 0 ? (
-          <p className="py-10 text-center text-sm text-[#6b7280]">Nessuna raccomandazione trovata.</p>
+          <p className="py-10 text-center text-sm text-muted-foreground">Nessuna raccomandazione trovata.</p>
         ) : (
           <div className="flex flex-col gap-2">
             {recommendations.map((r) => {
@@ -170,7 +149,7 @@ export default function ProPageClient() {
               const likes = likesPerRec.get(r.id) ?? 0;
 
               return (
-                <div key={r.id} className="rounded-[20px] bg-[#111111] p-4">
+                <div key={r.id} className="rounded-[20px] bg-card p-4">
                   {/* Recommender */}
                   <div className="flex items-center gap-3">
                     {username ? (
@@ -179,30 +158,30 @@ export default function ProPageClient() {
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={prof.avatar_url} alt={name} className="h-full w-full object-cover" />
                         ) : (
-                          <span className="text-xs font-bold text-white">{initials(name)}</span>
+                          <span className="text-xs font-bold text-white">{avatarInitials(name)}</span>
                         )}
                       </Link>
                     ) : (
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ${color}`}>
-                        <span className="text-xs font-bold text-white">{initials(name)}</span>
+                        <span className="text-xs font-bold text-white">{avatarInitials(name)}</span>
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       {username ? (
-                        <Link href={`/p/${username}`} className="block truncate text-sm font-semibold text-white transition hover:text-[#0D9488]">{name}</Link>
+                        <Link href={`/p/${username}`} className="block truncate text-sm font-semibold text-white transition hover:text-primary">{name}</Link>
                       ) : (
                         <p className="truncate text-sm font-semibold text-white">{name}</p>
                       )}
-                      <p className="text-[11px] text-[#6b7280]">{timeAgo(r.created_at)}</p>
+                      <p className="text-[11px] text-muted-foreground">{timeAgo(r.created_at)}</p>
                     </div>
                   </div>
 
                   {/* Badges */}
                   <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-[#0D9488]/15 px-[10px] py-[4px] text-[11px] text-[#0D9488]">
+                    <span className="rounded-full bg-primary/15 px-[10px] py-[4px] text-[11px] text-primary">
                       {capitalize(r.category)}
                     </span>
-                    <span className="rounded-full bg-[#1F2937] px-[10px] py-[4px] text-[11px] text-[#9CA3AF]">
+                    <span className="rounded-full bg-muted px-[10px] py-[4px] text-[11px] text-subdued">
                       {capitalize(r.city)}
                     </span>
                     {r.price_range && (
@@ -218,7 +197,7 @@ export default function ProPageClient() {
 
                   {/* Address */}
                   {r.address && (
-                    <p className="mt-2 flex items-center gap-1.5 text-[12px] text-[#6b7280]">
+                    <p className="mt-2 flex items-center gap-1.5 text-[12px] text-muted-foreground">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3 w-3 shrink-0">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
@@ -229,12 +208,12 @@ export default function ProPageClient() {
 
                   {/* Note */}
                   {r.note && (
-                    <p className="mt-2 text-[14px] leading-relaxed text-[#9CA3AF]">{r.note}</p>
+                    <p className="mt-2 text-[14px] leading-relaxed text-subdued">{r.note}</p>
                   )}
 
                   {/* Likes */}
                   {likes > 0 && (
-                    <p className="mt-3 text-[12px] text-[#6b7280]">
+                    <p className="mt-3 text-[12px] text-muted-foreground">
                       ♥ {likes} {likes === 1 ? "like" : "likes"}
                     </p>
                   )}

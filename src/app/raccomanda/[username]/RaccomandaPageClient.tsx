@@ -73,7 +73,7 @@ export default function RaccomandaPageClient() {
 
   if (profile === undefined) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0a0a0a]">
+      <div className="flex min-h-dvh items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-white" />
       </div>
     );
@@ -81,7 +81,7 @@ export default function RaccomandaPageClient() {
 
   if (profile === null) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-[#0a0a0a]">
+      <div className="flex min-h-dvh items-center justify-center bg-background">
         <p className="text-zinc-400">Profilo non trovato.</p>
       </div>
     );
@@ -93,7 +93,7 @@ export default function RaccomandaPageClient() {
   const color = avatarColor(profile.id);
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center bg-[#0a0a0a] px-5 py-12 text-white">
+    <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-5 py-12 text-white">
       <div className="w-full max-w-[400px]">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
@@ -107,10 +107,10 @@ export default function RaccomandaPageClient() {
         </div>
 
         {/* Professional card */}
-        <div className="rounded-[20px] border border-[#1a1a1a] bg-[#111111] p-6 text-center">
+        <div className="rounded-[20px] border border-border bg-card p-6 text-center">
           {/* Avatar */}
           <div
-            className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${color} text-2xl font-bold text-white ring-4 ring-[#0D9488]/20`}
+            className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br ${color} text-2xl font-bold text-white ring-4 ring-primary/20`}
           >
             {initials(fullName)}
           </div>
@@ -119,19 +119,19 @@ export default function RaccomandaPageClient() {
 
           <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
             {category && (
-              <span className="rounded-full bg-[#0D9488]/15 px-2.5 py-1 text-[12px] font-medium text-[#0D9488]">
+              <span className="rounded-full bg-primary/15 px-2.5 py-1 text-[12px] font-medium text-primary">
                 {capitalize(category)}
               </span>
             )}
             {city && (
-              <span className="rounded-full bg-[#1a1a1a] px-2.5 py-1 text-[12px] text-[#6b7280]">
+              <span className="rounded-full bg-muted px-2.5 py-1 text-[12px] text-muted-foreground">
                 {city}
               </span>
             )}
           </div>
 
           {typeof recCount === "number" && recCount > 0 && (
-            <p className="mt-3 text-[13px] text-[#6b7280]">
+            <p className="mt-3 text-[13px] text-muted-foreground">
               Già{" "}
               <span className="font-semibold text-white">{recCount}</span>{" "}
               {recCount === 1 ? "raccomandazione" : "raccomandazioni"} su Filo
@@ -144,7 +144,7 @@ export default function RaccomandaPageClient() {
           <p className="text-[17px] font-bold text-white">
             Hai usato i servizi di {fullName.split(" ")[0]}?
           </p>
-          <p className="mt-2 text-[14px] leading-relaxed text-[#6b7280]">
+          <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
             Raccomandalo su Filo — il tuo consiglio aiuterà chi cerca un
             professionista di fiducia nella tua rete.
           </p>
@@ -154,20 +154,20 @@ export default function RaccomandaPageClient() {
         <div className="mt-6 flex flex-col gap-3">
           <Link
             href={`/login?ref=${username}`}
-            className="flex h-12 items-center justify-center rounded-full bg-[#0D9488] text-[15px] font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.3)] transition hover:bg-[#0b7c76]"
+            className="flex h-12 items-center justify-center rounded-full bg-primary text-[15px] font-semibold text-white shadow-[0_0_24px_rgba(13,148,136,0.3)] transition hover:bg-primary-hover"
           >
             Iscriviti e raccomanda
           </Link>
           <Link
             href={`/login?redirectTo=/add`}
-            className="flex h-12 items-center justify-center rounded-full border border-[#1a1a1a] bg-[#111111] text-[14px] text-[#8b8fa8] transition hover:text-white"
+            className="flex h-12 items-center justify-center rounded-full border border-border bg-card text-[14px] text-muted-foreground transition hover:text-white"
           >
             Ho già un account — accedi
           </Link>
         </div>
 
         {/* Footer */}
-        <p className="mt-8 text-center text-[12px] text-[#3a3a3a]">
+        <p className="mt-8 text-center text-[12px] text-muted-foreground">
           Filo — il passaparola digitale italiano
         </p>
       </div>

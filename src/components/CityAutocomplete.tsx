@@ -91,7 +91,7 @@ export function CityAutocomplete({
 
   const inputCls =
     className ??
-    "h-12 w-full rounded-2xl border border-[#232340] bg-[#16162a] px-4 text-sm text-white placeholder:text-[#9ca3af] outline-none transition focus:border-[#0D9488]";
+    "h-12 w-full rounded-2xl border border-border bg-card px-4 text-sm text-white placeholder:text-subdued outline-none transition focus:border-primary";
 
   return (
     <div ref={containerRef} className="relative">
@@ -111,26 +111,26 @@ export function CityAutocomplete({
       />
 
       {showDropdown && (
-        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 overflow-hidden rounded-2xl border border-[#232340] bg-[#111111] shadow-2xl">
+        <div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 overflow-hidden rounded-2xl border border-border bg-card shadow-2xl">
           {results.map((city) => (
             <button
               key={city}
               type="button"
               onMouseDown={(e) => { e.preventDefault(); select(city); }}
-              className="flex w-full items-center px-4 py-3 text-left text-sm text-white transition hover:bg-[#16162a]"
+              className="flex w-full items-center px-4 py-3 text-left text-sm text-white transition hover:bg-card"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="mr-2.5 h-4 w-4 shrink-0 text-[#5c5f7a]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="mr-2.5 h-4 w-4 shrink-0 text-muted-foreground">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
               {city}
             </button>
           ))}
-          <div className={results.length > 0 ? "border-t border-[#232340]" : ""}>
+          <div className={results.length > 0 ? "border-t border-border" : ""}>
             <button
               type="button"
               onMouseDown={(e) => { e.preventDefault(); select(query); }}
-              className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-[#0D9488] transition hover:bg-[#16162a]"
+              className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm text-primary transition hover:bg-card"
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4 shrink-0">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

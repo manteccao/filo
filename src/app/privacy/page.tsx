@@ -7,16 +7,16 @@ export const metadata = {
 
 const h2 = "mt-10 text-lg font-bold text-white";
 const h3 = "mt-6 text-base font-semibold text-white";
-const p = "mt-3 text-sm leading-relaxed text-[#9ca3af]";
-const li = "mt-1.5 text-sm leading-relaxed text-[#9ca3af]";
+const p = "mt-3 text-sm leading-relaxed text-subdued";
+const li = "mt-1.5 text-sm leading-relaxed text-subdued";
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-svh bg-[#0a0a0a] text-white">
+    <div className="min-h-svh bg-background text-white">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[#1a1a1a] bg-[#0a0a0a]/95 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
         <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
-          <Link href="/" className="flex items-center gap-2 text-sm text-[#6b7280] transition hover:text-white">
+          <Link href="/" className="flex items-center gap-2 text-sm text-muted-foreground transition hover:text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-4 w-4">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
             </svg>
@@ -34,7 +34,7 @@ export default function PrivacyPage() {
           Benvenuto nella privacy policy di Filo. Questa policy ti aiuterà a comprendere quali dati raccogliamo,
           perché li raccogliamo e quali sono i tuoi diritti in merito.
         </p>
-        <p className="mt-3 text-xs text-[#6b7280]">Ultima modifica: 8 aprile 2026</p>
+        <p className="mt-3 text-xs text-muted-foreground">Ultima modifica: 8 aprile 2026</p>
 
         {/* Sommario */}
         <h2 className={h2}>Sommario</h2>
@@ -49,8 +49,8 @@ export default function PrivacyPage() {
             "Ulteriori informazioni sul trattamento",
             "Definizioni e riferimenti legali",
           ].map((item) => (
-            <li key={item} className="flex items-start gap-2 text-sm text-[#9ca3af]">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+            <li key={item} className="flex items-start gap-2 text-sm text-subdued">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
         </p>
         <p className={p}>
           Indirizzo email del Titolare:{" "}
-          <a href="mailto:filo.networks@gmail.com" className="text-[#0D9488] underline underline-offset-2 hover:text-teal-400">
+          <a href="mailto:filo.networks@gmail.com" className="text-primary underline underline-offset-2 hover:text-teal-400">
             filo.networks@gmail.com
           </a>
         </p>
@@ -159,7 +159,7 @@ export default function PrivacyPage() {
             "il trattamento è necessario per il perseguimento del legittimo interesse del Titolare o di terzi.",
           ].map((item, i) => (
             <li key={i} className={`flex items-start gap-2 ${li}`}>
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -176,7 +176,7 @@ export default function PrivacyPage() {
           richiesto dalla finalità per la quale sono stati raccolti e potrebbero essere conservati per un periodo più
           lungo a causa di eventuali obbligazioni legali o sulla base del consenso degli Utenti.
         </p>
-        <p className="mt-3 text-sm text-[#9ca3af]">Pertanto:</p>
+        <p className="mt-3 text-sm text-subdued">Pertanto:</p>
         <ul className="mt-3 space-y-2">
           {[
             "I Dati Personali raccolti per scopi collegati all'esecuzione di un contratto tra il Titolare e l'Utente saranno trattenuti sino a quando sia completata l'esecuzione di tale contratto.",
@@ -184,7 +184,7 @@ export default function PrivacyPage() {
             "Quando il trattamento è basato sul consenso dell'Utente, il Titolare può conservare i Dati Personali più a lungo sino a quando detto consenso non venga revocato. Inoltre, il Titolare potrebbe essere obbligato a conservare i Dati Personali per un periodo più lungo per adempiere ad un obbligo di legge o per ordine di un'autorità.",
           ].map((item, i) => (
             <li key={i} className={`flex items-start gap-2 ${li}`}>
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -215,8 +215,8 @@ export default function PrivacyPage() {
             ["proporre reclamo.", "L'Utente può proporre un reclamo all'autorità di controllo della protezione dei dati personali competente o agire in sede giudiziale."],
           ].map(([title, desc], i) => (
             <li key={i} className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
-              <p className="text-sm leading-relaxed text-[#9ca3af]">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+              <p className="text-sm leading-relaxed text-subdued">
                 <span className="font-semibold text-white">{title}</span>{" "}{desc}
               </p>
             </li>
@@ -330,7 +330,7 @@ export default function PrivacyPage() {
             "Gestisci le tue preferenze sulla privacy",
           ].map((item, i) => (
             <li key={i} className={`flex items-start gap-2 ${li}`}>
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D9488]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {item}
             </li>
           ))}
@@ -343,21 +343,21 @@ export default function PrivacyPage() {
         </p>
 
         {/* Footer / Contatti */}
-        <div className="mt-12 rounded-2xl border border-[#1a1a1a] bg-[#111111] p-5">
+        <div className="mt-12 rounded-2xl border border-border bg-card p-5">
           <p className="text-sm font-semibold text-white">Contattaci</p>
           <p className="mt-2 text-sm font-bold text-white">Filo</p>
-          <p className="mt-1 text-sm text-[#9ca3af]">
+          <p className="mt-1 text-sm text-subdued">
             Carlo Mantecchini — Strada san Martino, 18. Castiglione torinese. 10090, Torino
           </p>
           <a
             href="mailto:filo.networks@gmail.com"
-            className="mt-1 block text-sm text-[#0D9488] underline underline-offset-2 hover:text-teal-400"
+            className="mt-1 block text-sm text-primary underline underline-offset-2 hover:text-teal-400"
           >
             filo.networks@gmail.com
           </a>
         </div>
 
-        <p className="mt-6 text-center text-xs text-[#4b5563]">
+        <p className="mt-6 text-center text-xs text-muted-foreground">
           Ultima modifica: 8 aprile 2026
         </p>
       </main>
