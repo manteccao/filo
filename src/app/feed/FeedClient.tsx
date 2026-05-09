@@ -244,7 +244,7 @@ function RequestRepliesSheet({
             targetUserId: request.user_id,
             message: `${currentUserName} ha risposto alla tua richiesta`,
           }),
-        });
+        }).catch(() => {});
       }
     } else {
       // Revert optimistic update on error
@@ -439,7 +439,7 @@ function CommentsSheet({
             targetUserId: recOwnerId,
             message: `${currentUserName} ha commentato la tua raccomandazione`,
           }),
-        });
+        }).catch(() => {});
       }
     } else {
       // Revert on error

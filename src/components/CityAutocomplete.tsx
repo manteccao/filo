@@ -44,21 +44,25 @@ export function CityAutocomplete({
 
     let cancelled = false;
     async function search() {
-      if (!fuseRef.current) {
-        const [{ default: Fuse }, { ITALIAN_CITIES }] = await Promise.all([
-          import("fuse.js"),
-          import("@/lib/cities"),
-        ]);
-        fuseRef.current = new Fuse(ITALIAN_CITIES, {
-          threshold: 0.4,
-          minMatchCharLength: 2,
-          includeScore: true,
-        });
+      try {
+        if (!fuseRef.current) {
+          const [{ default: Fuse }, { ITALIAN_CITIES }] = await Promise.all([
+            import("fuse.js"),
+            import("@/lib/cities"),
+          ]);
+          fuseRef.current = new Fuse(ITALIAN_CITIES, {
+            threshold: 0.4,
+            minMatchCharLength: 2,
+            includeScore: true,
+          });
+        }
+        if (cancelled) return;
+        const hits = fuseRef.current.search(query, { limit: 5 }).map((r: { item: string }) => r.item);
+        setResults(hits);
+        setShowDropdown(true);
+      } catch {
+        // City search is non-critical — fail silently and let the user type freely
       }
-      if (cancelled) return;
-      const hits = fuseRef.current.search(query, { limit: 5 }).map((r: { item: string }) => r.item);
-      setResults(hits);
-      setShowDropdown(true);
     }
     search();
     return () => { cancelled = true; };

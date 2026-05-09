@@ -25,8 +25,6 @@ export default async function CercaPage() {
     .map((f) => f.following_id as string)
     .filter(Boolean);
 
-  console.log("[cerca] userId:", userId, "myCity:", myCity, "following:", followingIds.length);
-
   return (
     <CercaClient
       userId={userId}

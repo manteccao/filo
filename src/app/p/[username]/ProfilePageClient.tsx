@@ -84,8 +84,6 @@ export default function ProfilePageClient() {
 
       const prof = profData;
 
-      console.log("[profile] profile id:", prof?.id, "account_type:", prof?.account_type);
-
       setCurrentUserId(user?.id ?? null);
       setProfile(prof ?? null);
 
@@ -98,7 +96,8 @@ export default function ProfilePageClient() {
           .from("recommendations")
           .select("id,professional_name,category,city,note,created_at")
           .eq("user_id", prof.id)
-          .order("created_at", { ascending: false }),
+          .order("created_at", { ascending: false })
+          .limit(50),
         user && user.id !== prof.id
           ? supabase
               .from("blocks")
@@ -113,10 +112,9 @@ export default function ProfilePageClient() {
               .select("id,note,category,created_at,user_id")
               .eq("professional_id", prof.id)
               .order("created_at", { ascending: false })
+              .limit(50)
           : Promise.resolve({ data: [], error: null }),
       ]);
-
-      console.log("[profile] isPro:", isPro, "receivedRaw:", receivedRaw, "error:", receivedError);
 
       setRecommendations(recs ?? []);
       setInitialIsBlocked(!!(blockResult as { data: unknown }).data);

@@ -623,15 +623,19 @@ export default function RequestsPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
 
-      const [{ data: reqs }, { data: counts }] = await Promise.all([
-        supabase
-          .from("requests_with_profile")
-          .select("id, user_id, content, category, city, created_at, full_name")
-          .order("created_at", { ascending: false }),
-        supabase.from("request_replies").select("request_id"),
-      ]);
+      const { data: reqs } = await supabase
+        .from("requests_with_profile")
+        .select("id, user_id, content, category, city, created_at, full_name")
+        .order("created_at", { ascending: false })
+        .limit(100);
 
       const requests = (reqs as Request[]) ?? [];
+      const requestIds = requests.map((r) => r.id);
+
+      const { data: counts } = requestIds.length
+        ? await supabase.from("request_replies").select("request_id").in("request_id", requestIds)
+        : { data: [] as { request_id: string }[] };
+
       const countMap: Record<string, number> = {};
       for (const c of (counts ?? [])) {
         const rid = (c as { request_id: string }).request_id;

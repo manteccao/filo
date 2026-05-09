@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const REASONS = [
@@ -23,6 +23,13 @@ export function ReportDialog({
   const [reason, setReason] = useState("spam");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   async function handleSubmit() {
     if (submitting) return;
@@ -30,7 +37,7 @@ export function ReportDialog({
     await onSubmit(reason);
     setSubmitting(false);
     setDone(true);
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
       setDone(false);
       onClose();
     }, 1500);

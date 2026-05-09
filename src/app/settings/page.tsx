@@ -39,6 +39,7 @@ export default function SettingsPage() {
   const [proSaved, setProSaved] = useState(false);
   const [proError, setProError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [copiedProfile, setCopiedProfile] = useState(false);
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -82,19 +83,20 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file || !userId) return;
     setUploading(true);
+    setUploadError(null);
     try {
       const supabase = createClient();
       const ext = file.name.split(".").pop() ?? "jpg";
       const path = `${userId}/avatar.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
-      if (uploadError) throw uploadError;
+      const { error: storageError } = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      if (storageError) throw storageError;
       const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
       const url = urlData.publicUrl;
       await supabase.from("profiles").update({ avatar_url: url }).eq("id", userId);
       await supabase.auth.updateUser({ data: { avatar_url: url } });
       setAvatarUrl(url);
-    } catch (err) {
-      console.error("Avatar upload error:", err);
+    } catch {
+      setUploadError("Errore durante il caricamento della foto. Riprova.");
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -107,17 +109,11 @@ export default function SettingsPage() {
     setCityError(null);
     try {
       const supabase = createClient();
-      console.log("[settings] userId usato:", userId);
-      console.log("[settings] città da salvare:", city.trim());
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      console.log("[settings] auth.uid():", authUser?.id);
-      console.log("[settings] match:", authUser?.id === userId);
       const { data, error } = await supabase
         .from("profiles")
         .update({ city: city.trim() })
         .eq("id", userId)
         .select("city");
-      console.log("[settings] city update result — data:", data, "error:", error);
       if (error) {
         setCityError(`Errore: ${error.message}`);
         return;
@@ -128,8 +124,7 @@ export default function SettingsPage() {
       }
       setCitySaved(true);
       setTimeout(() => setCitySaved(false), 2000);
-    } catch (err) {
-      console.error("[settings] city save exception:", err);
+    } catch {
       setCityError("Errore imprevisto, riprova.");
     } finally {
       setSavingCity(false);
@@ -244,6 +239,7 @@ export default function SettingsPage() {
           </button>
           <p className="text-xs text-muted-foreground">Tocca per cambiare foto</p>
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+          {uploadError && <p className="text-xs text-red-400">{uploadError}</p>}
         </div>
 
         {/* Account */}
