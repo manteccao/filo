@@ -51,16 +51,18 @@ export default async function FeedPage() {
 
   const recIds = recommendations.map((r) => r.id);
 
-  // Fetch profiles con client autenticato (RLS permette la lettura a utenti autenticati)
-  const profilesResult = allProfileIds.length
-    ? await supabase.from("profiles").select("id,full_name,city,username,account_type").in("id", allProfileIds)
-    : { data: [], error: null };
+  // Run profiles + likes/saves/second-degree in a single parallel batch
+  // (all inputs come from the previous Promise.all, so no waterfall needed)
   const [
+    profilesResult,
     { data: secondDegreeFollows },
     { data: myLikes },
     { data: allLikes },
     { data: mySaves },
   ] = await Promise.all([
+    allProfileIds.length
+      ? supabase.from("profiles").select("id,full_name,city,username,account_type").in("id", allProfileIds)
+      : Promise.resolve({ data: [], error: null }),
     followingIds.length
       ? supabase.from("follows").select("following_id").in("follower_id", followingIds)
       : Promise.resolve({ data: [] }),

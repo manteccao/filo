@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Fuse from "fuse.js";
-import { ITALIAN_CITIES } from "@/lib/cities";
 
-const fuse = new Fuse(ITALIAN_CITIES, {
-  threshold: 0.4,
-  minMatchCharLength: 2,
-  includeScore: true,
-});
+// Fuse instance is created lazily on first keystroke — keeps cities.ts (~134 KB)
+// out of the initial JS bundle for pages that use CityAutocomplete.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fuseRef = { current: null as any };
 
 type Props = {
   value: string;
@@ -37,16 +34,34 @@ export function CityAutocomplete({
     setQuery(value);
   }, [value]);
 
-  // Search on query change
+  // Search on query change — Fuse + cities are loaded lazily on first keystroke
   useEffect(() => {
     if (query.length < 2) {
       setResults([]);
       setShowDropdown(false);
       return;
     }
-    const hits = fuse.search(query, { limit: 5 }).map((r) => r.item);
-    setResults(hits);
-    setShowDropdown(true);
+
+    let cancelled = false;
+    async function search() {
+      if (!fuseRef.current) {
+        const [{ default: Fuse }, { ITALIAN_CITIES }] = await Promise.all([
+          import("fuse.js"),
+          import("@/lib/cities"),
+        ]);
+        fuseRef.current = new Fuse(ITALIAN_CITIES, {
+          threshold: 0.4,
+          minMatchCharLength: 2,
+          includeScore: true,
+        });
+      }
+      if (cancelled) return;
+      const hits = fuseRef.current.search(query, { limit: 5 }).map((r: { item: string }) => r.item);
+      setResults(hits);
+      setShowDropdown(true);
+    }
+    search();
+    return () => { cancelled = true; };
   }, [query]);
 
   // Close on outside click
