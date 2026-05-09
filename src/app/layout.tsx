@@ -8,10 +8,16 @@ import { DeferredShell } from "@/components/DeferredShell";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans',display:'swap'});
 
+const BASE_URL = "https://filo.network";
+
 export const metadata: Metadata = {
-  title: "Filo",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "Filo — Il passaparola digitale",
+    template: "%s | Filo",
+  },
   description:
-    "Filo è un social network dove le persone condividono raccomandazioni di professionisti di fiducia.",
+    "Trova professionisti affidabili grazie alle raccomandazioni di persone che conosci. Il passaparola diventa digitale.",
   manifest: "/manifest.json",
   icons: {
     icon: "/favicon.png",
@@ -21,6 +27,28 @@ export const metadata: Metadata = {
     capable: true,
     title: "Filo",
     statusBarStyle: "black-translucent",
+  },
+  openGraph: {
+    type: "website",
+    locale: "it_IT",
+    siteName: "Filo",
+    images: [
+      {
+        url: "/api/og",
+        width: 1200,
+        height: 630,
+        alt: "Filo — Il passaparola digitale",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/api/og"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 
