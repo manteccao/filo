@@ -15,6 +15,12 @@ export async function POST(req: NextRequest) {
   if (!targetUserId || !message) {
     return NextResponse.json({ error: "Missing params" }, { status: 400 });
   }
+  if (message.length > 200) {
+    return NextResponse.json({ error: "Message too long" }, { status: 400 });
+  }
+  if (url && (url.length > 500 || !/^https?:\/\//.test(url))) {
+    return NextResponse.json({ error: "Invalid url" }, { status: 400 });
+  }
 
   await sendPush(targetUserId, message, url);
   return NextResponse.json({ ok: true });

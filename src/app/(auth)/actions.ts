@@ -19,6 +19,12 @@ export async function signUp(formData: FormData) {
   if (!email || !password || !fullName || !city) {
     errorRedirect("/register", "Compila tutti i campi.");
   }
+  if (fullName.length > 100) {
+    errorRedirect("/register", "Il nome non può superare i 100 caratteri.");
+  }
+  if (city.length > 100) {
+    errorRedirect("/register", "La città non può superare i 100 caratteri.");
+  }
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
