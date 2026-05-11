@@ -17,6 +17,7 @@ import { deleteRecommendation, loadMoreFeedItems, toggleLike, updateRecommendati
 import type { FeedItem, FeedRecommendation, FeedRequest } from "./types";
 import { reportContent } from "@/app/moderation/actions";
 import { createClient } from "@/lib/supabase/browser";
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 // Lazy-load heavy drawers — only downloaded when first opened
 const NotificationsDrawer = dynamic(
@@ -56,29 +57,7 @@ const EDIT_CATEGORIES = [
   "orologiaio", "ottico", "altro",
 ] as const;
 
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-violet-600 to-purple-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-emerald-600 to-teal-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-];
-
 // ─── Utilities ────────────────────────────────────────────────────────────────
-
-function avatarColor(name: string) {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  return name.trim().split(/\s+/).slice(0, 2)
-    .map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
-}
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -264,7 +243,7 @@ function RequestRepliesSheet({
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(authorName)}`}>
-                <span className="text-xs font-bold text-white">{initials(authorName)}</span>
+                <span className="text-xs font-bold text-white">{avatarInitials(authorName)}</span>
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-white">{authorName}</p>
@@ -296,7 +275,7 @@ function RequestRepliesSheet({
                 return (
                   <div key={rep.id} className="flex gap-3">
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${avatarColor(name)}`}>
-                      <span className="text-xs font-bold text-white">{initials(name)}</span>
+                      <span className="text-xs font-bold text-white">{avatarInitials(name)}</span>
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-baseline gap-2">
@@ -506,7 +485,7 @@ function CommentsSheet({
                 return (
                   <div key={c.id} className="flex gap-3">
                     <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${isDeleted ? "from-zinc-700 to-zinc-600" : avatarColor(name)}`}>
-                      <span className="text-[10px] font-bold text-white">{isDeleted ? "·" : initials(name)}</span>
+                      <span className="text-[10px] font-bold text-white">{isDeleted ? "·" : avatarInitials(name)}</span>
                     </div>
                     <div className="min-w-0 flex-1">
                       {isDeleted ? (
@@ -828,7 +807,7 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
               // eslint-disable-next-line @next/next/no-img-element
               <img src={r.profile.avatar_url} alt={recommenderName} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover" />
             ) : (
-              <span className="text-sm font-bold text-white">{initials(recommenderName)}</span>
+              <span className="text-sm font-bold text-white">{avatarInitials(recommenderName)}</span>
             )}
           </Link>
           <div className="min-w-0 flex-1">
@@ -1070,6 +1049,8 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
 
 // ─── Feed Client ──────────────────────────────────────────────────────────────
 
+const TABS_ORDER = ["tutti", "seguiti"] as const;
+
 export function FeedClient({
   items,
   followingIds,
@@ -1088,7 +1069,6 @@ export function FeedClient({
   const [mode, setMode] = useState<"tutti" | "seguiti">("tutti");
   const [notifsOpen, setNotifsOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
-  const TABS_ORDER = ["tutti", "seguiti"] as const;
   const swipeStartX = useRef<number | null>(null);
 
   // ── Infinite scroll state ──────────────────────────────────────────────────
