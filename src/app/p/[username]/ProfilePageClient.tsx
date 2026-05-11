@@ -91,7 +91,7 @@ export default function ProfilePageClient() {
 
       const isPro = (prof as Profile).account_type === "professional";
 
-      const [{ data: recs }, blockResult, { data: receivedRaw, error: receivedError }] = await Promise.all([
+      const [{ data: recs }, blockResult, { data: receivedRaw }] = await Promise.all([
         supabase
           .from("recommendations")
           .select("id,professional_name,category,city,note,created_at")

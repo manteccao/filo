@@ -6,7 +6,6 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence, MotionConfig } from "framer-motion";
 
 import { BottomNav } from "@/components/BottomNav";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,

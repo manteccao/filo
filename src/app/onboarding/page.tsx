@@ -113,7 +113,7 @@ export default function OnboardingPage() {
           note: note.slice(0, 300),
         });
       }
-    } catch (_) {
+    } catch {
       // proceed even on error
     } finally {
       setSaving(false);
@@ -127,7 +127,7 @@ export default function OnboardingPage() {
     try {
       const supabase = createClient();
       await supabase.from("profiles").update({ city: myCity.trim(), onboarding_completed: true }).eq("id", userId);
-    } catch (_) {
+    } catch {
       // proceed
     } finally {
       setSaving(false);
@@ -149,7 +149,7 @@ export default function OnboardingPage() {
         onboarding_completed: true,
         ...(proCity.trim() ? { city: proCity.trim() } : {}),
       }).eq("id", userId);
-    } catch (_) {
+    } catch {
       // proceed even on error
     } finally {
       setSaving(false);

@@ -19,8 +19,6 @@ const CATEGORIES = [
   "orologiaio", "ottico", "altro",
 ] as const;
 
-type Category = (typeof CATEGORIES)[number];
-
 type ProfessionalResult = {
   id: string;
   full_name: string | null;

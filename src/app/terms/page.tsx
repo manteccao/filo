@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 };
 
 const h2 = "mt-10 text-lg font-bold text-white";
-const h3 = "mt-6 text-base font-semibold text-white";
 const p = "mt-3 text-sm leading-relaxed text-subdued";
 const li = "mt-1.5 text-sm leading-relaxed text-subdued";
 

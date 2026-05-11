@@ -41,7 +41,6 @@ export default function Home() {
         {/* Logo */}
         <div className="flex flex-col items-center text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/filo-logo-v2.png" alt="Filo" className="h-9 w-auto object-contain" />
           <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
             Il social network della fiducia — trova professionisti

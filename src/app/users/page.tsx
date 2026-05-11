@@ -3,28 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BottomNav } from "@/components/BottomNav";
 import { followUser, unfollowUser } from "./actions";
-
-const AVATAR_COLORS = [
-  "from-teal-600 to-cyan-500",
-  "from-blue-600 to-indigo-500",
-  "from-emerald-600 to-teal-500",
-  "from-rose-600 to-pink-500",
-  "from-amber-600 to-orange-500",
-  "from-cyan-600 to-blue-500",
-  "from-fuchsia-600 to-violet-500",
-  "from-violet-600 to-purple-500",
-];
-
-function avatarColor(name: string): string {
-  let hash = 0;
-  for (const ch of name) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffff;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string) {
-  const parts = name.trim().split(/\s+/).slice(0, 2);
-  return parts.map((p) => p[0]?.toUpperCase()).filter(Boolean).join("") || "?";
-}
+import { avatarColor, avatarInitials } from "@/lib/avatar";
 
 export default async function UsersPage() {
   const supabase = await createClient();
@@ -68,7 +47,7 @@ export default async function UsersPage() {
                 className="flex items-center gap-3.5 rounded-2xl border border-border bg-card px-4 py-3.5"
               >
                 <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${color} text-sm font-bold text-white`}>
-                  {initials(name)}
+                  {avatarInitials(name)}
                 </div>
 
                 <div className="min-w-0 flex-1">
