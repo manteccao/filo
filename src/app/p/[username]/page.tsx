@@ -13,11 +13,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { username } = await params;
   const supabase = await createClient();
-  const { data: profile } = await supabase
+  // Try by username first; if slug is a UUID (no-username fallback), try by id
+  let { data: profile } = await supabase
     .from("profiles")
     .select("full_name, city")
     .eq("username", username)
-    .single();
+    .maybeSingle();
+
+  if (!profile) {
+    const { data: byId } = await supabase
+      .from("profiles")
+      .select("full_name, city")
+      .eq("id", username)
+      .maybeSingle();
+    profile = byId ?? null;
+  }
 
   if (!profile) return { title: "Profilo non trovato" };
 

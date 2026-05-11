@@ -789,7 +789,9 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
     );
   }
 
-  const profileHref = `/p/${r.profile?.username ?? r.user_id}`;
+  // Use username if set, else fall back to user_id (UUID). Guard against empty
+  // strings so we never navigate to /p/ and land on a 404.
+  const profileSlug = r.profile?.username || r.user_id || null;
   const metaLine = timeAgo(r.created_at);
 
   return (
@@ -802,17 +804,32 @@ function PostCard({ r, followingIds, secondDegreeIds, isOwner, currentUserId, in
       >
         {/* Header row */}
         <div className="flex items-center gap-3">
-          <Link href={profileHref} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-primary/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
-            {r.profile?.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={r.profile.avatar_url} alt={recommenderName} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover" />
-            ) : (
-              <span className="text-sm font-bold text-white">{avatarInitials(recommenderName)}</span>
-            )}
-          </Link>
+          {profileSlug ? (
+            <Link href={`/p/${profileSlug}`} className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-primary/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
+              {r.profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={r.profile.avatar_url} alt={recommenderName} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-sm font-bold text-white">{avatarInitials(recommenderName)}</span>
+              )}
+            </Link>
+          ) : (
+            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br overflow-hidden ${recColor}${r.profile?.account_type === "professional" ? " ring-2 ring-primary/50 ring-offset-2 ring-offset-[#111111]" : ""}`}>
+              {r.profile?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={r.profile.avatar_url} alt={recommenderName} loading={index < 3 ? "eager" : "lazy"} className="h-full w-full object-cover" />
+              ) : (
+                <span className="text-sm font-bold text-white">{avatarInitials(recommenderName)}</span>
+              )}
+            </div>
+          )}
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-1.5">
-              <Link href={profileHref} className="truncate text-[15px] font-bold text-white transition hover:text-primary">{recommenderName}</Link>
+              {profileSlug ? (
+                <Link href={`/p/${profileSlug}`} className="truncate text-[15px] font-bold text-white transition hover:text-primary">{recommenderName}</Link>
+              ) : (
+                <span className="truncate text-[15px] font-bold text-white">{recommenderName}</span>
+              )}
               {r.profile?.account_type === "professional" && (
                 <span className="shrink-0 rounded-full bg-primary/15 px-1.5 py-[2px] text-[10px] font-semibold text-primary">
                   Pro
