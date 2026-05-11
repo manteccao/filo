@@ -39,7 +39,14 @@ export async function signUp(formData: FormData) {
   });
 
   if (error) {
-    errorRedirect("/register", error.message);
+    // Map auth errors to user-friendly messages without leaking internals
+    const msg =
+      error.message.toLowerCase().includes("already registered") ||
+      error.message.toLowerCase().includes("already exists") ||
+      error.message.toLowerCase().includes("duplicate")
+        ? "Email già registrata. Accedi o usa un'altra email."
+        : "Registrazione non riuscita. Riprova o contatta il supporto.";
+    errorRedirect("/register", msg);
   }
 
   // Best-effort profile creation. If email confirmation is enabled,
@@ -53,7 +60,7 @@ export async function signUp(formData: FormData) {
 
     // Ignore duplicates (e.g., if a trigger already created it)
     if (profileError && profileError.code !== "23505") {
-      errorRedirect("/register", profileError.message);
+      errorRedirect("/register", "Errore durante la registrazione. Riprova.");
     }
   }
 
@@ -72,7 +79,7 @@ export async function signIn(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    errorRedirect("/login", error.message);
+    errorRedirect("/login", "Credenziali non valide. Riprova.");
   }
 
   // After successful login, redirect server-side to the protected feed.

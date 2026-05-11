@@ -22,6 +22,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid url" }, { status: 400 });
   }
 
+  // Rate limit: max 50 push notifications per user per hour
+  const since1h = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count: recentCount } = await supabase
+    .from("notifications")
+    .select("id", { count: "exact", head: true })
+    .eq("actor_id", user.id)
+    .gte("created_at", since1h);
+  if ((recentCount ?? 0) >= 50) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
+
   await sendPush(targetUserId, message, url);
   return NextResponse.json({ ok: true });
 }
