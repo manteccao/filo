@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="it"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0D9488">
+<title>Filo — Il passaparola diventa digitale</title>
+<meta name="description" content="Trova professionisti affidabili grazie alle raccomandazioni di persone che conosci.">
+<link rel="icon" type="image/png" href="/landing/filo-logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<style>/* vietnamese */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-9.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-6.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-4.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-9.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-6.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-4.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-9.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-6.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 800;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-4.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-5.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-8.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-3.woff2") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-2.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-7.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-1.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-5.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-8.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-3.woff2") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-2.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-7.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-1.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-5.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-8.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-3.woff2") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-2.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-7.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-1.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-5.woff2") format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-8.woff2") format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-3.woff2") format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-2.woff2") format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-7.woff2") format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/bricolage/bricolage-1.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+
+<style>
+  :root{
+    --bg: #000;
+    --bg-card: #0f1314;
+    --ink: #f3f5f3;
+    --ink-dim: #a6adac;
+    --ink-mute: #6b7370;
+    --teal: #14b8a6;
+    --teal-bright: #2ddfb0;
+    --teal-glow: rgba(20,184,166,.25);
+    --line: rgba(255,255,255,.08);
+    --line-soft: rgba(255,255,255,.04);
+    --display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+    --body: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color: rgba(45,223,176,.15)}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--teal-bright);color:#001712}
+
+  /* typography */
+  h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.03em;line-height:1;margin:0}
+  h1{font-size: clamp(44px, 11vw, 80px); line-height:.98}
+  h2{font-size: clamp(32px, 7.8vw, 52px); line-height:1.04}
+  h3{font-size: 22px; font-weight:700; letter-spacing:-.02em}
+  em.acc{font-style:italic;color:var(--teal-bright);font-weight:800}
+  p.lead{font-size:17px;line-height:1.55;color:var(--ink-dim);max-width:46ch;margin:0}
+
+  section{position:relative;padding:80px 22px}
+  .wrap{max-width:1100px;margin:0 auto;position:relative;z-index:2}
+
+  /* buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:14px 22px;border-radius:999px;font-weight:700;font-size:15px;
+    transition: transform .12s ease, background .2s, box-shadow .25s, border-color .2s;
+    white-space:nowrap}
+  .btn:active{transform:translateY(1px) scale(.99)}
+  .btn-primary{background:var(--teal);color:#001712;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.05), 0 14px 36px -10px var(--teal-glow)}
+  .btn-primary:hover{background:#1ec5b1}
+  .btn-secondary{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.16)}
+  .btn-secondary:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.03)}
+  .btn .arrow{transition:transform .2s}
+  .btn:hover .arrow{transform:translateX(3px)}
+
+  /* ---------- nav ---------- */
+  header.nav{position:sticky;top:0;z-index:50;
+    backdrop-filter: blur(14px) saturate(1.2);-webkit-backdrop-filter: blur(14px) saturate(1.2);
+    background: linear-gradient(to bottom, rgba(0,0,0,.92), rgba(0,0,0,.55));
+    border-bottom:1px solid var(--line-soft)}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:12px 18px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:-.01em}
+  .brand .mark{width:30px;height:30px;border-radius:8px;overflow:hidden;flex:none;background:#0e1213;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 6px 18px rgba(20,184,166,.18)}
+  .brand .mark img{width:100%;height:100%;object-fit:cover}
+  .nav-cta{display:flex;align-items:center;gap:8px}
+  .btn-sm{padding:9px 16px;font-size:13.5px}
+
+  /* ---------- phone mockup ---------- */
+  .phone{
+    width:280px;aspect-ratio: 9 / 19.5;
+    border-radius:42px;
+    background: #15191a;
+    box-shadow:
+      inset 0 0 0 1.5px rgba(255,255,255,.07),
+      0 60px 120px -20px rgba(0,0,0,.7),
+      0 0 0 1px rgba(20,184,166,.08),
+      0 0 70px -10px var(--teal-glow);
+    padding:10px;position:relative;margin:0 auto;flex:none
+  }
+  .phone::before{content:"";position:absolute;top:10px;left:50%;transform:translateX(-50%);
+    width:90px;height:24px;background:#000;border-radius:14px;z-index:3}
+  .phone-screen{width:100%;height:100%;border-radius:32px;overflow:hidden;background:#000;position:relative;
+    border:1px solid rgba(255,255,255,.04)}
+  .phone-screen img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+
+  /* ---------- HERO ---------- */
+  .hero{padding-top:48px;padding-bottom:48px}
+  .hero-grid{display:flex;flex-direction:column;gap:48px;align-items:center;text-align:center}
+  .hero .logo-mark{
+    width:88px;height:88px;border-radius:22px;overflow:hidden;
+    background:#0e1213;margin:0 auto 28px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 24px 60px -10px var(--teal-glow), 0 0 30px -8px var(--teal-glow)
+  }
+  .hero .logo-mark img{width:100%;height:100%;object-fit:cover}
+  .hero h1 span{display:block}
+  .hero .sub{margin:24px auto 0;max-width:38ch;font-size:18px;line-height:1.55;color:var(--ink-dim)}
+  .hero .cta{display:flex;gap:10px;margin:32px auto 0;width:100%;max-width:380px;flex-direction:column}
+  .hero .cta .btn{width:100%}
+  .hero .signal{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:22px;color:var(--ink-mute);font-size:13px;flex-wrap:wrap}
+  .hero .signal .avs{display:flex}
+  .hero .signal .avs span{width:24px;height:24px;border-radius:50%;display:inline-grid;place-items:center;
+    border:1.5px solid var(--bg);margin-left:-7px;font-size:10px;font-weight:700;color:#0a0a0a}
+  .hero .signal .avs span:first-child{margin-left:0}
+
+  /* ---------- COME FUNZIONA ---------- */
+  .section-head{text-align:center;display:flex;flex-direction:column;gap:18px;margin-bottom:48px;align-items:center}
+  .section-head h2{max-width:18ch}
+  .section-head p.lead{margin:0 auto}
+
+  .steps{display:grid;grid-template-columns:1fr;gap:14px}
+  .step{padding:28px 24px;border:1px solid var(--line);border-radius:22px;
+    background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:14px;
+    transition:border-color .25s, transform .25s}
+  .step:hover{border-color:rgba(45,223,176,.4);transform:translateY(-2px)}
+  .step .icon{
+    width:54px;height:54px;border-radius:16px;display:grid;place-items:center;
+    background: radial-gradient(circle at 30% 20%, rgba(45,223,176,.22), rgba(45,223,176,.06));
+    border:1px solid rgba(45,223,176,.25);color:var(--teal-bright)
+  }
+  .step .icon svg{width:26px;height:26px}
+  .step .num{font-size:13px;font-weight:700;color:var(--teal-bright);letter-spacing:.04em}
+  .step h3 em{font-style:italic;color:var(--teal-bright);font-weight:800}
+  .step p{margin:0;color:var(--ink-dim);font-size:15px;line-height:1.55}
+
+  /* ---------- PERCHÉ ---------- */
+  .why-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .why-card{padding:28px 24px;border:1px solid var(--line);border-radius:22px;
+    background: linear-gradient(180deg, rgba(20,184,166,.05), rgba(255,255,255,0))}
+  .why-card .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;
+    background:rgba(45,223,176,.1);color:var(--teal-bright);margin-bottom:16px}
+  .why-card .ic svg{width:20px;height:20px}
+  .why-card h3 em{font-style:italic;color:var(--teal-bright);font-weight:800}
+  .why-card p{margin:10px 0 0;color:var(--ink-dim);font-size:15px;line-height:1.55}
+
+  /* ---------- SHOWCASE (feed screen) ---------- */
+  .showcase{padding:80px 22px}
+  .showcase-grid{display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center}
+  .showcase h2 em{font-style:italic;color:var(--teal-bright);font-weight:800}
+  .showcase p.lead{margin: 18px auto 0}
+  .showcase .text{order:2}
+  .showcase .phone{order:1}
+
+  /* ---------- SOCIAL PROOF ---------- */
+  .proof{padding:80px 22px}
+  .quote-card{padding:36px 26px 30px;border:1px solid var(--line);border-radius:24px;
+    background: linear-gradient(180deg, rgba(20,184,166,.05), rgba(255,255,255,0));
+    display:flex;flex-direction:column;gap:24px;position:relative;overflow:hidden;text-align:left;max-width:780px;margin:0 auto}
+  .quote-card .qmark{position:absolute;top:10px;right:24px;font-family:var(--display);font-style:italic;font-weight:800;font-size:140px;color:var(--teal-bright);opacity:.14;line-height:.7;pointer-events:none}
+  .quote-card .q{font-family:var(--display);font-style:italic;font-weight:600;
+    font-size: clamp(22px, 5.6vw, 28px);line-height:1.3;letter-spacing:-.015em;color:var(--ink);max-width:36ch;position:relative;z-index:1}
+  .quote-card .q em{color:var(--teal-bright);font-style:italic}
+  .quote-card .author{display:flex;align-items:center;gap:14px;position:relative;z-index:1}
+  .quote-card .author .av{width:48px;height:48px;border-radius:50%;background:#c2c8ff;color:#0a0d0d;
+    display:grid;place-items:center;font-weight:800;font-size:15px;flex:none}
+  .quote-card .author .name{font-weight:700;font-size:15px;display:block}
+  .quote-card .author .role{font-size:13px;color:var(--ink-mute);display:block;margin-top:2px}
+
+  .counters{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:780px;margin:32px auto 0}
+  .counter{padding:22px 14px;border:1px solid var(--line);border-radius:16px;
+    background:rgba(255,255,255,.02);text-align:center}
+  .counter .n{font-family:var(--display);font-weight:800;letter-spacing:-.03em;font-size:clamp(26px,6.5vw,38px);color:var(--teal-bright);line-height:1;margin-bottom:6px}
+  .counter .l{font-size:12px;color:var(--ink-mute);line-height:1.3}
+
+  /* ---------- PROFESSIONISTI ---------- */
+  .pros{padding:80px 22px}
+  .pros-card{padding:44px 28px 40px;border-radius:28px;
+    background: radial-gradient(120% 100% at 0% 0%, rgba(20,184,166,.18), transparent 60%), #0c1112;
+    border:1px solid rgba(45,223,176,.2);position:relative;overflow:hidden}
+  .pros-card h2{max-width:18ch}
+  .pros-card h2 em{font-style:italic;color:var(--teal-bright);font-weight:800}
+  .pros-card .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--teal-bright);padding:6px 12px;border-radius:999px;background:rgba(45,223,176,.1);border:1px solid rgba(45,223,176,.3);margin-bottom:18px}
+  .pros-card p{font-size:16px;line-height:1.55;color:var(--ink-dim);margin:20px 0 0;max-width:46ch}
+  .pros-points{list-style:none;padding:0;margin:24px 0 0;display:flex;flex-direction:column;gap:12px}
+  .pros-points li{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--ink)}
+  .pros-points li svg{flex:none;width:22px;height:22px;color:var(--teal-bright);margin-top:1px}
+  .pros-card .cta{margin-top:28px}
+  .pros-card .cta .btn{width:100%}
+
+  /* ---------- FOOTER ---------- */
+  footer{border-top:1px solid var(--line);padding:40px 22px 28px}
+  .foot{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:24px;align-items:flex-start}
+  .foot .brand{font-size:20px}
+  .foot p{color:var(--ink-dim);font-size:14px;line-height:1.55;margin:0;max-width:40ch}
+  .foot .links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot .links a{color:var(--ink-dim);font-size:14px;transition:color .2s}
+  .foot .links a:hover{color:var(--ink)}
+  .bottom{max-width:1100px;margin:30px auto 0;padding-top:22px;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;
+    color:var(--ink-mute);font-size:12.5px}
+
+  /* ---------- responsive ---------- */
+  @media (min-width: 760px){
+    section{padding:110px 32px}
+    .hero{padding-top:64px}
+    .hero-grid{flex-direction:row;text-align:left;justify-content:space-between;align-items:center;gap:60px}
+    .hero-grid > div:first-child{flex:1;max-width:560px}
+    .hero .logo-mark{margin:0 0 28px}
+    .hero .sub{margin:24px 0 0}
+    .hero .cta{margin:32px 0 0;flex-direction:row;max-width:none}
+    .hero .cta .btn{width:auto}
+    .hero .signal{justify-content:flex-start}
+    .phone{width:320px}
+    .steps, .why-grid{grid-template-columns:repeat(3,1fr);gap:18px}
+    .showcase-grid{flex-direction:row;text-align:left;justify-content:space-between;align-items:center;gap:80px}
+    .showcase .text{order:1;flex:1;max-width:520px}
+    .showcase .phone{order:2}
+    .showcase p.lead{margin:18px 0 0}
+    .pros-card{padding:64px 50px 56px}
+    .pros-card .cta .btn{width:auto}
+    .foot{flex-direction:row;justify-content:space-between;align-items:center;gap:40px}
+    .foot .col1{max-width:340px}
+    .foot .links{justify-content:flex-end}
+  }
+</style>
+</head>
+<body>
+
+<!-- ========= NAV ========= -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand" aria-label="Filo">
+      <span class="mark"><img src="/landing/filo-logo.png" alt=""></span>
+      <span>filo</span>
+    </a>
+    <div class="nav-cta">
+      <a href="https://filo.network/register" class="btn btn-primary btn-sm">Registrati <span class="arrow">→</span></a>
+    </div>
+  </div>
+</header>
+
+<!-- ========= HERO ========= -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="logo-mark"><img src="/landing/filo-logo.png" alt="Logo Filo"></div>
+        <h1>
+          <span>Il passaparola</span>
+          <span>diventa <em class="acc">digitale</em>.</span>
+        </h1>
+        <p class="sub">Trova dentisti, avvocati, idraulici e commercialisti grazie alle <strong style="color:var(--ink);font-weight:600">raccomandazioni di chi conosci</strong>. Niente recensioni anonime: solo nomi reali, dalla tua rete.</p>
+        <div class="cta">
+          <a href="https://filo.network/register" class="btn btn-primary">Inizia gratis <span class="arrow">→</span></a>
+          <a href="#come-funziona" class="btn btn-secondary">Come funziona</a>
+        </div>
+        <div class="signal">
+          <span class="avs" aria-hidden="true">
+            <span style="background:#ff8a3d">AF</span>
+            <span style="background:#c2c8ff">MR</span>
+            <span style="background:#2ddfb0">GC</span>
+            <span style="background:#f1d56a">LS</span>
+          </span>
+          <span>2.400+ italiani già su Filo</span>
+        </div>
+      </div>
+
+      <div class="phone" aria-hidden="true">
+        <div class="phone-screen">
+          <img src="/landing/screenshot-nuova-raccomandazione.png" alt="Schermata Nuova raccomandazione di Filo">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= COME FUNZIONA ========= -->
+<section id="come-funziona">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Tre gesti. <em class="acc">Zero finto</em>.</h2>
+      <p class="lead">Ogni raccomandazione su Filo ha un nome e una faccia. Funziona così.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"></path>
+          </svg>
+        </div>
+        <div class="num">01 · Raccomanda</div>
+        <h3>Scrivi <em>un nome</em>.</h3>
+        <p>Il dentista che ti ha salvato il molare, l'avvocato che ti ha fatto risparmiare. Aggiungi una nota: cosa ha fatto, perché lo consigli.</p>
+      </div>
+
+      <div class="step">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <circle cx="5" cy="6" r="2"></circle><circle cx="19" cy="6" r="2"></circle>
+            <circle cx="5" cy="18" r="2"></circle><circle cx="19" cy="18" r="2"></circle>
+            <path d="m6.5 7.5 3.5 3"></path><path d="m17.5 7.5-3.5 3"></path>
+            <path d="m6.5 16.5 3.5-3"></path><path d="m17.5 16.5-3.5-3"></path>
+          </svg>
+        </div>
+        <div class="num">02 · Filo</div>
+        <h3>La tua rete <em>la vede</em>.</h3>
+        <p>I tuoi contatti — e i contatti dei tuoi contatti — trovano la raccomandazione quando cercano. Più sei vicino, più peso ha.</p>
+      </div>
+
+      <div class="step">
+        <div class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
+          </svg>
+        </div>
+        <div class="num">03 · Scopri</div>
+        <h3>Cerca, <em>trova</em>, chiama.</h3>
+        <p>Hai bisogno di un commercialista? Filo ti mostra prima chi è stato raccomandato dai tuoi. Solo nomi reali.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= PERCHÉ ========= -->
+<section id="perche">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Perché funziona <em class="acc">davvero</em>.</h2>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M5 21a7 7 0 0 1 14 0"></path></svg>
+        </div>
+        <h3>Solo <em>persone reali</em>.</h3>
+        <p>Su Filo si entra con la propria identità. Niente bot, niente nickname anonimi, niente cinque stelle a pioggia.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="12" cy="12" r="8"></circle><path d="M12 4v4M12 16v4M4 12h4M16 12h4"></path></svg>
+        </div>
+        <h3>La <em>tua</em> rete.</h3>
+        <p>Vedi chi ti ha consigliato cosa, e a che distanza nella rete. Amico diretto, amico di amico, terzo grado. Si ferma lì.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"></path></svg>
+        </div>
+        <h3>Solo <em>positivo</em>.</h3>
+        <p>Si raccomanda, non si stronca. Se uno non ti convince, semplicemente non lo metti sul tuo filo. Punto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= SHOWCASE (feed screen) ========= -->
+<section class="showcase">
+  <div class="wrap">
+    <div class="showcase-grid">
+      <div class="text">
+        <h2>I consigli dei tuoi, <em>in un posto solo</em>.</h2>
+        <p class="lead">Apri Filo, scorri il feed: vedi chi nella tua rete ha consigliato un dentista, un personal trainer, un medico. Con foto, città, fascia di prezzo. E una nota personale.</p>
+      </div>
+
+      <div class="phone" aria-hidden="true">
+        <div class="phone-screen">
+          <img src="/landing/screenshot-showcase.png" alt="Schermata Home di Filo con raccomandazioni">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= SOCIAL PROOF ========= -->
+<section class="proof">
+  <div class="wrap">
+    <div class="quote-card">
+      <div class="qmark" aria-hidden="true">"</div>
+      <div class="q">Ho trovato il mio <em>fisioterapista</em> grazie a una collega del coro. Su Filo si capisce subito chi è bravo davvero — non chi paga le recensioni.</div>
+      <div class="author">
+        <div class="av">CR</div>
+        <div>
+          <span class="name">Chiara Romano</span>
+          <span class="role">Fisioterapista · Bologna</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="counters">
+      <div class="counter">
+        <div class="n" data-target="2400">0</div>
+        <div class="l">Italiani attivi</div>
+      </div>
+      <div class="counter">
+        <div class="n" data-target="850">0</div>
+        <div class="l">Professionisti raccomandati</div>
+      </div>
+      <div class="counter">
+        <div class="n" data-target="92" data-suffix="%">0%</div>
+        <div class="l">Trova dalla propria rete</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= PROFESSIONISTI ========= -->
+<section class="pros" id="professionisti">
+  <div class="wrap">
+    <div class="pros-card">
+      <span class="badge">Sei un professionista?</span>
+      <h2>Il tuo lavoro <em>parla per te</em>.</h2>
+      <p>Su Filo non ti promuovi tu: ti promuove chi ti ha conosciuto davvero. Nessun abbonamento, nessun annuncio sponsorizzato. Solo il passaparola dei tuoi clienti, finalmente cercabile.</p>
+      <ul class="pros-points">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg><span>Profilo verificato, sempre gratuito.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg><span>Vedi chi e quante persone ti raccomandano.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg><span>Ringrazia chi ti ha consigliato con un click.</span></li>
+      </ul>
+      <div class="cta">
+        <a href="https://filo.network/register" class="btn btn-primary">Iscriviti come professionista <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========= FOOTER ========= -->
+<footer>
+  <div class="foot">
+    <div class="col1">
+      <a href="#top" class="brand">
+        <span class="mark"><img src="/landing/filo-logo.png" alt=""></span>
+        <span>filo</span>
+      </a>
+      <p style="margin-top:14px">Il social network della fiducia. Trova professionisti grazie alle raccomandazioni di chi conosci.</p>
+    </div>
+    <nav class="links">
+      <a href="#come-funziona">Come funziona</a>
+      <a href="#perche">Perché</a>
+      <a href="#professionisti">Professionisti</a>
+      <a href="https://filo.network/login">Accedi</a>
+    </nav>
+  </div>
+  <div class="bottom">
+    <span>© 2026 Filo · Made in Italy</span>
+    <nav class="links" style="gap:18px">
+      <a href="#">Privacy</a>
+      <a href="#">Termini</a>
+      <a href="#">Cookie</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+  // counter animations
+  function animateCount(el){
+    const target = +el.dataset.target;
+    const suffix = el.dataset.suffix || '';
+    const dur = 1400;
+    const start = performance.now();
+    function tick(now){
+      const t = Math.min(1, (now - start) / dur);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const v = Math.floor(target * eased);
+      el.textContent = (target >= 1000 ? v.toLocaleString('it-IT') : v) + suffix;
+      if(t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        animateCount(e.target);
+        io.unobserve(e.target);
+      }
+    });
+  }, {threshold: .4});
+  document.querySelectorAll('.counter .n').forEach(el => io.observe(el));
+</script>
+
+
+</body></html>

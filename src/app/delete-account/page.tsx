@@ -2,32 +2,49 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Elimina account — Filo",
+  title: "Elimina il tuo account Filo",
   description:
     "Istruzioni per eliminare il tuo account Filo e tutti i dati associati.",
+  alternates: { canonical: "https://filo.network/delete-account" },
 };
 
 export default function DeleteAccountPage() {
   return (
-    <div className="min-h-screen bg-background text-white">
+    <div className="min-h-svh bg-background text-white">
       {/* Header */}
-      <header className="border-b border-white/5">
-        <div className="mx-auto flex max-w-2xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-sm text-muted-foreground transition hover:text-white">
-            ← Torna a Filo
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-5">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm text-muted-foreground transition hover:text-white"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              className="h-4 w-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
+            </svg>
+            Torna a Filo
           </Link>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/filo-logo-v2.png"
             alt="Filo"
             className="h-8 w-auto object-contain"
-           
           />
         </div>
       </header>
 
-      <main className="mx-auto max-w-2xl px-6 py-12">
-        {/* Hero */}
+      <main className="mx-auto max-w-2xl px-5 pb-24 pt-10">
+
+        {/* Icon + title */}
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10">
           <svg
             viewBox="0 0 24 24"
@@ -45,29 +62,44 @@ export default function DeleteAccountPage() {
         </div>
 
         <h1 className="mt-6 text-3xl font-bold tracking-tight">
-          Elimina il tuo account
+          Elimina il tuo account Filo
         </h1>
-        <p className="mt-3 text-subdued">
-          Puoi eliminare il tuo account Filo in qualsiasi momento direttamente
-          dall&apos;app. L&apos;eliminazione è permanente e rimuove tutti i
-          dati associati al tuo profilo.
+        <p className="mt-3 text-sm leading-relaxed text-subdued">
+          Se desideri eliminare il tuo account Filo e tutti i dati associati,
+          puoi farlo direttamente dall&apos;app:
         </p>
 
-        {/* Warning box */}
-        <div className="mt-8 rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
+        {/* Steps */}
+        <ol className="mt-8 space-y-5">
+          {[
+            { n: "1", text: "Apri Filo" },
+            { n: "2", text: "Vai su Profilo → Impostazioni (icona ingranaggio)" },
+            { n: "3", text: "Scorri in fondo e tocca \u2018Elimina account\u2019" },
+            { n: "4", text: "Conferma l\u2019eliminazione" },
+          ].map((step) => (
+            <li key={step.n} className="flex items-center gap-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
+                {step.n}
+              </div>
+              <p className="text-sm text-white">{step.text}</p>
+            </li>
+          ))}
+        </ol>
+
+        {/* What gets deleted */}
+        <div className="mt-10 rounded-2xl border border-red-500/20 bg-red-500/5 p-5">
           <p className="text-sm font-semibold text-red-400">
-            Cosa viene eliminato definitivamente:
+            Tutti i tuoi dati verranno eliminati permanentemente entro 30
+            giorni, inclusi:
           </p>
-          <ul className="mt-3 space-y-1.5 text-sm text-subdued">
+          <ul className="mt-3 space-y-1.5">
             {[
-              "Il tuo profilo e tutte le informazioni personali",
-              "Tutte le raccomandazioni che hai pubblicato",
-              "Commenti, like e contenuti salvati",
-              "Le connessioni (seguiti e follower)",
-              "Richieste di consiglio e risposte",
-              "Notifiche e dati di utilizzo",
+              "Profilo e foto",
+              "Raccomandazioni pubblicate",
+              "Commenti e like",
+              "Lista di persone seguite",
             ].map((item) => (
-              <li key={item} className="flex items-start gap-2">
+              <li key={item} className="flex items-start gap-2 text-sm text-subdued">
                 <span className="mt-0.5 shrink-0 text-red-500">×</span>
                 {item}
               </li>
@@ -75,70 +107,33 @@ export default function DeleteAccountPage() {
           </ul>
         </div>
 
-        {/* Steps */}
-        <div className="mt-10">
-          <h2 className="text-lg font-semibold">Come eliminare l&apos;account</h2>
-          <ol className="mt-4 space-y-4">
-            {[
-              {
-                n: "1",
-                title: "Accedi a Filo",
-                body: 'Apri l\'app e accedi con il tuo account.',
-              },
-              {
-                n: "2",
-                title: "Vai alle Impostazioni",
-                body: 'Dal tuo profilo, tocca l\'icona ⚙ in alto a destra per aprire le Impostazioni.',
-              },
-              {
-                n: "3",
-                title: 'Tocca "Elimina account"',
-                body: 'Scorri fino in fondo alla pagina delle Impostazioni e tocca il bottone rosso "Elimina account".',
-              },
-              {
-                n: "4",
-                title: "Conferma l'eliminazione",
-                body: 'Leggi il messaggio di avviso e tocca "Elimina tutto" per confermare. L\'operazione è irreversibile.',
-              },
-            ].map((step) => (
-              <li key={step.n} className="flex gap-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-sm font-bold text-primary">
-                  {step.n}
-                </div>
-                <div>
-                  <p className="font-semibold text-white">{step.title}</p>
-                  <p className="mt-0.5 text-sm text-subdued">{step.body}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-10 rounded-2xl border border-border bg-card p-6 text-center">
-          <p className="text-sm text-subdued">
-            Hai già un account e vuoi eliminarlo adesso?
+        {/* Email fallback */}
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6">
+          <p className="text-sm font-semibold text-white">
+            Non riesci ad accedere all&apos;app?
           </p>
-          <Link
-            href="/settings"
-            className="mt-4 inline-flex h-12 items-center justify-center rounded-2xl bg-red-600 px-8 text-sm font-semibold text-white transition hover:bg-red-700"
-          >
-            Vai alle Impostazioni → Elimina account
-          </Link>
+          <p className="mt-2 text-sm leading-relaxed text-subdued">
+            Puoi richiedere l&apos;eliminazione inviando un&apos;email a{" "}
+            <a
+              href="mailto:filo.networks@gmail.com"
+              className="text-primary underline underline-offset-2 hover:text-teal-400"
+            >
+              filo.networks@gmail.com
+            </a>{" "}
+            dal tuo indirizzo email registrato.
+          </p>
         </div>
 
         {/* Contact */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Hai bisogno di aiuto?{" "}
-            <a
-              href="mailto:filo.networks@gmail.com"
-              className="text-primary transition hover:underline"
-            >
-              filo.networks@gmail.com
-            </a>
-          </p>
-        </div>
+        <p className="mt-8 text-center text-sm text-subdued">
+          Per qualsiasi domanda scrivi a{" "}
+          <a
+            href="mailto:filo.networks@gmail.com"
+            className="text-primary underline underline-offset-2 hover:text-teal-400"
+          >
+            filo.networks@gmail.com
+          </a>
+        </p>
       </main>
     </div>
   );

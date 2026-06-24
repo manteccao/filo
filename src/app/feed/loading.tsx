@@ -1,4 +1,4 @@
-import { BottomNav } from "@/components/BottomNav";
+2import { BottomNav } from "@/components/BottomNav";
 
 function SkeletonCard({ opacity = 1 }: { opacity?: number }) {
   return (

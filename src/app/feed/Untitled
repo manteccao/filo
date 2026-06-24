@@ -1,0 +1,105 @@
+Ora dobbiamo ottimizzare la SEO della landing in public/landing/index.html.
+La landing è già online in locale e funziona — questo è solo un passaggio 
+di miglioramento prima del deploy.
+
+═══════════════════════════════════════════════
+OBIETTIVO STRATEGICO
+═══════════════════════════════════════════════
+
+Filo deve farsi trovare su Google da chi cerca professionisti per categoria 
+(dentista, avvocato, idraulico, commercialista, ecc.) in Italia. 
+Il differenziatore è: "raccomandati da persone che conosci", non recensioni anonime.
+Target geografico: Italia, focus iniziale Torino.
+
+═══════════════════════════════════════════════
+COSA DEVI FARE
+═══════════════════════════════════════════════
+
+Lavora SOLO su public/landing/index.html (non toccare nient'altro del progetto).
+Procedi step by step, fermandoti a chiedermi conferma tra i blocchi grossi.
+
+BLOCCO 1 — Meta tag fondamentali (fai e mostrami il diff):
+  a) Riscrivi <title> in modo che contenga le parole chiave dell'intento di 
+     ricerca (dentisti, avvocati, professionisti, raccomandati) ma resti sotto 
+     i 70 caratteri. Proponi 2-3 varianti e fammi scegliere.
+  b) Riscrivi la meta description (150-200 caratteri) con parole chiave forti.
+     Proponi 2 varianti e fammi scegliere.
+  c) Aggiungi <link rel="canonical" href="https://filo.network/">
+  d) Aggiungi <meta name="robots" content="index,follow">
+  e) Aggiungi <meta name="author"> e <meta name="keywords"> con le categorie 
+     principali (dentista, avvocato, idraulico, commercialista, notaio, 
+     architetto, fisioterapista, ecc.)
+  f) Aggiungi <link rel="apple-touch-icon"> usando filo-logo.png
+  g) Aggiungi <meta name="apple-mobile-web-app-title" content="Filo">
+
+FERMATI E ASPETTA CONFERMA.
+
+BLOCCO 2 — Open Graph + Twitter Card:
+Aggiungi tutti i tag OG e Twitter Card per anteprime corrette su WhatsApp, 
+Facebook, LinkedIn, X. 
+- og:type, og:url, og:title, og:description, og:locale (it_IT), og:site_name
+- og:image dovrebbe puntare a un'immagine 1200x630. Per ora NON ce l'abbiamo: 
+  usa filo-logo.png come fallback e ricordami nel riepilogo finale che 
+  serve generare una OG image dedicata 1200x630.
+- twitter:card = summary_large_image, twitter:title, twitter:description, 
+  twitter:image
+
+FERMATI E ASPETTA CONFERMA.
+
+BLOCCO 3 — JSON-LD strutturato (Schema.org):
+Aggiungi blocchi <script type="application/ld+json"> con:
+  a) Schema "Organization" per Filo (nome, url, logo, sameAs con social)
+  b) Schema "WebSite" con SearchAction (potenzialmente abilita il search box 
+     di Google nei risultati). L'URL di ricerca interno è 
+     https://filo.network/search?q={search_term_string}
+  c) Schema "Service" o "ProfessionalService" che elenca le categorie 
+     di professionisti coperte da Filo
+
+Per riempire questi blocchi mi servono da te alcune info — CHIEDIMELE PRIMA 
+DI SCRIVERE IL CODICE:
+- Nome legale dietro Filo (sono persona fisica? società? uso solo "Filo"?)
+- URL dei social media ufficiali di Filo (Instagram, TikTok, LinkedIn) 
+  o se non esistono ancora
+- Email di contatto pubblica (es. info@filo.network) — esiste?
+
+FERMATI, FAMMI LE DOMANDE, ASPETTA LE MIE RISPOSTE, POI SCRIVI IL CODICE.
+
+BLOCCO 4 — File ausiliari nella root di public/:
+  a) Crea public/robots.txt con regole sensate:
+     - Allow: / 
+     - Disallow: /api/, /auth/, /settings/, /onboarding/
+     - Sitemap: https://filo.network/sitemap.xml
+  b) Crea public/sitemap.xml con le pagine pubbliche principali. 
+     Esplora src/app/ per trovare quali rotte sono effettivamente 
+     pubbliche (non protette da auth) e includi solo quelle. 
+     Mostrami la lista PRIMA di scrivere il file e fammi confermare.
+
+FERMATI E ASPETTA CONFERMA.
+
+BLOCCO 5 — Ottimizzazione immagini (solo se hai sharp o un tool simile 
+disponibile nel progetto, altrimenti salta e segnalalo):
+  - Converti public/landing/filo-logo.png (853 KB) in WebP, salva come 
+    filo-logo.webp accanto al PNG.
+  - Aggiorna l'HTML per usare <picture> con WebP + fallback PNG.
+  - Stessa cosa per gli altri due screenshot se ha senso.
+  Se non hai sharp installato, NON installarlo di iniziativa: dimmi solo 
+  che andrebbe fatto e come (comando esatto da lanciare).
+
+BLOCCO 6 — Riepilogo finale:
+Dopo aver completato tutto, fammi un riepilogo con:
+  - Cosa è stato modificato
+  - Cosa NON è stato fatto e perché (eventuali asset mancanti, tool mancanti)
+  - Cosa devo fare io manualmente prima del deploy (es. generare OG image)
+  - Come verificare in locale (URL + tool consigliati: validator.w3.org, 
+    cards-dev.twitter.com/validator, opengraph.xyz, schema.org/validator)
+
+═══════════════════════════════════════════════
+REGOLE
+═══════════════════════════════════════════════
+
+- Lavora SOLO sui file dentro public/. Non toccare src/, next.config.ts, 
+  Supabase, niente.
+- Mantieni l'attuale design grafico INTATTO — la SEO deve essere invisibile 
+  all'utente.
+- Non installare dipendenze nuove senza chiedere.
+- Se trovi qualcosa di inaspettato, fermati e chiedi.
